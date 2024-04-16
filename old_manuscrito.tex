@@ -1,0 +1,406 @@
+\documentclass[a4paper,twoside,openright]{book}
+
+
+% \usepackage{fullpage}
+\usepackage[margin=1.1in]{geometry}
+
+
+%% Spanska!
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}    % 8-bit encoding. Acentuados como único caracter.
+\usepackage[spanish, es-tabla]{babel}
+\def\spanishoptions{argentina}
+
+
+%% inclusión de gráficas
+\usepackage[pdftex]{graphicx}           % instalar ghostscript-x para que el dvi muestre los eps
+% \usepackage{graphicx}           % instalar ghostscript-x para que el dvi muestre los eps
+\graphicspath{ {./graphs/} {../}}
+\usepackage{epstopdf}
+
+
+%% tablas: multirow
+\usepackage{multirow}
+\usepackage{booktabs}
+
+
+%% Matemática
+\usepackage{amsmath}
+
+
+%% Subfloats
+\usepackage{subcaption}
+% \usepackage{subfig} % deprecated https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
+
+
+% Interlineado 1,5
+% \renewcommand{\baselinestretch}{1.5}
+\renewcommand{\baselinestretch}{1.7}
+
+
+%% encadezado páginas
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% with this we ensure that the chapter and section
+% headings are in lowercase.
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{} % delete current setting for header and footer
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\bfseries\rightmark}
+\fancyhead[RE]{\bfseries\leftmark}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+%\addtolength{\headheight}{3.58337pt} % make space for the rule
+\addtolength{\headheight}{15.2pt} % make space for the rule
+\fancypagestyle{plain}{%
+\fancyhead{} % get rid of headers on plain pages
+\renewcommand{\headrulewidth}{0pt} % and the line
+}
+
+
+%% environment abstract para documentclass book
+\newenvironment{abstract}%
+{\cleardoublepage\null \vfill\begin{center}%
+\thispagestyle{empty}
+\bfseries \abstractname \end{center}}%
+{\vfill\null}
+
+
+%% Biblatex
+%\usepackage[hyperref=true,
+%	url=false,
+%	isbn=false,
+%	backref=true,
+%	% style=custom-numeric-comp,
+%	style=numeric,
+%	citereset=chapter,
+%	maxcitenames=7,
+%	maxbibnames=100,
+%	block=none,
+%	sorting=none,
+%	backend=biber]{biblatex}
+%\DefineBibliographyStrings{spanish}{}
+%\usepackage{textgreek}	% http://tex.stackexchange.com/questions/107352/non-ascii-characters-in-biblatex
+%\usepackage{csquotes}
+%% no urldate
+%\DeclareSourcemap{
+%  \maps[datatype=bibtex]{
+%    \map[overwrite=true]{
+%      \step[fieldset=urldate, null]
+%    }
+%  }
+%}
+%\addbibresource{thesis.bib}
+
+
+%% biblatex
+\usepackage[style=numeric, backend=biber, sorting= none, url= false, maxnames=20]{biblatex}
+\DefineBibliographyStrings{spanish}{}
+\usepackage{csquotes}
+\usepackage{textgreek} % https://tex.stackexchange.com/questions/107352/non-ascii-characters-in-biblatex 
+\addbibresource{bucher thesis.bib}
+\addbibresource{NLFO-PCFs.bib}
+\addbibresource{Secure Optical Network.bib}
+
+
+%% Nomenclatura
+\usepackage[spanish, intoc]{nomencl}
+\makenomenclature
+
+
+%% URLs
+\usepackage{color}
+\definecolor{DarkBlue}{rgb}{0,0,0.4}
+\usepackage[hidelinks]{hyperref}
+% \usepackage[colorlinks=true,urlcolor=DarkBlue]{hyperref}
+% \usepackage{url}
+
+
+%% Unidades
+\usepackage[locale=FR, per-mode=fraction, separate-uncertainty=true]{siunitx}
+\newcommand{\unit}[1]{\ensuremath{\, \mathrm{#1}}}	% ¿Que hace esto?
+\sisetup{detect-all}	% ¿Que hace esto?
+
+
+%% para doublebox linkSim
+\usepackage{fancybox}
+
+
+%% reinicio del contador de capítulos ante \part
+%% https://tex.stackexchange.com/questions/35782/how-to-split-a-latex-document-using-parts-and-chapters
+%% Comment the following to have chapters numbered without interruption (numbering through parts)
+\makeatletter\@addtoreset{chapter}{part}\makeatother%
+
+
+\setcounter{tocdepth}{2}	%% tabla de contenidos hasta nivel 3
+% \setcounter{tocdepth}{1}	%% tabla de contenidos hasta nivel 2
+
+
+%% \textsubscript \textsuperscript
+\usepackage{changes}
+% \usepackage{fixltx2e} 
+
+
+%% Glosario
+\usepackage[acronym,toc,nonumberlist,translate=babel]{glossaries}
+\setacronymstyle{short-long-desc}
+\include{glosario}
+\makeglossaries
+
+
+
+\begin{document}
+
+%% paginas titulo según
+%% http://www.df.uba.ar/academica/carrera-de-doctorado/pautas
+\begin{titlepage}
+	\begin{center}
+		\includegraphics[width=0.25\textwidth]{Logo}\\[1cm]
+		\textbf{\LARGE Universidad de Buenos Aires}\\
+		Facultad de Ciencias Exactas y Naturales\\
+		%Departamento de Física\\[1cm]
+  \textit{
+		\textbf{Monitoreo cruzado de escalas de tiempo atómico nacionales\\
+		Extensión del rango temporal de}}\\
+		% \textbf{Simulación de capa física de red óptica pasiva encriptada}\\[1cm]
+		Trabajo final de la Especilización\\
+		% Doctor de la Universidad de Buenos Aires en el área Ciencias Físicas\\[1cm]
+		\textit{\textbf{Víctor A. Bettachini}}\\[1cm]
+		% por \textit{\textbf{Víctor A. Bettachini}}\\[1cm]
+	\end{center}
+		Director de Tesis: \\
+		%Director de Tesis: Dr. Diego Fernando Grosz\\
+		%Director Asistente: Dr. José Ignacio Álvarez-Hamelin\\
+		%Consejera de Estudios: Dra. Victoria Bekeris\\[1cm]
+		%Lugar de Trabajo: Laboratorio de Optoelectrónica\\
+		%\hspace{3.9cm} Instituto Tecnológico de Buenos Aires\\[1cm]
+		\textit{\textbf{xx de xx de 2024}}
+\end{titlepage}
+
+\newpage
+\thispagestyle{empty}
+% \begin{abstract}
+% 	Blah.
+% \end{abstract}
+
+%% A continuación de la Carátula, debe figurar un resumen del trabajo, junto con palabras claves asociadas.
+% \thispagestyle{empty}
+\begin{abstract}
+	Blah.
+\end{abstract}
+Palabras clave?
+
+\newpage
+\thispagestyle{empty}
+%% Luego, en página aparte, el título de la Tesis, el resumen y las palabras claves, traducido al inglés.	
+{\cleardoublepage\null \vfill\begin{center}%
+\thispagestyle{empty}
+\bfseries Abstract \end{center}}%
+{\vfill\null}
+Keywords?
+
+\newpage
+\thispagestyle{empty}
+
+\tableofcontents
+
+% Print your own papers.
+\chapter{Publicaciones y presentaciones del autor}
+Las siguientes son publicaciones y presentaciones en conferencias en las que dan sustente a sendas partes que componen esta tesis.
+
+\section*{Parte I}
+\cite{caldarola_fuente_2009}
+\cite{caldarola_fuente_2010-1}
+\cite{rieznik_pcf-based_2010}
+\cite{rieznik_optimum_2012}
+\cite{caldarola_high-speed_2012}
+
+
+\section*{Parte II} 
+\cite{ortega_point--point_2011}
+\cite{ortega_altas_2010}
+\cite{ortega_cdma_2012}
+\cite{ortega_hamming-weight_2012}
+\cite{alvarez-hamelin_device_2013} % Patente
+\cite{ortega_encrypted_2014}
+
+
+\section*{Durante el doctorado no relacionadas} 
+\cite{pasquini_memory_2007}
+\cite{beget_sailhflood:_2013}
+
+
+
+%\begin{refsection}
+%% If you print a bibliography within this section, only citations within this refsection will be printed.
+%
+%% Option 1: Make nocite for all of your papers.
+%% Options 2 would be a seperate file which contains all of your papers.
+%%\section*{Parte I}
+%\cite{caldarola_fuente_2009}
+%\cite{caldarola_fuente_2010-1}
+%\cite{rieznik_pcf-based_2010}
+%\cite{rieznik_optimum_2012}
+%\cite{caldarola_high-speed_2012}
+%
+%% \section*{Parte II} 
+%\cite{ortega_point--point_2011}
+%\cite{ortega_altas_2010}
+%\cite{ortega_cdma_2012}
+%\cite{ortega_hamming-weight_2012}
+%\cite{alvarez-hamelin_device_2013} % Patente
+%\cite{ortega_encrypted_2014}
+%
+%% \section*{Durante el doctorado no relacionadas} 
+%\cite{pasquini_memory_2007}
+%\cite{beget_sailhflood:_2013}
+%
+%\defbibnote{myPrenote}{
+%	Esta tesis se basa en las siguientes publicaciones.
+%%	y presentaciones y publicaciones del autor separadas por su relación a la temática de la primer o segunda parte.
+%}
+%%\defbibnote{myPostnote}{
+%%	A bunch of papers are still in print and not yet published.
+%%}
+%\printbibliography[
+% heading=bibintoc,
+%	title={Contribuciones del autor},
+% prenote=myPrenote,
+% %postnote=myPostnote
+%]
+%\end{refsection}
+%
+
+
+
+
+\printglossaries
+
+%% Sección de nomenclatura
+%% makeindex phdthesis.nlo -s nomencl.ist -o phdthesis.nls
+% \printnomenclature
+% \chapter*{Simbología utilizada\markboth{Simbología utilizada}{Simbología utilizada}}
+% \addcontentsline{toc}{chapter}{Simbología utilizada}
+% \begin{description}
+% 	\item[$a_{\Delta}$:] \emph{Parámetro de la red triangular de vórtices}. Longitud de los vectores de la celda unidad de una red bidimensional de \emph{Bravais} triangular (o hexagonal).
+% \end{description}
+
+
+\newpage
+\thispagestyle{empty}
+
+\chapter{Preámbulo: dos lineas de trabajo... ¿y su unión?}
+Presentar las dos lineas de trabajo.
+Algún argumento de posible unión.
+Explicar que finalmente no se se unieron y se presentan en la tesis por separado.
+
+
+\mainmatter
+
+\part{Fuente de pulsos ultra cortos sintonizable en longitud de onda}
+
+% the scientific background of your work
+% Introducción
+\include{sci_Background}
+
+% the goals posed
+% dentro de Introducción
+
+% the experimental and theoretical methods applied
+% Modelo teórico
+\include{theory}
+
+% Simulación
+\include{simulacion}
+
+% Experimento
+\input{setup}	% ESTA ES LA FORMA CORRECTA, INCLUYENDO \chapter dentro del archivo
+
+% the results and
+\chapter{Resultados}
+
+% \chapter{Demostración experimental de sintonización rápida en el infrarojo (2012PapersInPhyics)}
+\input{2012_PapersInPhysics}
+
+% \chapter{Simulación de filtrado de pulsos visibles (2010_NP10)}
+\input{2010_NP10}
+
+% \chapter{Simulación de control de pulsos visible e infrarojos}
+\input{twoPulses}
+
+% their evaluation as well as
+% an appropriate summary
+
+% \chapter{¿Qué se logró y qué queda pendiente?}
+\input{balance_Pendientes}
+
+
+
+
+
+\part{Red óptica de acceso con seguridad en capa física}
+
+
+\chapter{CDMA y concepto sustentando la idea}
+
+% \chapter{Código de simulación del \emph{link}}
+% Volcar escrito sobre código \emph{noisesim}.
+
+\input{redOptica}
+
+\input{linkSim}
+
+\chapter{Resultados de simulación}
+
+\chapter{Desarrollos posteriores - Implementación física}
+\section{Implementación en FPGA}
+\section{Implementación en sonido}
+
+
+% \include{test}
+
+\part{Apendices}
+\appendix 
+
+
+%% Print your own papers.
+%\begin{refsection}
+%% If you print a bibliography within this section, only citations within this refsection will be printed.
+%
+%% Option 1: Make nocite for all of your papers.
+%% Options 2 would be a seperate file which contains all of your papers.
+%\nocite{caldarola_fuente_2009}
+%\cite{caldarola_fuente_2010}
+%
+%
+%\defbibnote{myPrenote}{
+%    Some words before I show you the list of my own papers.
+%}
+%\defbibnote{myPostnote}{
+%    A bunch of papers are still in print and not yet published.
+%}
+%\printbibliography[
+%    heading=bibintoc,
+%    title={Publicaciones y presentaciones relacionadas a la tesis bib},
+%    prenote=myPrenote,
+%    postnote=myPostnote
+%]
+%\end{refsection}
+
+%% HAY QUE HACERLO
+
+%% bibliografía
+\printbibliography[heading=bibintoc]
+
+\printglossaries
+
+\backmatter
+% \chapter{Glosario}
+
+
+
+\chapter{Agradecimientos}
+% \chapter{Agradecimientos\markboth{Agradecimientos}{Agradecimientos}}
+
+\end{document}
