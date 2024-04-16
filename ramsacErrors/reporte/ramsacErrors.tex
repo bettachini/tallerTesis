@@ -1,0 +1,73 @@
+\documentclass[11pt,spanish,a4paper]{article}
+
+\input{introModerno}
+
+%% biblatex
+\usepackage[style = numeric, backend = biber, sorting = none, doi = false, isbn = false, url = true]{biblatex}
+% \usepackage[defernumbers = true, style = numeric, backend = biber, sorting = none, doi = false, isbn = false, url = true]{biblatex}
+% \usepackage[style = numeric, backend = biber, sorting = none]{biblatex}    % REFERENCIAS como section
+\AtEveryBibitem{
+    \clearfield{urlyear}
+    \clearfield{urlmonth}
+} % Do not show the "(visited on <date>)" on the references
+\DefineBibliographyStrings{spanish}{}
+\usepackage{csquotes}
+\addbibresource{./tallerTesis.bib}
+%\renewcommand*{\bibfont}{\fontsize{9}{12}\selectfont}
+
+
+\begin{document}
+\begin{center}
+  \textsc{\large Taller de tesis I 2024 | Entrega I}\\
+	Contrastación del procesamiento de red RAMSAC
+\end{center}
+
+
+\section*{Conjunto de datos}
+
+Los desplazamientos de la corteza terrestre pueden determinarse registrando las posiciones relativas entre las órbitas de los sistemas satelitales de navegación global (GNSS) y estaciones terrestres fijas.
+Con este fin el Centro de Investigaciones Geodéticas Aplicadas (CIGA) del Instituto Geográfico Nacional (IGN) procesa datos de fase de la señal GNSS para cada estación de la red nacional RAMSAC y otras en latinoamérica \cite{noauthor_centro_nodate}.
+Con estos se genera una serie de tiempo en los que pueden presentarse apartamientos repentinos de la tendencia histórica.
+La presencia de resultados por fuera de \(3 \sigma\) de la misma lleva a una contrastación visual de la serie con otra generada tras un procesamiento similar por parte del Nevada Geodetic Laboratory \cite{noauthor_magnet_nodate}.
+Si estas, en opinión del observador, ``no coinciden'' se asigna el apartamiento de la tendencia a un fenómeno atribuible al procesamiento y se repite este análisis tras recibir una más exacta determinación de las órbitas de los satélites GNSS producto de observaciones de técnicas como Satellite Laser Ranging \cite{noauthor_aggo_nodate}. 
+
+Para esta propuesta de trabajo de tesis se cuenta con un histórico de series temporales de desplazamientos de estaciones terrestres de la red RAMSAC producto del procesamiento del IGN así como para casos ``coincidentes'' como los que no.
+
+
+
+%solución rápida de la posición de las estaciones terrestres que permite usualmente permite en una serie temporal detectar fuentes de error esporádicas, e.g. golpes de viento que mueva una antena.
+
+
+%En adición al dato de fase los satélites emiten sus parámetros orbitales lo que permite una determinación rápida de la posición de las estaciones terrestres fijas.
+
+%GAMIT es una colección de programas para procesar datos de fase de las señales de sistemas satelitales de navegación global (GNSS) \cite{noauthor_magnet_nodate}.
+
+%En el Centro de Investigaciones Geodéticas Aplicadas (CIGA) del Instituto Geográfico Nacional (IGN) se lo emplea para estimar posiciones relativas tridimensionales respecto a las órbitas de satélites GNSS de cada una de las estaciones terrestres fijas que conforman su red RAMSAC \cite{noauthor_centro_nodate}. 
+%En adición al dato de fase los satélites emiten sus parámetros orbitales lo que permite una determinación rápida de la posición de las estaciones terrestres fijas.
+%Posterior al procesamiento de observaciones desde tierra con técnicas como SLR se tiene una determinación más exacta de las órbitas.
+
+
+%El conjunto de datos de fase la red RAMSAC del IGN es un conjunto de datos de fase de GPS que se utilizan para estimar posiciones relativas de estaciones terrestres.
+
+
+
+\section*{Pregunta relevante}
+Determinar si puede automatizarse la clasificación de casos como ``coincidentes'' o no, sin conocimiento sobre el criterio de discriminación partiendo solo de ejemplos.
+Responder afirmativamente lo anterior y dejar operativo un mecanismo de clasificación automático ayudaría a aliviar la tarea cotidiana del CIGA del IGN.
+
+
+\section*{Técnicas adecuadas}
+El primer enfoque que se propone es el de análisis estadístico.
+Se comenzaría intentando discriminar con la distancia media cuadrática entre ambas series temporales.
+Luego para encontrar cuando difiero recurrir a un análisis de residuos de la diferencias.
+Otra alternativa es un análisis de correlación, e.g. de Pearson, entre ambas series.
+
+Como alternativa se podrá recurrir a un análisis espectral, a través de una transformada al dominio de la frecuencia.
+
+
+
+% \section*{Referencias}
+\printbibliography[title= Referencias, heading=bibintoc]
+
+
+\end{document}
