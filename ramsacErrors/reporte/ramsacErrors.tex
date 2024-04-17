@@ -19,17 +19,20 @@
 \begin{document}
 \begin{center}
   \textsc{\large Taller de tesis I 2024 | Entrega I}\\
-	Contrastación del procesamiento de red RAMSAC
+	Control de calidad del procesamiento para RAMSAC
 \end{center}
 
 
 \section*{Conjunto de datos}
 
-Los desplazamientos de la corteza terrestre pueden determinarse registrando las posiciones relativas entre las órbitas de los sistemas satelitales de navegación global (GNSS) y estaciones terrestres fijas.
-Con este fin el Centro de Investigaciones Geodéticas Aplicadas (CIGA) del Instituto Geográfico Nacional (IGN) procesa datos de fase de la señal GNSS para cada estación de la red nacional RAMSAC y otras en latinoamérica \cite{noauthor_centro_nodate}.
-Con estos se genera una serie de tiempo en los que pueden presentarse apartamientos repentinos de la tendencia histórica.
-La presencia de resultados por fuera de \(3 \sigma\) de la misma lleva a una contrastación visual de la serie con otra generada tras un procesamiento similar por parte del Nevada Geodetic Laboratory \cite{noauthor_magnet_nodate}.
-Si estas, en opinión del observador, ``no coinciden'' se asigna el apartamiento de la tendencia a un fenómeno atribuible al procesamiento y se repite este análisis tras recibir una más exacta determinación de las órbitas de los satélites GNSS producto de observaciones de técnicas como Satellite Laser Ranging \cite{noauthor_aggo_nodate}. 
+Los desplazamientos de la corteza terrestre pueden determinarse registrando las posiciones relativas entre las órbitas de los sistemas satelitales de navegación global (GNSS) y estaciones receptoras fijas.
+La efemérides satélitales con precisiones milimétricas se publican tras dos semanas de registradas las mediciones.
+Para realizar un control de su calidad previo el Centro de Investigaciones Geodésicas Aplicadas (CIGA) del Instituto Geográfico Nacional (IGN) procesa datos de fase de la señal GNSS para cada estación de la red nacional RAMSAC \cite{noauthor_centro_nodate} utilizando las efemérides transmitidas por el satélite en tiempo real, menos exactas.
+Con estos se genera una serie diaria en los que pueden presentarse apartamientos repentinos de la tendencia histórica.
+La presencia de resultados por fuera de \(3 \sigma\) genera una alerta para observar si tres sucesivos días presentan tal comportamiento.
+En tal caso se realiza una comparación manual con la serie producto del procesamiento del Nevada Geodetic Laboratory realizada con otro código \cite{noauthor_magnet_nodate}.
+Si el apartamiento se ve en ambas series, responde a un evento en la adquisición del dato crudo que se descarta de posteriores procesamientos.
+Si entre ambos procesamientos se observa algún apartamiento que supere los \SI{3}{\milli\metre} esto lleva a un trabajo manual sobre los datos crudos para adecuarles a un posterior re-procesamiento por parte del CIGA. 
 
 Para esta propuesta de trabajo de tesis se cuenta con un histórico de series temporales de desplazamientos de estaciones terrestres de la red RAMSAC producto del procesamiento del IGN así como para casos ``coincidentes'' como los que no.
 
@@ -53,7 +56,7 @@ Para esta propuesta de trabajo de tesis se cuenta con un histórico de series te
 
 \section*{Pregunta relevante}
 Determinar si puede automatizarse la clasificación de casos como ``coincidentes'' o no, sin conocimiento sobre el criterio de discriminación partiendo solo de ejemplos.
-Responder afirmativamente lo anterior y dejar operativo un mecanismo de clasificación automático ayudaría a aliviar la tarea cotidiana del CIGA del IGN.
+Responder afirmativamente lo anterior y dejar operativo un mecanismo de clasificación automático ayudaría a aliviar la tarea cotidiana de RAMSAC del IGN.
 
 
 \section*{Técnicas adecuadas}
