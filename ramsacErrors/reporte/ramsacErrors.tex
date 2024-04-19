@@ -26,13 +26,37 @@
 \section*{Conjunto de datos}
 
 Los desplazamientos de la corteza terrestre pueden determinarse registrando las posiciones relativas entre las órbitas de los sistemas satelitales de navegación global (GNSS) y estaciones receptoras fijas.
-La efemérides satélitales con precisiones milimétricas se publican tras dos semanas de registradas las mediciones.
+La efemérides satelitales con precisiones milimétricas se publican tras dos semanas de registradas las mediciones.
 Para realizar un control de su calidad previo el Centro de Investigaciones Geodésicas Aplicadas (CIGA) del Instituto Geográfico Nacional (IGN) procesa datos de fase de la señal GNSS para cada estación de la red nacional RAMSAC \cite{noauthor_centro_nodate} utilizando las efemérides transmitidas por el satélite en tiempo real, menos exactas.
 Con estos se genera una serie diaria en los que pueden presentarse apartamientos repentinos de la tendencia histórica.
 La presencia de resultados por fuera de \(3 \sigma\) genera una alerta para observar si tres sucesivos días presentan tal comportamiento.
 En tal caso se realiza una comparación manual con la serie producto del procesamiento del Nevada Geodetic Laboratory realizada con otro código \cite{noauthor_magnet_nodate}.
-Si el apartamiento se ve en ambas series, responde a un evento en la adquisición del dato crudo que se descarta de posteriores procesamientos.
-Si entre ambos procesamientos se observa algún apartamiento que supere los \SI{3}{\milli\metre} esto lleva a un trabajo manual sobre los datos crudos para adecuarles a un posterior re-procesamiento por parte del CIGA. 
+Si el apartamiento figura en ambas series, responde a un evento en la adquisición del dato crudo que se descarta de posteriores procesamientos.
+Si entre ambos procesamientos la comparación visual determina que no son ``coincidentes'' se procede a un trabajo manual sobre los datos crudos para adecuarles a un posterior re-procesamiento por parte del CIGA.
+% Si entre ambos procesamientos se observa algún apartamiento que supere los \SI{3}{\milli\metre} esto lleva a un trabajo manual sobre los datos crudos para adecuarles a un posterior re-procesamiento por parte del CIGA.
+ 
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[scale=1, every node/.style={scale=0.8}]
+  % I want to draw with tikz a flux diagram
+  % Define block styles
+  \tikzstyle{block} = [rectangle, draw, text width=5em, text centered, rounded corners, minimum height=4em]
+  % style for decision
+  % \tikzstyle{decision} = [diamond, draw, fill=red!20, text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+  \tikzstyle{decision} = [diamond, aspect=2, text centered, text width = 2 cm, draw=black]
+  \tikzstyle{line} = [draw, -latex']
+  % Place nodes
+  \node [decision] (3sigma) {$> 3 \sigma$};
+  \node [decision, right of= 3sigma, node distance= 6 cm] (3mas) {3 más\\en semana};
+  \path [line] (3sigma) -- (3mas) node [midway, fill = white] {Sí};
+  \node [decision, right of= 3mas, node distance= 6 cm] (deltaNevada) {$\Delta$ Nevada};
+  \path [line] (3mas) -- (deltaNevada) node [midway, fill = white] {Sí};
+  \node [block, above right = 0 cm and 2.5 cm of deltaNevada] (errorCIGA) {Adecuar datos}; 
+  \path [line] (deltaNevada) -- (errorCIGA) node [midway, fill = white] {Sí};
+  \node [block, below right = 0 cm and 2.5 cm of deltaNevada] (errorEstacion) {Descartar datos};
+  \path [line] (deltaNevada) -- (errorEstacion) node [midway, fill = white] {No};
+  \end{tikzpicture}
+\end{figure}
 
 Para esta propuesta de trabajo de tesis se cuenta con un histórico de series temporales de desplazamientos de estaciones terrestres de la red RAMSAC producto del procesamiento del IGN así como para casos ``coincidentes'' como los que no.
 
@@ -56,8 +80,9 @@ Para esta propuesta de trabajo de tesis se cuenta con un histórico de series te
 
 \section*{Pregunta relevante}
 Determinar si puede automatizarse la clasificación de casos como ``coincidentes'' o no, sin conocimiento sobre el criterio de discriminación partiendo solo de ejemplos.
-Responder afirmativamente lo anterior y dejar operativo un mecanismo de clasificación automático ayudaría a aliviar la tarea cotidiana de RAMSAC del IGN.
+Confirmar lo anterior y dejar operativo un mecanismo de clasificación automático ayudaría a aliviar la tarea cotidiana de RAMSAC del IGN.
 
+Potencialmente se podrían analizar los casos descartados para etiquetar automáticamente causas de apartamientos a partir del registro histórico de casos debidos a cuestiones mecánicas, de corte de energía, informáticos y otros.
 
 \section*{Técnicas adecuadas}
 El primer enfoque que se propone es el de análisis estadístico.
@@ -65,7 +90,7 @@ Se comenzaría intentando discriminar con la distancia media cuadrática entre a
 Luego para encontrar cuando difiero recurrir a un análisis de residuos de la diferencias.
 Otra alternativa es un análisis de correlación, e.g. de Pearson, entre ambas series.
 
-Como alternativa se podrá recurrir a un análisis espectral, a través de una transformada al dominio de la frecuencia.
+Un enfoque alternativo podría partir de un análisis espectral, a través de una transformada al dominio de la frecuencia.
 
 
 
