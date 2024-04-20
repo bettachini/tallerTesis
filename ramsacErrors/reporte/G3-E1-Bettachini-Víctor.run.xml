@@ -44,10 +44,10 @@
   <internal package="biblatex" priority="9" active="0">
     <generic>latex</generic>
     <provides type="dynamic">
-      <file>ramsacErrors.bcf</file>
+      <file>G3-E1-Bettachini-Víctor.bcf</file>
     </provides>
     <requires type="dynamic">
-      <file>ramsacErrors.bbl</file>
+      <file>G3-E1-Bettachini-Víctor.bbl</file>
     </requires>
     <requires type="static">
       <file>blx-dm.def</file>
@@ -64,19 +64,19 @@
     <generic>biber</generic>
     <cmdline>
       <binary>biber</binary>
-      <infile>ramsacErrors</infile>
+      <infile>G3-E1-Bettachini-Víctor</infile>
     </cmdline>
     <input>
-      <file>ramsacErrors.bcf</file>
+      <file>G3-E1-Bettachini-Víctor.bcf</file>
     </input>
     <output>
-      <file>ramsacErrors.bbl</file>
+      <file>G3-E1-Bettachini-Víctor.bbl</file>
     </output>
     <provides type="dynamic">
-      <file>ramsacErrors.bbl</file>
+      <file>G3-E1-Bettachini-Víctor.bbl</file>
     </provides>
     <requires type="dynamic">
-      <file>ramsacErrors.bcf</file>
+      <file>G3-E1-Bettachini-Víctor.bcf</file>
     </requires>
     <requires type="editable">
       <file>./tallerTesis.bib</file>
