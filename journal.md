@@ -3,6 +3,7 @@
 ## Enlaces
 [Frontispicio](https://tallerdetesis1-2024.netlify.app/)
 [Cronograma](https://tallerdetesis1-2024.netlify.app/cronograma)
+Martes de 19 a 22hs. https://exactas-uba.zoom.us/j/86457673848 [exactas-uba.zoom.us] ID de reunión: 864 5767 3848 Código de acceso: tti24-sur
 
 
 ## Rios
