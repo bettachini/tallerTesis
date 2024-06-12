@@ -1,0 +1,206 @@
+---
+title: "Taller de tesis - Sismos"
+author: "Víctor A. Bettachini"
+date: "junio de 2024"
+output:
+  html_document
+---
+
+# Fuente de los datos
+
+Elaborados a partir de lo publicado por el [Instituto Nacional de Prevención Sísmica (INPRES)](http://www.inpres.gob.ar/)  
+Sistematizados por Daniela Parada del Instituto de cálculo, FCEyN, UBA. [Presentamos un ejemplo para visualización de datos de sismos de Argentina de los últimos 10 años.](https://daniellaparada.github.io/IC-datasets-docencia/04_visualizacion.html) 
+
+
+
+# Carga de datos
+
+
+Determino directorios de trabajo según entorno de ejecución.
+```{r Directorio de trabajo: ¿Local o GitHub Codespaces?}
+if (
+  dir.exists(
+    file.path(
+      "/workspaces"
+    )
+  )
+) {
+  setwd("/workspaces/EEA-2023/trabajos_practicos/tp1")
+} else {
+  setwd(
+    "/home/vbettachini/documents/universitet/FCEyN/maestríaDatos/tallerTesis/sismos"
+  )
+}
+```
+
+```{r carga datosIC}
+# No funcionó el obtener los datos tras cargar la biblioteca datosIC
+
+# require(devtools)
+# devtools::install_github("daniellaparada/datosIC")
+# library(datosIC)
+# datos <- sismos
+```
+
+## Carga local
+Tras descargar al directorio local el archivo `sismos-arg.csv` desde el url `https://github.com/daniellaparada/IC-datasets-docencia/blob/main/fuente/04_visualizacion/sismos-arg.csv` lo cargo en la data.table `sismos_arg`.
+
+```{r carga data.table , warning=F, message=F}
+if (!require("data.table")) {
+  install.packages("data.table")
+}
+library("data.table")
+```
+
+Genero la data.table a partir del archivo ubicado en el sendero (path) del sistema de archivos local.
+```{r Lectura del archivo}
+# sismos_all <- fread("./sismos_all.csv", sep = ",") # este no tiene la columna de si fue percibido
+sismos_arg <- fread("./sismos-arg.csv", sep = ",")
+```
+
+## Verificación de que se cargó
+```{r columnas de la data.table}
+colnames(sismos_arg)
+```
+Pero, no está el atributo de si fue percibido  
+Debe haber otro conjunto de datos para descargar
+
+```{r tipo de dato}
+str(sismos_arg)
+```
+
+
+## Descripción estadística de los datos
+Una básica estadística descriptiva de los datos
+```{r resumen de la data.table}
+summary(sismos_arg)
+```
+Hay un fuerte desbalance en la variable `percibido` que indica si el sismo fue percibido o no hacia este último caso.
+  
+```{r fracción de no percibidos}
+sum(sismos_arg$Percibido == "FALSE") / nrow(sismos_arg)
+```
+
+## Planteo de la pregunta
+Encontrar los parámetros que más pesan en la percepción de un sismo en Argentina.
+
+Para eso pienso primero probar un modelo de regresión lineal con la variable `Percibido` como dependiente y las demás como independientes.
+
+Algo que me encantaría es factorizar la distancia entre el observador y la coordenada del sismo.
+Solo tengo la columna `Provincia`, ¿será la del observador o la del sismo?
+
+### Algunas modificaciones sobre los datos
+
+#### Escala de Richter
+Recuerdo que es una escala logarítmica, por lo que me interesaría pasarla a una escala lineal.
+
+> The Richter magnitude of an earthquake is determined from the logarithm of the amplitude of waves recorded by seismographs. Adjustments are included to compensate for the variation in the distance between the various seismographs and the epicenter of the earthquake. The original formula is:
+> $$
+> M_\mathrm{L} = \log_{10} A - \log_{10} A_\mathrm{0}(\delta) = \log_{10} [A / A_\mathrm{0}(\delta)]
+> $$
+> 
+> Fuente: https://en.wikipedia.org/wiki/Richter_scale
+
+La presunción es que el umbral de percepción estará ligado a la amplitud de oscilación de las ondas sísmicas.  
+Aunque también podría pensarse que sería con su potencia, es decir algo proporcional a $A^2$.  
+Algo para probar luego, por lo pronto a pasarle a una escala lineal.
+
+Sin ponerme a investigar más genero una columna de magnitud_lineal con $10^{M_L}$
+
+```{r Linealizar la escala de Richter}
+sismos_arg[, magnitud_lineal := 10^Magnitud]
+```
+
+```{r head de la data.table}
+head(sismos_arg)
+```
+
+```{r descripción para magnitud lineal}
+summary(sismos_arg$magnitud_lineal)
+```
+
+```{r máximo de Magnitud}
+max(sismos_arg$Magnitud)
+```
+
+```{r histograma de Magnitud con barras más finas}
+hist(sismos_arg$Magnitud, main = "Histograma de Magnitud", xlab = "Magnitud", ylab = "Frecuencia", breaks = 50)
+```
+
+
+
+### Primer ensayo de regresión lineal
+Dos histogramas superpuestos en función `magnitud_lineal` discriminados según el caso de haya o no sido `Percibido`. 
+
+```{r biblioteca ggplot2}
+library(ggplot2)
+```
+
+Lo mismo pero con rango acotado a un máximo de 1e5
+  
+```{r histogramas acotados}
+ggplot(sismos_arg, aes(x = magnitud_lineal, fill = Percibido)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 20) +
+  labs(title = "Histograma de magnitud lineal de sismos percibidos y no percibidos",
+       x = "Magnitud lineal",
+       y = "Frecuencia") +
+  xlim(0, 1e4)
+```
+
+Poca sorpresa, obviamente la proporción de no percibidos sería dominante en los de poca intensidad.
+Veré en un rango de magnitudes entre 5000 y 15000.
+
+```{r histogramas acotados 2}
+ggplot(sismos_arg, aes(x = magnitud_lineal, fill = Percibido)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 20) +
+  labs(title = "Histograma de magnitud lineal de sismos percibidos y no percibidos",
+       x = "Magnitud lineal",
+       y = "Frecuencia") +
+  xlim(5000, 50000)
+```
+
+
+### Algo para jugar: Ver por Provincia
+Se podría ver si hay alguna provincia que tenga una mayor proporción de sismos percibidos.
+Para eso necesitaría algo que ecualice la distribución de magnitudes.
+
+1. segmentar sismos por provincias
+2. elegida una provincia base, tomar su distribución de magnitudes de sismos como patrón
+3. en las restantes provincias, muestrear selectivamente para que la distribución de magnitudes sea similar a la de la provincia base
+4. comparar la proporción de sismos percibidos en cada provincia
+
+```{r segmentar por provincias}
+sismos_por_provincia <- sismos_arg[, .(cantidad = .N), by = Provincia]
+sismos_por_provincia <- sismos_por_provincia[order(-cantidad)]
+sismos_por_provincia
+```
+
+```{r histograma de cantidad de sismos por provincia}
+ggplot(sismos_por_provincia, aes(x = Provincia, y = cantidad)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Cantidad de sismos por provincia",
+       x = "Provincia",
+       y = "Cantidad")
+```
+
+Evidentemente es en la provincia de San Juan donde más sismos se registran.
+Esa será la provincia base para la distribución de magnitudes.
+
+```{r distribución de magnitudes en San Juan}
+sismos_san_juan <- sismos_arg[Provincia == "San Juan"]
+ggplot(sismos_san_juan, aes(x = magnitud_lineal)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 20) +
+  labs(title = "Histograma de magnitud lineal de sismos en San Juan",
+       x = "Magnitud lineal",
+       y = "Frecuencia")
+```
+
+Hmmmm, no... No es la distribución. Ya sé que sigue la curva estimada de Gutenberg-Richter.
+Como figura en https://daniellaparada.github.io/IC-datasets-docencia/04_visualizacion.html#exploraci%C3%B3n-inicial
+
+> En el siguiente gráfico se superpone, en azul, la curva estimada de Gutenberg-Richter a partir de los datos de San Juan.
+> $$
+> \log_{10} N = a - b M,
+> $$
+> con $a = 6.1812$ y $b = 1.1433$.
