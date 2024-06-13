@@ -1,0 +1,208 @@
+\documentclass[a4paper,twoside,openright]{report}
+
+
+% \usepackage{fullpage}
+\usepackage[margin=1.1in]{geometry}
+
+
+%% Spanska!
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}    % 8-bit encoding. Acentuados como único caracter.
+\usepackage[spanish, es-tabla]{babel}
+\def\spanishoptions{argentina}
+
+
+%% inclusión de gráficas
+\usepackage[pdftex]{graphicx}           % instalar ghostscript-x para que el dvi muestre los eps
+% \usepackage{graphicx}           % instalar ghostscript-x para que el dvi muestre los eps
+\graphicspath{ {./graphs/} {../}}
+\usepackage{epstopdf}
+
+
+%% tablas: multirow
+\usepackage{multirow}
+\usepackage{booktabs}
+
+
+%% Matemática
+\usepackage{amsmath}
+
+
+%% Subfloats
+\usepackage{subcaption}
+% \usepackage{subfig} % deprecated https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
+
+
+% Interlineado 1,5
+% \renewcommand{\baselinestretch}{1.5}
+\renewcommand{\baselinestretch}{1.7}
+
+
+%% encadezado páginas
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% with this we ensure that the chapter and section
+% headings are in lowercase.
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{} % delete current setting for header and footer
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\bfseries\rightmark}
+\fancyhead[RE]{\bfseries\leftmark}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+%\addtolength{\headheight}{3.58337pt} % make space for the rule
+\addtolength{\headheight}{15.2pt} % make space for the rule
+\fancypagestyle{plain}{%
+\fancyhead{} % get rid of headers on plain pages
+\renewcommand{\headrulewidth}{0pt} % and the line
+}
+
+
+
+%% Biblatex
+%\usepackage[hyperref=true,
+%	url=false,
+%	isbn=false,
+%	backref=true,
+%	% style=custom-numeric-comp,
+%	style=numeric,
+%	citereset=chapter,
+%	maxcitenames=7,
+%	maxbibnames=100,
+%	block=none,
+%	sorting=none,
+%	backend=biber]{biblatex}
+%\DefineBibliographyStrings{spanish}{}
+%\usepackage{textgreek}	% http://tex.stackexchange.com/questions/107352/non-ascii-characters-in-biblatex
+%\usepackage{csquotes}
+%% no urldate
+%\DeclareSourcemap{
+%  \maps[datatype=bibtex]{
+%    \map[overwrite=true]{
+%      \step[fieldset=urldate, null]
+%    }
+%  }
+%}
+%\addbibresource{thesis.bib}
+
+
+%% biblatex
+\usepackage[style=numeric, backend=biber, sorting= none, url= false, maxnames=20]{biblatex}
+\DefineBibliographyStrings{spanish}{}
+\usepackage{csquotes}
+\usepackage{textgreek} % https://tex.stackexchange.com/questions/107352/non-ascii-characters-in-biblatex 
+\addbibresource{sismos.bib}
+
+
+%% Nomenclatura
+\usepackage[spanish, intoc]{nomencl}
+\makenomenclature
+
+
+%% URLs
+\usepackage{color}
+\definecolor{DarkBlue}{rgb}{0,0,0.4}
+\usepackage[hidelinks]{hyperref}
+% \usepackage[colorlinks=true,urlcolor=DarkBlue]{hyperref}
+% \usepackage{url}
+
+
+%% Unidades
+\usepackage[locale=FR, per-mode=fraction, separate-uncertainty=true]{siunitx}
+\sisetup{detect-all}	% ¿Que hace esto?
+
+
+%% para doublebox linkSim
+\usepackage{fancybox}
+
+
+%% reinicio del contador de capítulos ante \part
+%% https://tex.stackexchange.com/questions/35782/how-to-split-a-latex-document-using-parts-and-chapters
+%% Comment the following to have chapters numbered without interruption (numbering through parts)
+% \makeatletter\@addtoreset{chapter}{part}\makeatother%
+
+
+\setcounter{tocdepth}{2}	%% tabla de contenidos hasta nivel 3
+% \setcounter{tocdepth}{1}	%% tabla de contenidos hasta nivel 2
+
+
+%% \textsubscript \textsuperscript
+\usepackage{changes}
+% \usepackage{fixltx2e} 
+
+
+%% Glosario
+\usepackage[acronym,toc,nonumberlist,translate=babel]{glossaries}
+\setacronymstyle{short-long-desc}
+\include{glosario}
+\makeglossaries
+
+
+
+\begin{document}
+
+%% paginas titulo según
+%% http://www.df.uba.ar/academica/carrera-de-doctorado/pautas
+\begin{titlepage}
+	\begin{center}
+		\includegraphics[width=\textwidth]{logos}\\[1cm]
+		%\textbf{\LARGE Universidad de Buenos Aires}\\
+		%Facultad de Ciencias Exactas y Naturales\\
+		%Departamento de Física\\[1cm]
+  \textit{\textbf{Optimización de fuente de pulsos infrarojos ultracortos}}\\
+		%\textbf{Simulación de capa física de red óptica pasiva encriptada}\\[1cm]
+		Trabajo final de la asignatura ``Taller de tesis''\\
+		% Trabajo de Tesis para optar por el título de\\
+		% Doctor de la Universidad de Buenos Aires en el área Ciencias Físicas\\[1cm]
+		\textit{\textbf{Víctor A. Bettachini}}\\[1cm]
+		% por \textit{\textbf{Víctor A. Bettachini}}\\[1cm]
+	\end{center}
+		\textit{\textbf{xx de xx de 2024}}
+\end{titlepage}
+
+% \newpage
+% \thispagestyle{empty}
+% \begin{abstract}
+% 	Blah.
+% \end{abstract}
+
+%% A continuación de la Carátula, debe figurar un resumen del trabajo, junto con palabras claves asociadas.
+% \thispagestyle{empty}
+\begin{abstract}
+	Blah.
+\end{abstract}
+% Palabras clave?
+
+%\newpage
+%\thispagestyle{empty}
+%%% Luego, en página aparte, el título de la Tesis, el resumen y las palabras claves, traducido al inglés.	
+%{\cleardoublepage\null \vfill\begin{center}%
+%\thispagestyle{empty}
+%\bfseries Abstract \end{center}}%
+%{\vfill\null}
+%Keywords?
+%
+%\newpage
+%\thispagestyle{empty}
+
+\tableofcontents
+
+\section{Introducción}
+Cosa. 
+
+\section{Marco teórico}
+
+\section{Metodología}
+
+\section{Resultados y discusión}
+
+\section{Conclusión}
+
+%% bibliografía
+\printbibliography[heading=bibintoc]
+
+% \printglossaries
+
+
+\end{document}

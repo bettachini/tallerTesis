@@ -1,0 +1,63 @@
+\documentclass[a4paper]{report}
+% \documentclass[a4paper,twoside,openright]{report}
+
+%% Spanska!
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}    % 8-bit encoding. Acentuados como único caracter.
+\usepackage[spanish, es-tabla]{babel}
+\def\spanishoptions{argentina}
+
+
+\usepackage{graphicx}
+\graphicspath{ {./graphs/} }
+
+%% biblatex
+\usepackage[style=numeric, backend=biber, sorting= none, url= false, maxnames=20]{biblatex}
+\DefineBibliographyStrings{spanish}{}
+\usepackage{csquotes}
+\usepackage{textgreek} % https://tex.stackexchange.com/questions/107352/non-ascii-characters-in-biblatex 
+\addbibresource{tallerTesis.bib}
+
+
+
+\begin{document}
+
+\title{
+	{Factores de percepción de sismos en Argentina}\\[1 cm]
+	{Trabajo final de la asignatura ``Taller de tesis''}
+	{\includegraphics[width=\textwidth]{logos}}
+}
+\author{Víctor A. Bettachini}
+\date{\today}
+\maketitle
+
+\begin{abstract}
+	cas
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introducción}
+
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{logos}
+\caption{Figura 1.}
+\label{fig:figura1}
+\end{figure}
+
+
+\chapter{Marco teórico}
+
+\chapter{Metodología}
+
+\chapter{Resultados y discusión}
+
+\chapter{Conclusión}
+
+%% bibliografía
+\printbibliography[heading=bibintoc]
+
+
+\end{document}
