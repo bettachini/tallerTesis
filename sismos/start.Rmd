@@ -6,6 +6,11 @@ output:
   html_document
 ---
 
+# R restart
+```{r restart R}
+# System("R")
+```
+
 # Fuente de los datos
 
 Elaborados a partir de lo publicado por el [Instituto Nacional de Prevención Sísmica (INPRES)](http://www.inpres.gob.ar/)  
@@ -13,8 +18,17 @@ Sistematizados por Daniela Parada del Instituto de cálculo, FCEyN, UBA. [Presen
 
 
 
-# Carga de datos
+# Planteo de la pregunta
+Encontrar los parámetros que más pesan en la percepción de un sismo en Argentina.
 
+Para eso pienso primero probar un modelo de regresión lineal con la variable `Percibido` como dependiente y las demás como independientes.
+
+Algo que me encantaría es factorizar la distancia entre el observador y la coordenada del sismo.
+Solo tengo la columna `Provincia`, ¿será la del observador o la del sismo?
+
+
+
+# Carga y preprocesamieto de datos
 
 Determino directorios de trabajo según entorno de ejecución.
 ```{r Directorio de trabajo: ¿Local o GitHub Codespaces?}
@@ -40,7 +54,9 @@ if (
 # devtools::install_github("daniellaparada/datosIC")
 # library(datosIC)
 # datos <- sismos
+# data(sismos)
 ```
+
 
 ## Carga local
 Tras descargar al directorio local el archivo `sismos-arg.csv` desde el url `https://github.com/daniellaparada/IC-datasets-docencia/blob/main/fuente/04_visualizacion/sismos-arg.csv` lo cargo en la data.table `sismos_arg`.
@@ -58,8 +74,9 @@ Genero la data.table a partir del archivo ubicado en el sendero (path) del siste
 sismos_arg <- fread("./sismos-arg.csv", sep = ",")
 ```
 
+
 ## Verificación de que se cargó
-```{r columnas de la data.table}
+```{r nombres columnas iguales a publicado}
 colnames(sismos_arg)
 ```
 Pero, no está el atributo de si fue percibido  
@@ -70,28 +87,59 @@ str(sismos_arg)
 ```
 
 
-## Descripción estadística de los datos
-Una básica estadística descriptiva de los datos
-```{r resumen de la data.table}
-summary(sismos_arg)
+## Datos faltantes o duplicados
+```{r datos faltantes}
+sum(is.na(sismos_arg))
 ```
-Hay un fuerte desbalance en la variable `percibido` que indica si el sismo fue percibido o no hacia este último caso.
-  
-```{r fracción de no percibidos}
-sum(sismos_arg$Percibido == "FALSE") / nrow(sismos_arg)
+No hay registros con "no números" ("not a number" o NA).
+
+
+```{r datos duplicados número}
+nrow(sismos_arg)
+duplicados <- sismos_arg[duplicated(sismos_arg, fromLast = TRUE)]
+#length duplicados
+c(nrow(duplicados), nrow(sismos_arg), nrow(duplicados)/nrow(sismos_arg) )
+```
+Esos 23 registros son un 0.04% de los 55817 registros.
+
+```{r datos duplicados todas las ocurrencias}
+# find out whether two rows are equal
+all_duplicates <- sismos_arg[duplicated(sismos_arg) | duplicated(sismos_arg, fromLast = TRUE)]
+all_duplicates
 ```
 
-## Planteo de la pregunta
-Encontrar los parámetros que más pesan en la percepción de un sismo en Argentina.
+```{r sin duplicados}
+sismos <- sismos_arg[!duplicated(sismos_arg)]
+```
+En `sismos` queda un data.table sin duplicados.
 
-Para eso pienso primero probar un modelo de regresión lineal con la variable `Percibido` como dependiente y las demás como independientes.
 
-Algo que me encantaría es factorizar la distancia entre el observador y la coordenada del sismo.
-Solo tengo la columna `Provincia`, ¿será la del observador o la del sismo?
+## Modificaciones sobre los datos (feature engineering)
 
-### Algunas modificaciones sobre los datos
+### Decimalización de la hora
+```{r función de decimalización de la hora}
+# Function to convert hh:mm:ss to seconds past midnight
+convert_to_seconds <- function(time_str) {
+  time_posix <- strptime(time_str, format="%H:%M:%S")
+  seconds <- as.numeric(format(time_posix, "%H")) * 3600 +
+             as.numeric(format(time_posix, "%M")) * 60 +
+             as.numeric(format(time_posix, "%S"))
+  return(seconds)
+}
+```
 
-#### Escala de Richter
+```{r aplicación de la función}
+# Apply the function to the time_str column
+sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]
+# Print the result
+head(sismos)
+```
+
+```{r descripción de la nueva columna}
+summary(sismos$Hora_decimal)
+```
+
+### Escala de Richter
 Recuerdo que es una escala logarítmica, por lo que me interesaría pasarla a una escala lineal.
 
 > The Richter magnitude of an earthquake is determined from the logarithm of the amplitude of waves recorded by seismographs. Adjustments are included to compensate for the variation in the distance between the various seismographs and the epicenter of the earthquake. The original formula is:
@@ -108,23 +156,42 @@ Algo para probar luego, por lo pronto a pasarle a una escala lineal.
 Sin ponerme a investigar más genero una columna de magnitud_lineal con $10^{M_L}$
 
 ```{r Linealizar la escala de Richter}
-sismos_arg[, magnitud_lineal := 10^Magnitud]
+sismos[, magnitud_lineal := 10^Magnitud]
 ```
 
 ```{r head de la data.table}
-head(sismos_arg)
+head(sismos)
 ```
 
 ```{r descripción para magnitud lineal}
-summary(sismos_arg$magnitud_lineal)
+summary(sismos$magnitud_lineal)
 ```
 
 ```{r máximo de Magnitud}
-max(sismos_arg$Magnitud)
+max(sismos$Magnitud)
 ```
 
+
+
+# Análisis exploratorio de datos
+Una básica estadística descriptiva de los datos
+```{r resumen de la data.table}
+summary(sismos)
+```
+Hay un fuerte desbalance en la variable `percibido` que indica si el sismo fue percibido o no hacia este último caso.
+  
+```{r fracción de no percibidos}
+sum(sismos$Percibido == "FALSE") / nrow(sismos)
+```
+
+
+
+
+
+#### Magnitud: lineal y escala de Richter
+
 ```{r histograma de Magnitud con barras más finas}
-hist(sismos_arg$Magnitud, main = "Histograma de Magnitud", xlab = "Magnitud", ylab = "Frecuencia", breaks = 50)
+hist(sismos$Magnitud, main = "Histograma de Magnitud", xlab = "Magnitud", ylab = "Frecuencia", breaks = 50)
 ```
 
 

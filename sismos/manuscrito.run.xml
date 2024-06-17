@@ -79,7 +79,7 @@
       <file>manuscrito.bcf</file>
     </requires>
     <requires type="editable">
-      <file>tallerTesis.bib</file>
+      <file>sismos.bib</file>
     </requires>
   </external>
 </requests>
