@@ -12,6 +12,7 @@
 \usepackage{graphicx}
 \graphicspath{ {./graphs/} }
 \usepackage{wrapfig}
+\usepackage{tikz}
 
 %% biblatex
 \usepackage[style=numeric, backend=biber, sorting= none, url= true, maxnames=20]{biblatex}
@@ -34,18 +35,47 @@
 
 \begin{document}
 
-\title{
-	{Factores de percepción de terremotos en Argentina}\\[1 cm]
-	{Trabajo final de la asignatura ``Taller de tesis''}
-	{\includegraphics[width=\textwidth]{logos}}
-}
-\author{Víctor A. Bettachini}
-\date{\today}
-\maketitle
+%\title{
+%	{Factores físicos de los terremotos que influyen en su percepción por la población}\\[1 cm]
+%	{Trabajo final de la asignatura ``Taller de tesis''}
+%	{\includegraphics[width=\textwidth]{logos}}
+%}
+%\author{Víctor A. Bettachini}
+%\date{\today}
+%\maketitle
+%
+%\begin{abstract}
+%	Niente.
+%\end{abstract}
 
-\begin{abstract}
-	Niente.
-\end{abstract}
+
+% Title page
+\begin{titlepage}
+    \centering
+    %\vspace*{1in}
+    
+    \huge\textbf{Factores físicos de los terremotos que influyen en su percepción por la población}
+    
+    \vspace{0.5in}
+		Trabajo final de la asignatura\\``Taller de tesis''\\
+    \vspace{0.5in}
+		\includegraphics[width=\textwidth]{logos}\\
+    \vspace{0.5in}
+    
+    \large
+    \textbf{Autor:}\\
+		Víctor A. Bettachini\\
+    \vspace{0.5in}
+    \textbf{Fecha:}\\
+    \today
+    
+    \vfill
+    \begin{minipage}{0.8\textwidth}
+    \begin{abstract}
+        Una decena de terremotos se producen en el territorio nacional en forma diaria sin que sean detectados más que por instrumentos. Son muy pocos los casos en que las ondas sismicas que estos producen son percibidos por la población. Este trabajo examina busca determinar la importancia relativa de los descriptores físicos de terremotos que más contribuyen a que sean percibidos por las personas. 
+    \end{abstract}
+		\end{minipage}
+	\end{titlepage}
 
 \tableofcontents
 
@@ -53,20 +83,20 @@
 
 \chapter{Introducción}
 
-\section{Contexto y motivación científica}
+\section{Contexto y motivación científica}\label{sec:contexto}
 
 Un rápido desprendimiento entre dos fascetas enfrentadas de sendas placas tecnónicas que trabanban mutuamente su desplazamiento relativo produce una rápida liberación de energía que se denomina terremoto.
 Esto sucede a cierta profundidad en la corteza terrestre en el punto denominado hipocentro a partir del cual parte de esta energía se encauza como ondas elásticas.
-El estudio de estas ondas es el área llamada sismología y de ahí el termino sismo para un evento particular detectado, pero que debiera aclararse si se produjo por un terremoto u otra fuente de ondas \cite[sección 4.1.1]{fowler_solid_2004}.
-Sea que las ondas sean de compresión longitudinal de la corteza, las tipo P, o las del tipo S transversales y más lentas, ambas arriban con mayor intensidad al punto de la superficial terrestre que se encuentra directamente sobre el hipocentro, que se denomina epicentro \cite[sección 4.1.2]{fowler_solid_2004} como ilustra la figura \ref{fig:epicentro_hipocentro}.
-\begin{wrapfigure}[13]{r}{0.4\textwidth}
+El estudio de estas ondas es el área llamada sismología y de ahí el termino sismo para un evento particular detectado, pero que debiera aclararse si se produjo por un terremoto u otra fuente de ondas \cite[sección 4.1.1]{fowler_solid_1990}.
+\begin{wrapfigure}[15]{r}{0.4\textwidth}
   \centering
-	\includegraphics[width=0.3\textwidth]{eq-ed-fault-labeled.png}
+	\includegraphics[width=0.4\textwidth]{eq-ed-fault-labeled.png}
 	\caption{Epicentro e hipocentro de un sismo.}
 	\label{fig:epicentro_hipocentro}
 \end{wrapfigure}
+Sea que las ondas sean de compresión longitudinal de la corteza, las tipo P, o las del tipo S transversales y más lentas, ambas arriban con mayor intensidad al punto de la superficial terrestre que se encuentra directamente sobre el hipocentro, que se denomina epicentro \cite[sección 4.1.2]{fowler_solid_1990} como ilustra la figura \ref{fig:epicentro_hipocentro}.
 Cuanto más proxima es una locación en la superficie a un epicentro la amplitud de las ondas sísmicas es mayor.
-Tanto esta amplitud como el período de oscilación son mucho mayores que el de otros desplazamientos de la corteza respecto a otros desplazamientos como los de las mareas solares y lunares de la corteza \cite[sección 4.1.4]{fowler_solid_2004}.
+Tanto esta amplitud como el período de oscilación son mucho mayores que el de otros desplazamientos de la corteza respecto a otros desplazamientos como los de las mareas solares y lunares de la corteza \cite[sección 4.1.4]{fowler_solid_1990}.
 Como resultado estructuras artificiales pueden agitarse poniendo en riesgo su estabilidad estructural y haciendo caer elementos que no estaban fijados a esta o perdieron tal adhesión a causa de la agitación misma.
 Como consecuencia los sismos más fuertes pueden generar graves daños, poniendo en riesgo la integridad física y la seguridad de las personas al generar daños en las viviendas y edificios, derrumbes de puentes, rompimiento de vidrios, entre otros \cite{noauthor_que_2018}.
 
@@ -99,11 +129,27 @@ Se estructuró en los siguientes capitulos con temáticas difenciadas
 
 \section{Relevamiento de trabajos previos y relevantes}
 
+En relación con la temática de terremotos los trabajos publicados que hacen uso de herramientas de aprendizaje autómático en su mayoría persiguen el esquivo objetivo de predecir la ocurrencia de sismos de gran intensidad, y en segundo lugar para la mejora de la detección de estos por parte de instrumental, pero la temática de la perecpiún de los mismos por humanos no parece ser una temática corriente \cite{hu_applying_2024}.
 
+Un trabajo interesante no porque sea un antecedente del enfoque o temática de este trabajo pero sí por tocar al aspecto social de la percecpión de sismos hace uso del método conocido como SHAP (contracción de SHapley Additive exPlanations, explicaciones aditivas de Shapley) que determina la contribución de cada carecterística en un conjunto de datos a una determinada predicción \cite{molnar_96_2024}.
+Los datos son características sociológicas de los individuos y la predicción es sobre la percepción personal del riesgo sismológico.
+Los autores muestran un resultado estadístico que avala el que se incrementa la percepción del riesgo de esta fuente tras haber percibido un sismo \cite{bedle_recognizing_2022}.
 
+Un estudio de la problemática de la percecpión por la población de un terremoto tal vez deba separarse en dos problemas a resolver secuencialmente.
+En primer lugar determinar el espectro de frecuencias de oscilación del suelo en función de características físicas del terremoto y la corteza.
+Y en segundo lugar la respuesta de las personas a tal espectro de oscilaciones que depende además de características de las viviendas más crucialmente de cuestiones fisiológicas.
+
+Atendiendo a la primer cuestión la modelización física ha arribado a un conjunto de ecuaciones para predecir el especto de frecuencias de oscilación del suelo en función de la distancia al hipocentro y las características de la corteza en el camino de propagación de las ondas desde el terremoto \cite{lior_relation_2018}.
+Pero como estas ecuaciones dependen de una multitud de factores que deben ajustarse a cada locación en muchos casos en forma empírica se han ensayado alternativas basadas en el aprendizaje autómático en años recientes, en particular utilizando arquitecturas de redes neuroles recurrentes \cite{datta_deepshake_2022}.
+
+En cuanto a la segunda cuestión, la respuesta fisiológica al espectro de oscilaciones del suelo, el foco también a sido el consante en el campo de la sismología, el de la predicción de terremotos de gran importancia.
+El campo se ha enfocado primordialmente a la capacidad sensora no de humanos sino de animales tradicionalmente considerados más sensibles y fuentes de señal de alarma ante sismos \cite{kirschvink_earthquake_2000}.
+
+Pero en la superficial búsqueda superficial de literatura realizada para este trabajo no encontré antecedentes que cubrieran todo el arco desde características que describen el terremoto hasta la determinación excluyente de si los correspondientes sismos son o no percibidos por la población.
 
 
 \section{Conceptos y técnicas de ciencia de datos utilizados en el trabajo}
+
 Siendo el objetivo de cualquier modelo utilizado una clasificación entre dos clases, la percepción de un sismo o no, se busca determinar que tan fuerte es el vínculo de cada una de las variables de los sismos de las que se dispone datos y la percepción de los mismos por parte de la población.
 Para esto dos técnicas se planea utilizar dos distintas técnicas de la ciencia de datos: la regresión logística y la clasificación de árboles de decisión. 
 
@@ -115,7 +161,7 @@ Por otra parte se buscará utilizar una herramienta más reciente, las máquinas
 Las distintas implementaciones de estos algoritmos, como XGBoost, LightGBM o CatBoost son capaces de producir un único modelo con fuerte poder predictivo a partir de la síntesis de resultados de modelos de predicción débiles, típicamente árboles de decisión. 
 % Se planea utilizar la implementación de XGBoost en lenguaje R para este trabajo.
 
-Puesto que los GBM carecen de un mecanísmo para evidenciar la importancia de las variables en la clasificación como la que evidencian los pesos de la regresión logística, se planea utilizar los valores de explicaciones aditivas de Shapley (SHapley Additive exPlanations, SHAP) para tal fin.
+Puesto que los GBM carecen de un mecanísmo para evidenciar la importancia de las variables en la clasificación como la que evidencian los pesos de la regresión logística, se planea utilizar los valores del método SHAP comentado en la sección anterior para tal fin.
 Para el lenguaje R está disponible la biblioteca \emph{shapr} para tal fin \cite{camilla_lingjaerde_shapr_nodate}.
 
 El disponer de una herramienta de explicación de los modelos de predección aplicable al resultado de los dos a ensayar, el de regresión lógistica y el XGBoost, permitirá comparar la relevancia de las variables que asignará cada uno para la percepción de los sismos por parte de la población.
@@ -127,7 +173,7 @@ El disponer de una herramienta de explicación de los modelos de predección apl
 \section{Presentación y descripción de los datos utilizados}
 
 En el marco de los ``Proyectos de Asistencia Estadística del Instituto de Cálculo (IC)'' de la Facultad de Ciencias Exactas y Naturales (FCEyN) de la Universidad de Buenos Aires (UBA) se publicaron conjuntos de datos en un repositorio curado con el objeto de ser aplicados a la enseñanza de la estadística y la ciencia de datos por Daniela Parada, investigadora del IC \cite{noauthor_ic-datasets-docencia_nodate}.
-De estos conjuntos el utilizado en este trabajo es el que se publica en el apartado ``Visualización'' que corresponden a datos de sismos de Argentina de los últimos 10 años \cite{daniela_parada_ic-datasets-docencia_nodate}. 
+De estos conjuntos el utilizado en este trabajo es el que se publica en el apartado ``Visualización'' que corresponden a datos de sismos de Argentina de la última década \cite{daniela_parada_ic-datasets-docencia_nodate}. 
 En este repositorio alojado por la firma GitHub, se provee un front-end html que da un contexto, hace una exploración inicial, un analísis para una provincia en particular, muestra una estimación de probabilidad y provee otra información sobre lo datos.
 
 Los datos corresponden a detecciones por parte de estaciones de monitoreo sísmico en la República Argentina recopilados y publicados por el INPRES en su sitio web \cite{noauthor_buscador_nodate}.
@@ -138,13 +184,13 @@ Este mismo conjunto reducido puede descargarse en formato de texto separado por 
 
 Las variables reportadas para cada sismo son:
 \begin{itemize}
-	\item \emph{Fecha}: en el formato aaaa-mm-dd de la norma ISO 8601 \cite{noauthor_iso_2019}.
-	\item \emph{Hora}: una cadena de caracteres en formato hh:mm:ss lo que da una preción al segundo para los datos.
-	\item \emph{Latitud, Longitud}: un número con una precisión de un decimal con grados como unidad.
+	\item \emph{Fecha}: en el formato verb`aaaa-mm-dd`'' de la norma ISO 8601 \cite{noauthor_iso_2019}.
+	\item \emph{Hora}: una cadena de caracteres en formato \verb`hh:mm:ss`'' con una exactitud al segundo.
+	\item \emph{Latitud, Longitud}: un número con una exactitud de un decimal con grados como unidad.
 	\item \emph{Provincia}: cadena de caractéres del nombre de la provincia donde se produjo el sismo (no donde se ubicó quién potencialmente lo percibiera) según se afirma en el sitio de publicación \cite[5.1.1]{daniela_parada_ic-datasets-docencia_nodate}.
-	\item \emph{Magnitud}: un número con la escala Richter como unidad una función de la amplitud de las ondas sísmicas \cite[sección 4.2.3]{fowler_solid_2004}
+	\item \emph{Magnitud}: un número con la escala Richter como unidad una función de la amplitud de las ondas sísmicas \cite[sección 4.2.3]{fowler_solid_1990}
 	\item \emph{Profundidad}: un número entero con kilometros como unidad que indico que tan bajo la superficie se ubicó el epicentro.
-	\item \emph{Percibido}: lo que en el sitio del INPRES se califica como ``sismos sentidos'' es una clase categórica de si hubo reportes de percepeción del fenómeno por parte de la población. 
+	\item \emph{Percibido}: variable booleana de si hubo reportes de percepeción del fenómeno por parte de la población, 
 \end{itemize}
 Esta última variable es la que se busca predecir en este trabajo en función de las demás. 
 
@@ -155,13 +201,18 @@ Esta última variable es la que se busca predecir en este trabajo en función de
 Puesto que el conjunto de datos es curado por un equipo de investigación de la UBA, se asume que los mismos son confiables y que no se requiere de un proceso de limpieza de los mismos.
 De todas formas se realizaron las verificaciones usuales cada vez que se utilizan datos tabulares en un estudio de estadístico y/o de ciencia de datos.
 
-\paragraph{Inspección de columnas}
+
+\subsection{Limpieza de datos}
+
+\paragraph{Inspección de tipos de datos}
 Tras descargar el archivo de datos en fomato CSV y importarle a un entorno de trabajo en lenguaje R en una estructura de datos ``data.table'' denominado \verb'sismos_arg' ejecutar \verb'colnames(sismos_arg)' permitió verificar que contuviera las columnas con los nombres anunciados en el sitio que publica los datos en su sección \cite[Exploración inicial]{daniela_parada_ic-datasets-docencia_nodate}.
-Asimismo el tipo de datos se constató ejecutando \verb'str(sismos_arg)'.
+Las transformaciones o ingeniería de características que se detallan luego en esta sección se realizaron en función de los tipos de datos de cada columnas constatados con la función \verb'str(sismos_arg)'.
+
 
 \paragraph{Valores faltantes o duplicados}
 La presencia de valores faltantes indicados con el símbolo \verb'NA' se descartó cuando la ejecución \verb'sum(is.na(sismos_arg))' arrojó un cero como resultado.
-Por el contrario se encontró un número de 23 filas duplicadas (sobre 55817 registros) ejecutando \verb'sismos_arg[duplicated(sismos_arg, fromLast = TRUE)]'.
+Por el contrario unos \num{23} registros duplicadas mostró
+ejecutar \verb'sismos_arg[duplicated(sismos_arg, fromLast = TRUE)]' sobre un total de \num{55817} registros.
 Se hizo una copia de la tabla sin registros duplicados ejecutando \verb'sismos_arg[!duplicated(sismos_arg)]' en una nueva tabla con nombre más corto, \verb'sismos'.
 
 
@@ -169,21 +220,58 @@ Se hizo una copia de la tabla sin registros duplicados ejecutando \verb'sismos_a
 La detección y potenciales acciones sobre datos atípicos se tratan una vez iniciado un análisis exploratorio de datos temática de la sección \ref{sec:AED}.\\
 
 
+\subsection{Modificaciones de los datos (ingeniería de características)}
+
 Por otra parte el preprocesamiento comprende la generación de nuevas variables a partir de las existentes que se consideren relevantes para el análisis, lo que recibe el nombre de ingeniería de características (feature engineering).
 Se generaron dos nuevas columnas a partir de las existentes en el conjunto de datos original, una en función al formato de los datos en la columna ``Hora'' y otra en función de la escala física utilizada en la columna ``Magnitud''.
-
-
-\paragraph{Linealización de la magnitud}
-La escala de Richter de un terremoto se determina a partir del logaritmo en base 10 de la amplitud de las ondas registradas por los sismógrafos incluyendo ajustes para compensar la variación en la distancia entre los diversos sismógrafos y el epicentro del terremoto \cite{willian_l_ellsworth_earthquake_1991}.
-Puesto que el objetivo es predecir la percepción de los sismos, es razonable que esta guarde una relación con la amplitud de las ondas.
-Con tal fin se generó una columan con la manginitud linealizada exponenciado con base 10 los datos de magnitud a través del comando \verb'sismos[, magnitud_lineal := 10^Magnitud]'.
 
 
 \paragraph{Decimalización de la hora del sismo}
 La columna ``Hora'' está codificada como una cadena de caracteres.
 Para poder utilizarla en un análisis de regresión se la convirtió a un número entero de segundos transcurridos desde la medianoche del día en que se produjo el sismo. 
 Para ello se escribió una función \verb'convert_to_seconds' centrada en la función \verb'strptime' del paquete base de R.
-Se verificó que la columna generada con aplicación a través de \verb'sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]' estuvian en el rango de 0 a 86400 segundos, es decir, un día completo.
+Se verificó que la columna generada con aplicación a través de \verb'sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]' estuvieron en el rango de \num{0} a \SI{86400}{\second}, es decir, el de un día completo.
+
+
+\paragraph{Recorte por profundidad}
+
+\begin{wrapfigure}[17]{r}{0.4\textwidth}
+	\includegraphics[width=0.4\textwidth]{histograma_profundidad_menos50.png}
+	\caption{Los sismos con produndidad de \SI{0}{km} son pocos.}
+	\label{fig:histograma_profundidad}
+\end{wrapfigure}
+
+Puesto que hay sismos que tienen su origen en desplazamientos de tierra, explosiones artificiales para la minera, fracturado hidráulico para la extracción de hidrocarburos que no son terremotos, se omiten los datos informados con una profundidad de \SI{0}{\kilo\metre} con simple un filtado \verb'sismos <- sismos[Profundidad > 0]'.
+Esta es una práctica usual en el análisis de datos orientados a sismos originados en terremotos \cite{hu_applying_2024}.
+Siendo que la variable se informa como enteros de kilometros, estos representarían los hipocentros hasta una profundidad de \SI{500}{\metre}, compatibles con estas actividades artificiales.
+Esto es un número muy pequeño de los sismos en el conjunto de datos como la muestra el histograma según su profundidad que reproduce la figura \ref{fig:histograma_profundidad}.
+
+
+\paragraph{Linealización de la magnitud}
+Todas las escalas de magnitud de los sismos son logarítmicas con una forma genérica
+\begin{equation}
+	M = \log_{10} \left( \frac{A}{T} \right) + q(\Delta, h) + a,
+	\label{eq:magnitud}
+\end{equation}
+donde \(M\) es la magnitud, \(A\) es la amplitud de las ondas, \(T\) es el período de oscilación, \(q\) es una función de ajuste para el ángulo desde la vertical desde el sismógrafo al \(\Delta\) y su profundidad \(h\), y \(a\) es una constante de ajuste \cite[ecuación 4.13]{fowler_solid_1990}.
+Son las ondas S y P (ver sección \ref{sec:contexto}) tienen distintos coeficientes de ajuste en la ecuación \ref{eq:magnitud} y por ello se utilizan distintas escalas de magnitud.
+La más generalmente usada hay día es la de Gutemberg-Richter publicada en 1956 para la magnitud de este tipo de ondas, \(m_b\) ,
+\begin{equation}
+	m_b = \log_{10} \left( \frac{A}{T} \right)_\text{máx} + q(\Delta, h),
+	\label{eq:richter}
+\end{equation}
+sin la constante de ajuste \(a\) y con valores de \(q(\Delta, h)\) en un rango \(\approx \SIrange{6}{8}{}\)  para ondas P en \(\Delta = \SIrange{10}{110}{} ^\circ\) \cite[ecuación 4.18]{fowler_solid_1990}.
+Entonces la escala de Gutember-Richter de un terremoto es el logaritmo en base \num{10} de la mayor razón de la amplitud y período de las ondas registradas por los sismógrafos incluyendo ajustes para compensar la variación en la distancia entre el sismógrafo y el hipocentro \cite{willian_l_ellsworth_earthquake_1991}.
+
+Puesto que la magnitud busca dar cuenta de la energía liberada en el terremoto pero este trabajo busca predecir la percepción de los sismos, es de interés obtener un valor que sea lineal con la amplitud registrada por los sismógrafos en superficie, \(A\), que también es la que afecta a las personas. 
+Para obtener un valor lineal con esta \(A\) a partir de los datos de magnitud del INPRES se propone usar una valor medio del rango de \(q(\Delta,h)\) comentado en el párrafo anterior.
+Puesto que no figura en el conjunto de datos información sobre el período de las ondas, \(T\), no se encuentra otra alternativa que asumir que todos los fenómenos registrados tienen el mismo.
+Como consecuecia de asumir \(T_\text{consante}\) en el despeje a partir de la ecuación \ref{eq:richter} asumiendo tales condicionantes la amplitud será la máxima registrada por un sismógrafo, \(A_\text{máx}\),
+\begin{equation}
+	\left( \frac{A_\text{máx}}{T_\text{constante}} \right) = 10^{(m_b - 7)}.
+	\label{eq:linealizacionMagnitud} 
+\end{equation}
+Con el comando \verb'sismos[, proxy_amplitud := 10^(Magnitud- 7.0)]' se generó una columna para este valor.
 
 
 \section{Análisis exploratorio de datos (AED)}\label{sec:AED}
@@ -198,24 +286,102 @@ Este desbalance llama al uso de técnicas de balanceo de clases en los modelos d
 
 \paragraph{Distribución de ``Magnitud''}
 La variable ``Magnitud'' presenta una distribución asimétrica por el hecho de que cuanto mayor es la energía liberada, más infrecuente es el sismo.
+Esto la ilustra el número por año de sismos representado en una esacala logarítmica en función de la magnitud generado con código provisto junto con los datos \cite[sección 4.2.1]{daniela_parada_ic-datasets-docencia_nodate}, que se reproduce en la figura \ref{fig:acumulado_anual_magnitud}.
+
+%\begin{figure}[h]
+%% \begin{wrapfigure}[13]{r}{0.5\textwidth}
+%\centering
+%\includegraphics{acumulado_anual_magnitud.pdf}
+%% \includegraphics[width=0.5\textwidth]{acumulado_anual_magnitud.pdf}
+%\caption{Los sismos de mayor magnitud son más infrecuentes.}
+%\label{fig:acumulado_anual_magnitud}
+%% \end{wrapfigure}
+%\end{figure}
+
+\begin{figure}[!h]
+\centering
+% The output from tikz()
+% is imported here.
+\input{graphs/acumulado_anual_magnitud.tex}
+\caption{Los sismos de mayor magnitud son más infrecuentes.}
+\label{fig:acumulado_anual_magnitud}
+\end{figure}
 
 
 \paragraph{Horario de los percibidos}
-Se realizó un gráfico de densidad de los horarios de los sismos percibidos por la población y los no percibidos.
+Puede hipotetizarse que en los horarios de sueño de la mayoría de la población sea menor la proporción de sismos percibidos.
+Para ver si esto es se segmentaron los fenómenos con la variable \verb'Hora_decimal' en intervalos de una hora.
+En cada intervalo se puede calcular la proporción entre los casos percibidos y los que no y graficar las 24 proporciones.
+Contrariando la hipótesis se observa en la figura \ref{fig:histograma_percibidos_por_hora} que si hay una merma en percepciones de sismos esta es muy ligera y se produce entre las 10 y 19 horas.
+Donde es claro un cambio llamativo es en el incremento durante las tres horas que comienzan a las 23 de cada día.
+Habría que ver si tal variación es estadísticamente significativa, pero por sobre todo buscar una posible causa sociológica o fisiológica relacionada a que sean las primeras horas de sueño nocturo de la mayor parte de la población.
+
+\begin{figure}[h]
+\centering
+\input{graphs/histograma_percibidos_por_hora.tex}
+\caption{Proporción de sismos percibidos por la población en función de la hora del día.}
+\label{fig:histograma_percibidos_por_hora}
+\end{figure}
+
+
+\paragraph{Distribución geográfica}
+Como es esperable la mayor parte de los hipocentros se ubican en regiones con orografía elevada, como la cordillera de los Andes, producto de la subducción de la placa de Nazca bajo la placa Sudamericana, o las sierras cordobesas producto de procesos mucho más antiguos. 
+Una ubicación de los mismos sobre un mapa físico lo ilustra en la figura \ref{fig:mapa_sismos}.
+Esto conlleva a que la mayor parte de los sismos se produzcan en zonas de montaña o cerros en su mayoría alejados de las mayores urbanizaciones
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{mapa_sismos.png}
+\caption{Los sismos no percibidos, en azul, predominan pero la mayoría se registran en zonas de montaña o cerros en su mayoría alejados de las mayores urbanizaciones.
+Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
+\label{fig:mapa_sismos}
+\end{figure}
+
+La ubicación solo de los percibidos en un mapa político que muestra la figura \ref{fig:mapa_sismos_percibidos} muestra cierta concordancia con la figura anterior al tiempo de dejar a las claras que la percepción de los sismos por la población no es un fenómeno territorialmente homogéneo aún en provincias con abundante actividad sismica.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{mapa_percibidos.png}
+\caption{Los sismos percibidos tienen una distribución poco homogénea aún en provincias con abundante actividad sismica.}
+\label{fig:mapa_percibidos}
+\end{figure}
+
+
 
 
 \section{Descripción de las técnicas de análisis y, si corresponde, de modelado}
 
+
+
 \section{Descripción de la selección de características (si corresponde)}
 
+% \paragraph{El problema de la distancia}
 Evidentemente la proximidad de un epicentro a una población es un factor relevante en la percepción de un sismo.
-Lamentablemente en el conjunto de datos curados no se dispone de la ubicación de la población que informó haberles percibido lo que imposibilita incorporar la distancia al epicentro como una variable en el modelo.
-Esto no es un limitante en el registro de datos pues el INPRES tiene una metodología operativa para registrar la ubicación de los usuarios que reportan haber percibido un sismo a través de su página web \cite{noauthor_acerca_nodate}. 
+El INPRES tiene una metodología operativa para registrar la ubicación de los usuarios que reportan haber percibido un sismo a través de su página web \cite{noauthor_acerca_nodate}.
+Su buscador de sismos indica los sismos ``sentidos'' por usuarios con un color en sus resultados de búsqueda como ilustra la figura \ref{fig:resultado_búsqueda}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{resultado_búsqueda.png}
+\caption{Resultados de una búsqueda manual de sismos en el sitio del INPRES. El indicado en rojo fue percibido por la población. En la columna \emph{intensidad} se dan datos de ubicación de la población que lo percibió.}
+\label{fig:resultado_búsqueda}
+\end{figure}
+
+Lamentablemente en el conjunto de datos curados no se dispone de la ubicación de la población que informó haberles percibido lo que imposibilita incorporar la distancia al epicentro como una variable en el modelo sin realizar un nuevo \emph{scrapping} de estos datos en el sitio del INPRES.
+Por tal razón para este trabajo se obvian las variables de latitud y longitud del epicentro.
+Para que esto no sea una factor de sesgo en el modelo se decidió filtrar por la variable ``Provincia'' y trabajar con un subconjunto de los datos que correspondan a una provincia en particular.
+Se busca que esta presente un número elevado de sismos, que tenga una extensión geográfica relativamente limitada y que el reporte de sismos percibidos no tenga sesgos geográficos, es decir una mayor preponderancia en regiones meriodionales y/o orientales que en los sentidos opuestos.
+Como puede apreciarse en la figura \ref{fig:mapa_percibidos} presentada en la sección \ref{sec:AED} la provincia de San Juan cumple con estos requisitos.
+Se eligió entonces la provincia de San Juan por presentar un elevado número de casos percibidos o no en el conjunto de datos, por tener una extensión geográfica reducida en comparación con otras así como contar con una alta homogeidad espacial en el reporte de sismos hace que el factor distancia entre epicentro y población que reporta tenga menor impacto que en otras provincias
 
 
 \section{Descripción de las métricas de evaluación de los modelos (si corresponde)}
 
+
+
 \section{Descripción de los métodos estadísticos utilizados (si corresponde)}
+
+
+
+
 
 
 \chapter{Resultados y discusión}
@@ -226,12 +392,7 @@ Esto no es un limitante en el registro de datos pues el INPRES tiene una metodol
 
 \section{Limitaciones y posibles mejoras}
 
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{logos}
-\caption{Figura 1.}
-\label{fig:figura1}
-\end{figure}
+
 
 
 
@@ -246,16 +407,17 @@ Esto no es un limitante en el registro de datos pues el INPRES tiene una metodol
 % \backmatter
 
 %% bibliografía
-% include the bibliography as a numbered chapter
-\printbibliography[heading=bibnumbered]
-% \printbibliography[heading=bibintoc]
+% \printbibliography[heading=bibnumbered] % numbered as chapter
+\printbibliography[heading=bibintoc] % not numbered
 
 % Bibliografía:
 % Referencias bibliográficas citadas en el documento
 % Otras fuentes consultadas
 
 
-\chapter{Anexos (opcionales)}
+\chapter*{Anexos (opcionales)}
+\addcontentsline{toc}{chapter}{Anexos (opcionales)}
+
 \section{Código fuente utilizado en el análisis (link a un repositorio)}
 \section{Tablas y gráficos adicionales}
 \section{Otros materiales relevantes}

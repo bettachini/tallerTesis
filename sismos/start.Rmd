@@ -11,14 +11,15 @@ output:
 # System("R")
 ```
 
-# Fuente de los datos
+# Capítulo 1: Introducción
 
-Elaborados a partir de lo publicado por el [Instituto Nacional de Prevención Sísmica (INPRES)](http://www.inpres.gob.ar/)  
-Sistematizados por Daniela Parada del Instituto de cálculo, FCEyN, UBA. [Presentamos un ejemplo para visualización de datos de sismos de Argentina de los últimos 10 años.](https://daniellaparada.github.io/IC-datasets-docencia/04_visualizacion.html) 
+## Contexto y motivación científica
+Ver manuscrito.
+
+## Objetivo del trabajo / pregunta
+Ver manuscrito.
 
 
-
-# Planteo de la pregunta
 Encontrar los parámetros que más pesan en la percepción de un sismo en Argentina.
 
 Para eso pienso primero probar un modelo de regresión lineal con la variable `Percibido` como dependiente y las demás como independientes.
@@ -28,7 +29,29 @@ Solo tengo la columna `Provincia`, ¿será la del observador o la del sismo?
 
 
 
-# Carga y preprocesamieto de datos
+## Estructura del documento
+Ver manuscrito.
+
+
+
+# Capítulo 2: Marco teórico
+
+
+# Capítulo 3: Metodología
+
+## Presentación y descripción de los datos utilizados
+Ver manuscrito.
+
+Elaborados a partir de lo publicado por el [Instituto Nacional de Prevención Sísmica (INPRES)](http://www.inpres.gob.ar/)  
+Sistematizados por Daniela Parada del Instituto de cálculo, FCEyN, UBA. [Presentamos un ejemplo para visualización de datos de sismos de Argentina de los últimos 10 años.](https://daniellaparada.github.io/IC-datasets-docencia/04_visualizacion.html) 
+
+
+
+
+## Preprocesamiento y limpieza de los datos
+
+
+### Carga de los datos
 
 Determino directorios de trabajo según entorno de ejecución.
 ```{r Directorio de trabajo: ¿Local o GitHub Codespaces?}
@@ -58,7 +81,7 @@ if (
 ```
 
 
-## Carga local
+
 Tras descargar al directorio local el archivo `sismos-arg.csv` desde el url `https://github.com/daniellaparada/IC-datasets-docencia/blob/main/fuente/04_visualizacion/sismos-arg.csv` lo cargo en la data.table `sismos_arg`.
 
 ```{r carga data.table , warning=F, message=F}
@@ -70,28 +93,48 @@ library("data.table")
 
 Genero la data.table a partir del archivo ubicado en el sendero (path) del sistema de archivos local.
 ```{r Lectura del archivo}
-# sismos_all <- fread("./sismos_all.csv", sep = ",") # este no tiene la columna de si fue percibido
+sismos_all <- fread("./sismos_all.csv", sep = ",") # este no tiene la columna de si fue percibido
 sismos_arg <- fread("./sismos-arg.csv", sep = ",")
 ```
 
 
-## Verificación de que se cargó
+### Limpieza de datos 
+
+
+#### Inspección de tipos de datos
+Se verifica que se cargó
+
+```{r head de la data.table}
+head(sismos_all)
+```
+En `sismos_all`  los formatos son distintos, pero crucialmente no figura la columna de si fue percibido.
+
 ```{r nombres columnas iguales a publicado}
 colnames(sismos_arg)
 ```
-Pero, no está el atributo de si fue percibido  
-Debe haber otro conjunto de datos para descargar
+Aquí si figura el booleano de si fue percibido
 
 ```{r tipo de dato}
 str(sismos_arg)
 ```
 
 
-## Datos faltantes o duplicados
+
+#### Valores faltantes o duplicados
 ```{r datos faltantes}
 sum(is.na(sismos_arg))
 ```
 No hay registros con "no números" ("not a number" o NA).
+
+```{r datos con cero}
+# check at each column for any instance of 0
+sapply(sismos_arg, function(x) sum(x == 0))
+```
+
+```{r registros igulas a cero}
+# show rows with Profundidad == 0
+sismos_arg[Profundidad == 0]
+```
 
 
 ```{r datos duplicados número}
@@ -114,9 +157,14 @@ sismos <- sismos_arg[!duplicated(sismos_arg)]
 En `sismos` queda un data.table sin duplicados.
 
 
-## Modificaciones sobre los datos (feature engineering)
+#### Datos atípicos
+Ver sección de Análisis exploratorio de datos.
 
-### Decimalización de la hora
+
+### Modificaciones de los datos (ingeniería de características)
+
+
+#### Decimalización de la hora
 ```{r función de decimalización de la hora}
 # Function to convert hh:mm:ss to seconds past midnight
 convert_to_seconds <- function(time_str) {
@@ -139,8 +187,32 @@ head(sismos)
 summary(sismos$Hora_decimal)
 ```
 
-### Escala de Richter
-Recuerdo que es una escala logarítmica, por lo que me interesaría pasarla a una escala lineal.
+
+## Recorte por produndidad
+
+```{r histograma de Profundidad}
+hist(sismos$Profundidad, main = "Histograma de Profundidad", xlab = "Profundidad", ylab = "Frecuencia", breaks = 50)
+# save the plot
+png("histograma_profundidad.png")
+```
+
+```{r histograma de Profundidad con barras más finas}
+hist(sismos[Profundidad < 50]$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
+profundidad_menos50 <- recordPlot()
+png("graphs/histograma_profundidad_menos50.png", width = 400, height = 400, res = 100)
+replayPlot(profundidad_menos50)
+dev.off()
+```
+
+```{r solo registros con profundidad no nula}
+# copy of data.table
+sismos_todasProfundidades <- copy(sismos)
+sismos <- sismos[Profundidad > 0]
+```
+
+
+#### Linealización de la magnitud
+Puesto que la escala de Richter es una escala logarítmica me interesaría pasarla a una escala lineal.
 
 > The Richter magnitude of an earthquake is determined from the logarithm of the amplitude of waves recorded by seismographs. Adjustments are included to compensate for the variation in the distance between the various seismographs and the epicenter of the earthquake. The original formula is:
 > $$
@@ -156,7 +228,7 @@ Algo para probar luego, por lo pronto a pasarle a una escala lineal.
 Sin ponerme a investigar más genero una columna de magnitud_lineal con $10^{M_L}$
 
 ```{r Linealizar la escala de Richter}
-sismos[, magnitud_lineal := 10^Magnitud]
+sismos[, proxy_amplitud := 10^(Magnitud- 7.0)]
 ```
 
 ```{r head de la data.table}
@@ -164,11 +236,7 @@ head(sismos)
 ```
 
 ```{r descripción para magnitud lineal}
-summary(sismos$magnitud_lineal)
-```
-
-```{r máximo de Magnitud}
-max(sismos$Magnitud)
+summary(sismos$proxy_amplitud)
 ```
 
 
@@ -185,18 +253,116 @@ sum(sismos$Percibido == "FALSE") / nrow(sismos)
 ```
 
 
-
-
-
-#### Magnitud: lineal y escala de Richter
+## Magnitud: distribución lineal y escala de Richter
 
 ```{r histograma de Magnitud con barras más finas}
 hist(sismos$Magnitud, main = "Histograma de Magnitud", xlab = "Magnitud", ylab = "Frecuencia", breaks = 50)
+# save the plot
+png("graphs/histograma_magnitud.png")
+```
+
+```{r acumulado anuales por magnitud}
+library(dplyr)
+
+sismos_SJ <- sismos %>%
+# sismos_SJ <- sismos_SJ %>%
+  mutate(Año = format(Fecha, format = "%Y"))
+
+df <- sismos_SJ %>%
+  filter(Año > 2012,
+         Año < 2022) %>%
+  group_by(Año, Magnitud) %>%
+  summarize(n = n())
+
+
+df2 <- df %>%
+  group_by(Año) %>%
+  arrange(-Magnitud) %>%
+  summarize(Magnitud = Magnitud,
+            nacum = cumsum(n))
+
+library(plotly)
+
+ggplotly(
+  ggplot(data = df2, aes(
+    x = Magnitud, y = log(nacum, 10), colour = Año, key = nacum
+  )) +
+    labs(x = "Magnitud [escala Richter]", y = "(Log 10) sismos") +
+    geom_point() +
+    theme_classic(),
+  source = "select",
+  tooltip = c("key")
+)
+
+# # save as pdf
+# ggsave("graphs/acumulado_anual_magnitud.pdf", width = 12, height = 6, units = "cm")
+
+# install.packages('tikzDevice')
+library(tikzDevice)
+tikz('graphs/acumulado_anual_magnitud.tex',width=5,height=2)
+# plot(1,main='Hello World!')
+ggplot(data = df2, aes(x = Magnitud, y = log(nacum, 10), colour = Año)) +
+  labs(x = "Magnitud [escala Richter]", y = "(Log 10) sismos") +
+  geom_point() +
+  theme_classic()
+dev.off()
+```
+
+### Horario de los percibidos
+```{r percibidos segmentados por hora}
+# Create two separate data.tables for TRUE and FALSE cases
+dt_true <- sismos[Percibido == TRUE]
+dt_false <- sismos[Percibido == FALSE]
+
+# Define the breaks for the 24 hours of the day (0 to 86400 seconds)
+breaks <- seq(0, 86400, by = 3600)
+
+# Create histograms for TRUE and FALSE cases
+hist_true <- hist(dt_true$Hora_decimal, breaks = breaks, plot = FALSE)
+hist_false <- hist(dt_false$Hora_decimal, breaks = breaks, plot = FALSE)
+
+# Calculate the ratio of counts in each bin
+ratio <- hist_true$counts / hist_false$counts
+
+# Create a data.table to hold the result
+percibidos_hora <- data.table(
+  Hora = floor(hist_true$mids / 3600), # Convert bin midpoints to hours
+  Porcentaje = ratio * 100
+)
+
+# Handle possible Inf or NA values in the ratio
+percibidos_hora[is.infinite(Porcentaje) | is.na(Porcentaje), Porcentaje := NA]
+
+# Print the result
+print(percibidos_hora)
 ```
 
 
+```{r histograma percibidos segmentados por hora}
+# generate a vertical bar plot to reproduce an histogram on data at result
+ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
+  geom_bar(stat = "identity") +
+  # labs(title = "Razón de sismos percibidos a no percibidos por hora",
+  labs(
+       x = "Hora",
+       y = "Percibidos [%]")
 
-### Primer ensayo de regresión lineal
+# save it to tikz file
+tikz('graphs/histograma_percibidos_por_hora.tex',width= 4.8,height=2)
+ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Hora", y = "Percibidos [\\%]"
+  )
+dev.off()
+```
+
+
+## Descripción de la selección de características (si corresponde)
+
+
+# Modelado
+
+## Primer ensayo de regresión lineal
 Dos histogramas superpuestos en función `magnitud_lineal` discriminados según el caso de haya o no sido `Percibido`. 
 
 ```{r biblioteca ggplot2}
