@@ -498,21 +498,28 @@ library("glmnet")
 ```
 
 
-Modelo con todas las variables
-```{r regresión logística}
+
+#### Múltiple sin interacción entre variables}
+
+```{r múltiple definición}
 # Fit a logistic regression model
 logit_model <- glm(
   Percibido ~ Hora_decimal + Profundidad + proxy_amplitud,
    data = entrenamiento_SJ_balanceado,
   family = "binomial"
   )
+```
 
+```{r múltiple significativos}
 # Print the summary of the model
 summary(logit_model)
 ```
+Del sumario se indica con p-values que las variables `Profundidad` y `proxy_amplitud` son significativas, pero no `Hora_decimal`.
 
 
-```{r coeficientes de la regresión logística}
+
+
+
 # Extract the coefficients
 coef(logit_model)
 ```

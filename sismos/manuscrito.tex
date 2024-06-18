@@ -34,6 +34,12 @@
 %% tablas
 \usepackage{booktabs}
 
+%% matemática
+\usepackage{amsmath} % aligned
+
+%% color text
+\usepackage{xcolor}
+
 
 
 \begin{document}
@@ -445,16 +451,72 @@ Se generó así un nuevo conjunto de datos de entrenamiento \verb'entrenamiento_
 
 \section{Descripción de los métodos estadísticos utilizados (si corresponde)}
 
-La regresión logística es un método de clasificación binaria que se basa en la regresión lineal.
-Se ajusta un modelo de regresión lineal a los datos de entrada y se aplica una función logística a la salida de este modelo para obtener una probabilidad de que la variable dependiente sea igual a uno.
-La función logística es una función sigmoidea que toma valores entre cero y uno.
-En este trabajo tal probabilidad es la de si la actividad sismica fue percibido por la población en función de las restantes variables correspondientes al terremoto.
+\subsection{Regresión logística para la predicción binaria}
+
+La siguiente es un resumen del material de la novena clase de la asignatua \emph{Enfoque estadístico del aprendizaje} titulada 
+\emph{Regresión Logística} elaborodo por Juan Barriola, Azul Villanueva y Franco Mastelli. 
+
+Un modelo de regresión lineal con coeficientes \(beta_i\) para cada variable \(X_i\) que busque la probabilidad de una dependiente binaria \(P(Y)\)  
+\[
+P(Y) = \beta_0 + \sum\limits_{j=1}^p \beta_j X_j,	
+\]
+no presentaría un punto de corte claro para clasificar los datos en dos categorías.
+Para sortear esta dificulta se toma la salida de esta regresión como la variable dependiente de una regresión logística,
+\[
+P(Y|X)= \frac{e^{\beta_0 + \sum\limits_{j=1}^p \beta_j X_j}}{1+e^{\beta_0 + \sum\limits_{j=1}^p \beta_j X_j}},
+\]
+lo que asegura un valor entre 0 y 1.
+De esta expresión puede arribarse a 
+\[
+	\log {\frac{P(x)}{1-P(x)}}= \beta_0 + \sum\limits_{j=1}^p \beta_j X_j,
+\]
+cuyo lado izquierdo es el logaritmo de los \emph{odds} y se llama \emph{logit}. 
+
+La funcíón \verb'glm' de la biblioteca \verb'glmnet' permite crear un modelo lineal generalizado (Generalized Linear Model).
+Al igual que la función de modelo lineal \verb'lm' toma como argumentos una \emph{formula} y los \emph{datos} pero también se debe especificar el argumento \emph{family}: indicamos la distribución del error y la función link que vamos a utilizar en el modelo según la distribución que corresponde a la variable a predecir 
+\begin{itemize}
+	\item Binomial: link=logit
+	\item Poisson: link=log
+	\item Gaussiana: link=identidad
+\end{itemize}
+Como estamos trabajando con un fenómeno que suponemos tiene una distribución binomial, así lo especificamos en el parámetro \emph{family}.
+
+
+
+\subsection{XGBoost para una predicción binaria}
+
+\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
 
 
 
 \chapter{Resultados y discusión}
 
 \section{Presentación y análisis de resultados obtenidos}
+
+\subsection{Regresión logística}
+
+\subsubsection*{Múltiple sin interacción entre variables}
+
+El primer modelo ensayado es uno múltiple de regresión logística con las variables \verb'Hora_decimal', \verb'Profundidad' y \verb'proxy_amplitud' como predictores sin interacción entre ellos,
+
+\begin{align}
+	\log \left( \frac{p}{1-p} \right) = &
+	 \beta_0 + \beta_1\, \text{Hora\_decimal} + \beta_2 \, \text{Profundidad}\notag\\
+	& + \beta_3 \, \text{proxy\_amplitud},
+	\label{eq:regresion_logistica}
+\end{align}
+
+La función \verb'summary' produce un resumen de los resultados arroja para los coeficientes:
+\begin{verbatim}
+	Coefficients:
+                Estimate Std. Error z value Pr(>|z|)    
+(Intercept)    -0.311098   0.014614 -21.287   <2e-16 ***
+Hora_decimal   -0.015398   0.013362  -1.152    0.249    
+Profundidad    -0.555176   0.010705 -51.863   <2e-16 ***
+proxy_amplitud  0.167536   0.006263  26.750   <2e-16 ***
+\end{verbatim} 
+Esto indica que excepto el coeficiente \(\beta_1\) para la \verb'Hora_decimal', todos son significativos ya que sus probabilidades de que no tengan esos valores y se cumpla la hipótesis nula \(Pr(>|z|)\) para el estadístico \(z = \frac{\beta}{\sigma_\beta}\) se indican como muy inferiores a \(0.05\).
+
 
 \section{Discusión de los resultados y su relevancia}
 
