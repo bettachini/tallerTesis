@@ -89,6 +89,10 @@ if (!require("data.table")) {
   install.packages("data.table")
 }
 library("data.table")
+
+## DT[i, j, by]
+##   R:                 i                 j        by
+## SQL:  where | order by   select | update  group by
 ```
 
 Genero la data.table a partir del archivo ubicado en el sendero (path) del sistema de archivos local.
@@ -184,7 +188,7 @@ head(sismos)
 ```
 
 ```{r descripción de la nueva columna}
-summary(sismos$Hora_decimal)
+summary(sismos[ ,Hora_decimal, ])
 ```
 
 
@@ -226,9 +230,12 @@ Aunque también podría pensarse que sería con su potencia, es decir algo propo
 Algo para probar luego, por lo pronto a pasarle a una escala lineal.
 
 Sin ponerme a investigar más genero una columna de magnitud_lineal con $10^{M_L}$
+```{r min Magnitud}
+min(sismos[,Magnitud, ])
+```
 
 ```{r Linealizar la escala de Richter}
-sismos[, proxy_amplitud := 10^(Magnitud- 7.0)]
+sismos[, proxy_amplitud := 10^(Magnitud- 2.5)]
 ```
 
 ```{r head de la data.table tras generar proxy_amplitud}
@@ -262,7 +269,10 @@ png("graphs/histograma_magnitud.png")
 ```
 
 ```{r acumulado anuales por magnitud}
-library(dplyr)
+if (!require("dplyr")) {
+  install.packages("dplyr")
+}
+library("dplyr")
 
 sismos_SJ <- sismos %>%
 # sismos_SJ <- sismos_SJ %>%
@@ -281,7 +291,10 @@ df2 <- df %>%
   summarize(Magnitud = Magnitud,
             nacum = cumsum(n))
 
-library(plotly)
+if (!require("plotly")) {
+  install.packages("plotly")
+}
+library("plotly")
 
 ggplotly(
   ggplot(data = df2, aes(
@@ -299,6 +312,11 @@ ggplotly(
 
 # install.packages('tikzDevice')
 library(tikzDevice)
+if (!require("tikzDevice")) {
+  install.packages("tikzDevice")
+}
+library("tikzDevice")
+
 tikz('graphs/acumulado_anual_magnitud.tex',width=5,height=2)
 # plot(1,main='Hello World!')
 ggplot(data = df2, aes(x = Magnitud, y = log(nacum, 10), colour = Año)) +
@@ -372,7 +390,10 @@ sismos_SJ <- sismos[Provincia == "San Juan", , ]
 ```
 
 ```{r registros SJ}
-c(nrow(sismos), nrow(sismos_SJ) )
+c(nrow(sismos), nrow(sismos_SJ), nrow(sismos_SJ)/nrow(sismos))
+```
+
+```{r head de sismos_SJ}
 ```
 
 Quedan así un total de tres variables a trabajar en el modelo de clasificación del estado de \verb'Percibido': \verb'Hora_decimal', \verb'Profundidad' y  \verb'proxy_amplitud'.
@@ -388,15 +409,144 @@ corr_alles[, 4]
 ```
 
 
+## Preprocesamiento
+Las evaluaciones sobre la calidad de los modelos de clasificación generados se realizarán sobre un subconjuntos de ensayo (test) del \(20 \%\) de los datos de la provincia de San Juan, el resto se utilizará para el entrenamiento (train).
+
+
+### Escalamiento
+Previo a la partición (splitting) se realiza un escaleo uniforme sobre todo el conjunto de datos (scaling) de las tres características numéricas.
+Para esto se hace uso de la función `scale` de la biblioteca `caret`.
+El objeto de hacer esto previo a un ajuste lineal es que los coeficientes de la regresión sean comparables entre sí.
+
+```{r escalamiento}
+if (!require("caret")) {
+  install.packages("caret")
+}
+library("caret")
+
+# copy only some columns
+sismos_SJ_escalado <- sismos_SJ[, .(Hora_decimal, Profundidad, proxy_amplitud, Percibido)]
+
+# # copia
+# sismos_SJ_escalado <- copy(sismos_SJ)
+
+# Scale numerical features
+numerical_features <- c("Hora_decimal", "Profundidad", "proxy_amplitud")
+sismos_SJ_escalado[, (numerical_features) := lapply(.SD, scale), .SDcols = numerical_features]
+
+head(sismos_SJ_escalado)
+```
+
+
+### División con estratificación
+Dado el desbalance de la clase Percibido comentado en la sección xxx, la división de los datos en subconjuntos entrenamiento y prueba se hará con estratificación usando la función \verb'CreateDataPartion'.
+
+```{r división con estratificación}
+# Split the data into training and testing sets
+set.seed(123)
+train_index <- createDataPartition(sismos_SJ_escalado$Percibido, p = 0.8, list = FALSE)
+entrenamiento_SJ <- sismos_SJ_escalado[train_index]
+ensayo_SJ <- sismos_SJ_escalado[-train_index]
+
+# Print the number of observations in each set
+c(nrow(entrenamiento_SJ), nrow(ensayo_SJ))
+```
+
+
+### Corrección del desbalance
+```{r corrección del desbalance}
+if (!require("ROSE")) {
+  install.packages("ROSE")
+}
+library("ROSE")
+
+# Percibido como factor para el imbalance
+entrenamiento_SJ[, Percibido := as.factor(Percibido)]
+
+# Apply the ROSE algorithm to correct the imbalance
+# entrenamiento_SJ_balanceado <- ovun.sample(Percibido ~ ., data = entrenamiento_SJ, method = "over", N = nrow(entrenamiento_SJ), seed = 123)$data
+entrenamiento_SJ_balanceado <- ROSE(Percibido ~ ., data = entrenamiento_SJ, seed = 123)$data
+
+# Print the number of observations in each set
+c(nrow(entrenamiento_SJ_balanceado), nrow(ensayo_SJ))
+```
+
+```{r verificación del balanceo}
+# Check the balance of the target variable in training set
+table(entrenamiento_SJ_balanceado$Percibido)
+
+# Check the balance of the target variable in test set, must still be unbalanced
+table(ensayo_SJ$Percibido)
+```
+
+
 ## Descripción de las métricas de evaluación de los modelos (si corresponde)
 
 
-
 ## Descripción de los métodos estadísticos utilizados (si corresponde)
-Contar sobre regresión logística aplicada a variables categóricas.
+Contar sobre regresión logística aplicada a variables categóricas y sobre el XFGBoost.
+
+
+### Regresión logística
 
 Utilizaré como base el código de Enfoque estadístico del aprendizaje, clase 9, dedicada a logit.
+```{r biblioteca ajuste regresión lineal}
+if (!require("glmnet")) {
+  install.packages("glmnet")
+}
+library("glmnet")
+```
 
+
+Modelo con todas las variables
+```{r regresión logística}
+# Fit a logistic regression model
+logit_model <- glm(
+  Percibido ~ Hora_decimal + Profundidad + proxy_amplitud,
+   data = entrenamiento_SJ_balanceado,
+  family = "binomial"
+  )
+
+# Print the summary of the model
+summary(logit_model)
+```
+
+
+```{r coeficientes de la regresión logística}
+# Extract the coefficients
+coef(logit_model)
+```
+
+```{r odds ratios}
+# Calculate the odds ratios
+exp(coef(logit_model))
+```
+
+```{r predicciones}
+# Predict the probabilities of the response variable
+sismos_SJ[, prob := predict(logit_model, newdata = sismos_SJ, type = "response")]
+
+# Print the result
+head(sismos_SJ)
+```
+
+```{r roc}
+if (!require("pROC")) {
+  install.packages("pROC")
+}
+library("pROC")
+
+# Create a ROC curve
+roc_curve <- roc(sismos_SJ$Percibido, sismos_SJ$prob)
+
+# Plot the ROC curve
+plot(roc_curve, main = "ROC Curve", col = "blue")
+```
+
+```{r auc}
+# Calculate the AUC
+auc(roc_curve)
+```
 
 
 
@@ -406,7 +556,10 @@ Utilizaré como base el código de Enfoque estadístico del aprendizaje, clase 9
 Dos histogramas superpuestos en función `magnitud_lineal` discriminados según el caso de haya o no sido `Percibido`. 
 
 ```{r biblioteca ggplot2}
-library(ggplot2)
+if (!require("ggplot2")) {
+  install.packages("ggplot2")
+}
+library("ggplot2")
 ```
 
 Lo mismo pero con rango acotado a un máximo de 1e5
