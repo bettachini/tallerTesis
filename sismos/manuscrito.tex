@@ -5,7 +5,7 @@
 %% Spanska!
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}    % 8-bit encoding. Acentuados como único caracter.
-\usepackage[spanish, es-tabla]{babel}
+\usepackage[spanish]{babel}
 % \def\spanishoptions{argentina}
 
 %% graphics
@@ -31,6 +31,9 @@
     colorlinks=false    % false:boxedlinks ; true:coloredlinks
 }
 
+%% tablas
+\usepackage{booktabs}
+
 
 
 \begin{document}
@@ -54,7 +57,7 @@
     \centering
     %\vspace*{1in}
     
-    \huge\textbf{Factores físicos de los terremotos que influyen en su percepción por la población}
+    \huge\textbf{Predicción de la percepción de sismos por la población a partir de datos básicos de terremotos}
     
     \vspace{0.5in}
 		Trabajo final de la asignatura\\``Taller de tesis''\\
@@ -72,7 +75,9 @@
     \vfill
     \begin{minipage}{0.8\textwidth}
     \begin{abstract}
-        Una decena de terremotos se producen en el territorio nacional en forma diaria sin que sean detectados más que por instrumentos. Son muy pocos los casos en que las ondas sismicas que estos producen son percibidos por la población. Este trabajo examina busca determinar la importancia relativa de los descriptores físicos de terremotos que más contribuyen a que sean percibidos por las personas. 
+        Una decena de terremotos se producen en el territorio nacional en forma diaria sin que sean detectados más que por instrumentos.
+				Son muy pocos los casos en que las ondas sismicas que estos producen son percibidos por la población.
+				Este trabajo busca cuantificar la capacidad de predecir esta eventualidad por dos herramientas de la ciencia de datos usando solo datos básicos de terremotos.
     \end{abstract}
 		\end{minipage}
 	\end{titlepage}
@@ -108,7 +113,7 @@ El caso inverso es también problemático con casos en que ante una carencia de 
 
 \section{Objetivos del trabajo / Pregunta}
 Contar con una estimación rápida a partir de los datos sismicos registrados por instrumental de si un dado evento será percibido por la población o no permitiría a las autoridades tomar decisiones informadas sobre la comunicación a la población.
-Este trabajo busca determinar si con métodos de ciencias de datos puede predecirse con un grado de certeza elevado si un sismo será percibido por la población o no a partir de las variables de los sismos que se registran en los datos del Instituto Nacional de Prevención Sísmica (INPRES) que es el organismo público de Argentina que realiza estudios e investigaciones básicas y aplicadas de sismología \cite{noauthor_instituto_2022}.
+Este trabajo busca determinar el grado de certeza con que ciertos métodos de ciencias de datos pueden predecir si la población percibirá actividad sismica producto de terremotos a partir de unos pocos datos básicos sobre los mismos publicados por el Instituto Nacional de Prevención Sísmica (INPRES) que es el organismo público de Argentina que realiza estudios e investigaciones básicas y aplicadas de sismología \cite{noauthor_instituto_2022}.
 
 
 
@@ -204,9 +209,14 @@ De todas formas se realizaron las verificaciones usuales cada vez que se utiliza
 
 \subsection{Limpieza de datos}
 
+\paragraph{Carga de los datos}
+Tras descargar el archivo de datos en fomato CSV se le importó en una estructura de datos \emph{data.table} de en un entorno de trabajo en lenguaje R.
+Esta estructura de datos permite una consulta de los datos análoga a la del lenguaje SQL de bases de datos relacionales lo que le hace una herramienta versatil para el análisis de datos tabulares \cite{noauthor_introduction_2024}.
+
+
 \paragraph{Inspección de tipos de datos}
-Tras descargar el archivo de datos en fomato CSV y importarle a un entorno de trabajo en lenguaje R en una estructura de datos ``data.table'' denominado \verb'sismos_arg' ejecutar \verb'colnames(sismos_arg)' permitió verificar que contuviera las columnas con los nombres anunciados en el sitio que publica los datos en su sección \cite[Exploración inicial]{daniela_parada_ic-datasets-docencia_nodate}.
-Las transformaciones o ingeniería de características que se detallan luego en esta sección se realizaron en función de los tipos de datos de cada columnas constatados con la función \verb'str(sismos_arg)'.
+Ejecutar la funcíon \verb'colnames' con la \emph{data.table} denominada \verb'sismos_arg' como argumento permitió verificar que contuviera las columnas con los nombres anunciados en el sitio que publica los datos en su sección \cite[Exploración inicial]{daniela_parada_ic-datasets-docencia_nodate}.
+Las transformaciones o ingeniería de características que se detallan luego en esta sección se realizaron en función de los tipos de datos de cada columnas constatados con la función \verb'str'.
 
 
 \paragraph{Valores faltantes o duplicados}
@@ -353,7 +363,7 @@ La ubicación solo de los percibidos en un mapa político que muestra la figura 
 
 \section{Descripción de la selección de características (si corresponde)}
 
-% \paragraph{El problema de la distancia}
+\paragraph{El problema de la distancia}
 Evidentemente la proximidad de un epicentro a una población es un factor relevante en la percepción de un sismo.
 El INPRES tiene una metodología operativa para registrar la ubicación de los usuarios que reportan haber percibido un sismo a través de su página web \cite{noauthor_acerca_nodate}.
 Su buscador de sismos indica los sismos ``sentidos'' por usuarios con un color en sus resultados de búsqueda como ilustra la figura \ref{fig:resultado_búsqueda}.
@@ -365,12 +375,40 @@ Su buscador de sismos indica los sismos ``sentidos'' por usuarios con un color e
 \label{fig:resultado_búsqueda}
 \end{figure}
 
+
+\paragraph{Obviando latitud y longitud}
 Lamentablemente en el conjunto de datos curados no se dispone de la ubicación de la población que informó haberles percibido lo que imposibilita incorporar la distancia al epicentro como una variable en el modelo sin realizar un nuevo \emph{scrapping} de estos datos en el sitio del INPRES.
 Por tal razón para este trabajo se obvian las variables de latitud y longitud del epicentro.
 Para que esto no sea una factor de sesgo en el modelo se decidió filtrar por la variable ``Provincia'' y trabajar con un subconjunto de los datos que correspondan a una provincia en particular.
+
+
+\paragraph{Elección de la provincia de San Juan}
 Se busca que esta presente un número elevado de sismos, que tenga una extensión geográfica relativamente limitada y que el reporte de sismos percibidos no tenga sesgos geográficos, es decir una mayor preponderancia en regiones meriodionales y/o orientales que en los sentidos opuestos.
 Como puede apreciarse en la figura \ref{fig:mapa_percibidos} presentada en la sección \ref{sec:AED} la provincia de San Juan cumple con estos requisitos.
-Se eligió entonces la provincia de San Juan por presentar un elevado número de casos percibidos o no en el conjunto de datos, por tener una extensión geográfica reducida en comparación con otras así como contar con una alta homogeidad espacial en el reporte de sismos hace que el factor distancia entre epicentro y población que reporta tenga menor impacto que en otras provincias
+Se eligió entonces la provincia de San Juan por presentar un elevado número de casos percibidos o no en el conjunto de datos, por tener una extensión geográfica reducida en comparación con otras así como contar con una alta homogeidad espacial en el reporte de sismos hace que el factor distancia entre epicentro y población que reporta tenga menor impacto que en otras provincias.
+Se procedió a filtrar los datos por la provincia de San Juan con el comando \verb'sismos_SJ <- sismos[Provincia == "San Juan"]'.
+
+
+\paragraph{Variables a correlacionar con la percepción}
+De las originales referidas al tiempo en que se produce el terremoto \verb'Fecha' y \verb'Hora' se trabajará solo con la generada a partir de la segunda \verb'Hora_decimal' obviando la primera pues no es esperable que la percepción de un sismo por parte de la población.
+De las originales referidas a la magnitud y profundidad del sismo se trabajará con la generada a partir de la primera \verb'proxy_amplitud' y la segunda sin modificación.
+Quedan así un total de tres variables a trabajar en el modelo de clasificación del estado de \verb'Percibido': \verb'Hora_decimal', \verb'Profundidad' y  \verb'proxy_amplitud'.
+Con la función \verb'cor' se verificó que lo covarianza de \verb'Percibido' con \verb'Hora_decimal' es casi nula, que cuanto más profundo es el terremoto es menos percibido y que \verb'proxy_amplitud' tiene ura correlación positiva, como era de esperarse, con la percepción de los sismos.
+Se resume esto en el cuadro \ref{tab:correlaciones}.
+\begin{table}[h]
+\centering
+\begin{tabular}{llll}
+\toprule
+\verb'Hora_decimal' & \verb'Profundidad'  & \verb'proxy_amplitud' & \verb'Percibido' \\ 
+\midrule
+-0.004116917  & -0.142358740  &  0.165371903 &   1.000000000 \\
+\bottomrule
+\end{tabular}
+\caption{La fila paar la variable de percepción de la matriz de covarianza entre las variables de los sismos a analizarán muestra una débil correlación positiva con la variable que depende de la amplitud de las ondas sísmicas y una negativa con la profundidad del terremoto en concordancia con las expectaciones lógicas que pueden tenerse sobre el fenómeno.}
+\label{tab:correlaciones}
+\end{table}
+
+
 
 
 \section{Descripción de las métricas de evaluación de los modelos (si corresponde)}

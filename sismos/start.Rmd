@@ -231,7 +231,7 @@ Sin ponerme a investigar más genero una columna de magnitud_lineal con $10^{M_L
 sismos[, proxy_amplitud := 10^(Magnitud- 7.0)]
 ```
 
-```{r head de la data.table}
+```{r head de la data.table tras generar proxy_amplitud}
 head(sismos)
 ```
 
@@ -308,6 +308,8 @@ ggplot(data = df2, aes(x = Magnitud, y = log(nacum, 10), colour = Año)) +
 dev.off()
 ```
 
+
+
 ### Horario de los percibidos
 ```{r percibidos segmentados por hora}
 # Create two separate data.tables for TRUE and FALSE cases
@@ -357,7 +359,45 @@ dev.off()
 ```
 
 
+### Distribución geográfica
+Hay código en (https://daniellaparada.github.io/IC-datasets-docencia/04_visualizacion.html#exploraci%C3%B3n-inicial) pero se tomaron las imágenes de allí.
+
+
+
 ## Descripción de la selección de características (si corresponde)
+
+### El problema de la distancia -> San Juan 
+```{r select rows with Provincia == San Juan}
+sismos_SJ <- sismos[Provincia == "San Juan", , ]
+```
+
+```{r registros SJ}
+c(nrow(sismos), nrow(sismos_SJ) )
+```
+
+Quedan así un total de tres variables a trabajar en el modelo de clasificación del estado de \verb'Percibido': \verb'Hora_decimal', \verb'Profundidad' y  \verb'proxy_amplitud'.
+
+Podría verse si hay puede hacerse un heat map de correlaciones entre estas variables con 'Percibido'.
+
+```{r correlación variables}
+# use any tool
+corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, proxy_amplitud, Percibido)], use = "complete.obs")
+str(corr_alles)
+# only the last column
+corr_alles[, 4]
+```
+
+
+## Descripción de las métricas de evaluación de los modelos (si corresponde)
+
+
+
+## Descripción de los métodos estadísticos utilizados (si corresponde)
+Contar sobre regresión logística aplicada a variables categóricas.
+
+Utilizaré como base el código de Enfoque estadístico del aprendizaje, clase 9, dedicada a logit.
+
+
 
 
 # Modelado
