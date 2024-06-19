@@ -15,6 +15,26 @@ Daniela Parada - dparada@dm.uba.ar
 https://daniellaparada.github.io/IC-datasets-docencia/04_visualizacion.html
 
 ### 2024-06-18 Entrega III
+Date: Tue, 18 Jun 2024 23:59:09 -0300 (-03)
+From: Victor A. Bettachini <bettachini@gmail.com>
+To: gsolovey@gmail.com, bounosian@gmail.com, dparada@dm.uba.ar
+Subject: Taller de tesis | Entrega III (debo la II)
+
+Hola Daniela, Ian, Guillermo.
+
+Estoy en el grupo 3 y hoy hice mi envío para la entrega III correspondiente a "Introducción y resultados".
+
+Tras no haber realizado la entrega II "Metodología y análisis exploratorio de datos" hice la III incluyendo esos puntos, pero debo reconocer casi carente de resultados.No hice ni la mitad de lo que puede hacerse con una de las
+técnicas con que me propuse trabajar y ni comencé con la segunda.
+
+Si algo estoy entregado es gracias al trabajo de Daniela en compilar el dataset de sismos y por la sugerencias que ella me dió de ideas para trabajar con él durante la última clase (nuevamente, ¡gracias!).
+
+De más está decir que no hay excusa para mi desempeño este cuatrimestre, pero aún así les agradeceré cualquier instrucción de como seguir, aunque sea para tener una mejor base al recursar. En particular, ¿empaqueto lo que escribí en
+el pdf de la entrega III sobre "Metodología y EDA" en una entrega II tardía? Esto es, si es que aún pudieran darme sugerencias sobre estas temáticas.
+
+Hasta pronto.
+
+
 
 
 ### 2024-06-04
