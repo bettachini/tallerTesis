@@ -5,6 +5,35 @@
 [Cronograma](https://tallerdetesis1-2024.netlify.app/cronograma)
 Martes de 19 a 22hs. https://exactas-uba.zoom.us/j/86457673848 [exactas-uba.zoom.us] ID de reunión: 864 5767 3848 Código de acceso: tti24-sur
 
+## Docentes
+Guillermo Solovey - gsolovey@gmail.com
+Ian Bounos - bounosian@gmail.com
+Daniela Parada - dparada@dm.uba.ar
+
+
+## Terremotos
+https://daniellaparada.github.io/IC-datasets-docencia/04_visualizacion.html
+
+### 2024-06-18 Entrega III
+
+
+### 2024-06-04
+Opciones
+1.Clasificar si fueron percibidos
+	- cercanía zona urbana (distancia a ciudad más próximo)
+	- intensidad
+	- profundidad
+1. Correlación
+- coordenadas con intensidad (e.g. si más al oeste, cerca de la cordillera son más presentes)
+1. Tiempo de ocurrencia entre eventos por sobre cierta intensidad
+
+
+
+A un mes -> todo
+dos semanas -> ¿Qué se va a responder? ¿Con que dos técnicas voy a atacarle?
+
+
+
 
 ## Rios
 9 promedios de revisitas cada 16 min -> 144 min (1/10 día)

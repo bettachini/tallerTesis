@@ -197,15 +197,16 @@ summary(sismos[ ,Hora_decimal, ])
 ```{r histograma de Profundidad}
 hist(sismos$Profundidad, main = "Histograma de Profundidad", xlab = "Profundidad", ylab = "Frecuencia", breaks = 50)
 # save the plot
-png("histograma_profundidad.png")
+# png("histograma_profundidad.png")
 ```
 
 ```{r histograma de Profundidad con barras más finas}
 hist(sismos[Profundidad < 50]$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
 profundidad_menos50 <- recordPlot()
-png("graphs/histograma_profundidad_menos50.png", width = 400, height = 400, res = 100)
-replayPlot(profundidad_menos50)
-dev.off()
+
+#png("graphs/histograma_profundidad_menos50.png", width = 400, height = 400, res = 100)
+#replayPlot(profundidad_menos50)
+#dev.off()
 ```
 
 ```{r solo registros con profundidad no nula}
@@ -264,8 +265,8 @@ sum(sismos$Percibido == "FALSE") / nrow(sismos)
 
 ```{r histograma de Magnitud con barras más finas}
 hist(sismos$Magnitud, main = "Histograma de Magnitud", xlab = "Magnitud", ylab = "Frecuencia", breaks = 50)
-# save the plot
-png("graphs/histograma_magnitud.png")
+## save the plot
+# png("graphs/histograma_magnitud.png")
 ```
 
 ```{r acumulado anuales por magnitud}
@@ -308,7 +309,7 @@ ggplotly(
 )
 
 # # save as pdf
-# ggsave("graphs/acumulado_anual_magnitud.pdf", width = 12, height = 6, units = "cm")
+# pdf("graphs/acumulado_anual_magnitud.pdf", width = 12, height = 6, units = "cm")
 
 # install.packages('tikzDevice')
 library(tikzDevice)
@@ -317,13 +318,13 @@ if (!require("tikzDevice")) {
 }
 library("tikzDevice")
 
-tikz('graphs/acumulado_anual_magnitud.tex',width=5,height=2)
-# plot(1,main='Hello World!')
-ggplot(data = df2, aes(x = Magnitud, y = log(nacum, 10), colour = Año)) +
-  labs(x = "Magnitud [escala Richter]", y = "(Log 10) sismos") +
-  geom_point() +
-  theme_classic()
-dev.off()
+#tikz('graphs/acumulado_anual_magnitud.tex',width=5,height=2)
+## plot(1,main='Hello World!')
+#ggplot(data = df2, aes(x = Magnitud, y = log(nacum, 10), colour = Año)) +
+#  labs(x = "Magnitud [escala Richter]", y = "(Log 10) sismos") +
+#  geom_point() +
+#  theme_classic()
+#dev.off()
 ```
 
 
@@ -367,13 +368,13 @@ ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
        x = "Hora",
        y = "Percibidos [%]")
 
-# save it to tikz file
-tikz('graphs/histograma_percibidos_por_hora.tex',width= 4.8,height=2)
-ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
-  geom_bar(stat = "identity") +
-  labs(x = "Hora", y = "Percibidos [\\%]"
-  )
-dev.off()
+## save it to tikz file
+#tikz('graphs/histograma_percibidos_por_hora.tex',width= 4.8,height=2)
+#ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
+#  geom_bar(stat = "identity") +
+#  labs(x = "Hora", y = "Percibidos [\\%]"
+#  )
+#dev.off()
 ```
 
 
@@ -487,6 +488,7 @@ table(ensayo_SJ$Percibido)
 Contar sobre regresión logística aplicada a variables categóricas y sobre el XFGBoost.
 
 
+
 ### Regresión logística
 
 Utilizaré como base el código de Enfoque estadístico del aprendizaje, clase 9, dedicada a logit.
@@ -499,7 +501,7 @@ library("glmnet")
 
 
 
-#### Múltiple sin interacción entre variables}
+#### Múltiple sin interacción entre variables
 
 ```{r múltiple definición}
 # Fit a logistic regression model
@@ -510,130 +512,130 @@ logit_model <- glm(
   )
 ```
 
+
 ```{r múltiple significativos}
 # Print the summary of the model
 summary(logit_model)
 ```
 Del sumario se indica con p-values que las variables `Profundidad` y `proxy_amplitud` son significativas, pero no `Hora_decimal`.
 
+```{r múltiple predicciones}
+# Make predictions on the test set
+prediction_full <- predict(logit_model, newdata = ensayo_SJ, type = "response")
 
-
-
-
-# Extract the coefficients
-coef(logit_model)
+# Print the first few predictions
+head(prediction_full)
 ```
 
-```{r odds ratios}
-# Calculate the odds ratios
-exp(coef(logit_model))
-```
+```{r múltiple metrics function}
+# Define the prediction metrics function
+prediction_metrics <- function(cutoff, predictions, actual) {
+  # Example adjustment if Percibido is boolean
+  actual <- factor(actual, levels = c(FALSE, TRUE))
+  predicted_class <- factor(ifelse(predictions > cutoff, TRUE, FALSE), levels = c(FALSE, TRUE))
 
-```{r predicciones}
-# Predict the probabilities of the response variable
-sismos_SJ[, prob := predict(logit_model, newdata = sismos_SJ, type = "response")]
-
-# Print the result
-head(sismos_SJ)
-```
-
-```{r roc}
-if (!require("pROC")) {
-  install.packages("pROC")
-}
-library("pROC")
-
-# Create a ROC curve
-roc_curve <- roc(sismos_SJ$Percibido, sismos_SJ$prob)
-
-# Plot the ROC curve
-plot(roc_curve, main = "ROC Curve", col = "blue")
-```
-
-```{r auc}
-# Calculate the AUC
-auc(roc_curve)
-```
-
-
-
-# Modelado
-
-## Primer ensayo de regresión lineal
-Dos histogramas superpuestos en función `magnitud_lineal` discriminados según el caso de haya o no sido `Percibido`. 
-
-```{r biblioteca ggplot2}
-if (!require("ggplot2")) {
-  install.packages("ggplot2")
-}
-library("ggplot2")
-```
-
-Lo mismo pero con rango acotado a un máximo de 1e5
+  # predicted_class <- ifelse(predictions > cutoff, 1, 0)
+  # actual <- factor(actual, levels = c(0, 1))
+  # predicted_class <- factor(predicted_class, levels = c(0, 1))
   
-```{r histogramas acotados}
-ggplot(sismos_arg, aes(x = magnitud_lineal, fill = Percibido)) +
-  geom_histogram(position = "identity", alpha = 0.5, bins = 20) +
-  labs(title = "Histograma de magnitud lineal de sismos percibidos y no percibidos",
-       x = "Magnitud lineal",
-       y = "Frecuencia") +
-  xlim(0, 1e4)
+  # Ensure there is at least one instance of each class
+  if (length(unique(predicted_class)) < 2 || length(unique(actual)) < 2) {
+    return(data.frame(
+      cutoff = cutoff,
+      accuracy = NA,
+      sensitivity = NA,
+      specificity = NA,
+      precision = NA
+    ))
+  }
+
+  cm <- confusionMatrix(predicted_class, actual, positive = "TRUE")
+  
+  data.frame(
+    cutoff = cutoff,
+    accuracy = cm$overall['Accuracy'],
+    sensitivity = cm$byClass['Sensitivity'],
+    specificity = cm$byClass['Specificity'],
+    precision = cm$byClass['Precision']
+  )
+}
 ```
 
-Poca sorpresa, obviamente la proporción de no percibidos sería dominante en los de poca intensidad.
-Veré en un rango de magnitudes entre 5000 y 15000.
+```{r múltiple metrics_list}
+cutoffs <- seq(0.05, 0.95, by = 0.01)
 
-```{r histogramas acotados 2}
-ggplot(sismos_arg, aes(x = magnitud_lineal, fill = Percibido)) +
-  geom_histogram(position = "identity", alpha = 0.5, bins = 20) +
-  labs(title = "Histograma de magnitud lineal de sismos percibidos y no percibidos",
-       x = "Magnitud lineal",
-       y = "Frecuencia") +
-  xlim(5000, 50000)
+# Calculate metrics for each cutoff value
+metrics_list <- lapply(cutoffs, function(cutoff) {
+  prediction_metrics(cutoff, predictions = prediction_full, actual = ensayo_SJ$Percibido)
+})
+
+# Print the first few elements of metrics_list to check
+head(metrics_list)
 ```
 
 
-### Algo para jugar: Ver por Provincia
-Se podría ver si hay alguna provincia que tenga una mayor proporción de sismos percibidos.
-Para eso necesitaría algo que ecualice la distribución de magnitudes.
+```{r múltiple metrics plot}
+# Combine the list of data frames into a single data frame
+logit_pred <- do.call(rbind, metrics_list)
 
-1. segmentar sismos por provincias
-2. elegida una provincia base, tomar su distribución de magnitudes de sismos como patrón
-3. en las restantes provincias, muestrear selectivamente para que la distribución de magnitudes sea similar a la de la provincia base
-4. comparar la proporción de sismos percibidos en cada provincia
+# Reshape the data for plotting
+logit_pred <- logit_pred %>%
+  pivot_longer(cols = -cutoff, names_to = "term", values_to = "estimate") %>%
+  mutate(estimate = round(estimate, 3))
 
-```{r segmentar por provincias}
-sismos_por_provincia <- sismos_arg[, .(cantidad = .N), by = Provincia]
-sismos_por_provincia <- sismos_por_provincia[order(-cantidad)]
-sismos_por_provincia
+# Plot the results
+ggplot(logit_pred, aes(cutoff, estimate, group = term, color = term)) +
+  geom_line(size = 1) +
+  theme_bw() #+
+# labs(
+#  title = 'Accuracy, Sensitivity, Specificity y Precision',
+#  subtitle = 'Modelo completo',
+#  color = ""
+#)
 ```
 
-```{r histograma de cantidad de sismos por provincia}
-ggplot(sismos_por_provincia, aes(x = Provincia, y = cantidad)) +
-  geom_bar(stat = "identity") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(title = "Cantidad de sismos por provincia",
-       x = "Provincia",
-       y = "Cantidad")
+```{r múltiple metrics plot castellano}
+# Assuming logit_pred is your data frame containing metrics like accuracy, sensitivity, etc.
+
+# copy logit_pred to a new data frame
+logit_pred_castellano <- copy(logit_pred)
+
+# Translate terms to Spanish
+logit_pred_castellano$term <- recode(logit_pred_castellano$term,
+                          "accuracy" = "Exactitud",
+                          "sensitivity" = "Sensibilidad",
+                          "specificity" = "Especificidad",
+                          "precision" = "Precisión")
+
+# names(logit_pred_castellano)[names(logit_pred_castellano) == "estimate"] <- "estimación"
+
+# Plot with translated labels
+ggplot(logit_pred_castellano, aes(cutoff, estimate, group=term, color=term)) + 
+  geom_line(size=1) +
+  theme_bw() +
+  labs`title = 'Exactitud, Sensibilidad, Especificidad y Precisión',
+       subtitle = 'Modelo completo',
+       color = "Métricas",
+       x = "Umbral de Corte",
+       y = "Valor") +
+  scale_color_manual(values = c("Exactitud" = "black",
+                                "Sensibilidad" = "blue",
+                                "Especificidad" = "red",
+                                "Precisión" = "green"))
 ```
 
-Evidentemente es en la provincia de San Juan donde más sismos se registran.
-Esa será la provincia base para la distribución de magnitudes.
 
-```{r distribución de magnitudes en San Juan}
-sismos_san_juan <- sismos_arg[Provincia == "San Juan"]
-ggplot(sismos_san_juan, aes(x = magnitud_lineal)) +
-  geom_histogram(position = "identity", alpha = 0.5, bins = 20) +
-  labs(title = "Histograma de magnitud lineal de sismos en San Juan",
-       x = "Magnitud lineal",
-       y = "Frecuencia")
+```{r save to tikz}
+tikz('graphs/múltiple_metrics.tex',width=5,height=3)
+ggplot(logit_pred, aes(cutoff, estimate, group = term, color = term)) +
+  geom_line(size = 1) +
+  theme_bw()
+dev.off()
 ```
 
-Hmmmm, no... No es la distribución. Ya sé que sigue la curva estimada de Gutenberg-Richter.
-Como figura en https://daniellaparada.github.io/IC-datasets-docencia/04_visualizacion.html#exploraci%C3%B3n-inicial
+let's guess I choose a cutoff of 0.5
 
-> En el siguiente gráfico se superpone, en azul, la curva estimada de Gutenberg-Richter a partir de los datos de San Juan.
-> $$
-> \log_{10} N = a - b M,
-> $$
-> con $a = 6.1812$ y $b = 1.1433$.
+```{r múltiple metrics at 0.5}
+# Calculate metrics for the chosen cutoff value
+prediction_metrics(0.5, predictions = prediction_full, actual = ensayo_SJ$Percibido)
+```

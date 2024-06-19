@@ -161,21 +161,54 @@ Pero en la superficial búsqueda superficial de literatura realizada para este t
 
 \section{Conceptos y técnicas de ciencia de datos utilizados en el trabajo}
 
-Siendo el objetivo de cualquier modelo utilizado una clasificación entre dos clases, la percepción de un sismo o no, se busca determinar que tan fuerte es el vínculo de cada una de las variables de los sismos de las que se dispone datos y la percepción de los mismos por parte de la población.
-Para esto dos técnicas se planea utilizar dos distintas técnicas de la ciencia de datos: la regresión logística y la clasificación de árboles de decisión. 
+% Siendo el objetivo de cualquier modelo utilizado una clasificación entre dos clases, la percepción de un sismo o no, se busca determinar que tan fuerte es el vínculo de cada una de las variables de los sismos de las que se dispone datos y la percepción de los mismos por parte de la población.
 
-Un modelo de regresión logística permite una clasificación binaria de los datos en función de una variable dependiente y un conjunto de variables independientes al tiempo de dar un peso a cada una de estas últimas lo que permitirá transmitir cuales son más relevantes en la clasificación.
-Determinar la atribución de la percepción de un sismo a las variables de los mismos se considera de interés para los objetivo de este trabajo. 
-Ajustando el grado de regularización tipo Lasso (L1) se buscará reducir el número de variables independientes en el modelo verificando en que grado su omisión afecta a la predicción.
+Se utilizan en este trabajo dos técnicas con aplicación a la predicción pero en sendos extremos de complejidad y transparencia en cuanto al peso relativo que tienen las variables independientes en el resultado, el de regresión logística y el de máquinas de potenciacion de gradiente, más conocidos por su nombre en inglés Gradient Boosting Machines (GBM).
 
-Por otra parte se buscará utilizar una herramienta más reciente, las máquinas de potenciacion de gradiente, más conocidos por su nombre en inglés Gradient Boosting Machines (GBM).
+
+\subsection{Regresión logística para la predicción binaria}
+
+La siguiente es un resumen del material de la novena clase de la asignatua \emph{Enfoque estadístico del aprendizaje} titulada \emph{Regresión Logística} elaborodo por Juan Barriola, Azul Villanueva y Franco Mastelli. 
+
+Un modelo de regresión lineal con coeficientes \(beta_i\) para cada variable \(X_i\) que busque la probabilidad de una dependiente binaria \(P(Y)\)  
+\[
+P(Y) = \beta_0 + \sum\limits_{j=1}^p \beta_j X_j,	
+\]
+no presentaría un punto de corte claro para clasificar los datos en dos categorías.
+Para sortear esta dificulta se toma la salida de esta regresión como la variable dependiente de una regresión logística,
+\[
+P(Y|X)= \frac{e^{\beta_0 + \sum\limits_{j=1}^p \beta_j X_j}}{1+e^{\beta_0 + \sum\limits_{j=1}^p \beta_j X_j}},
+\]
+lo que asegura un valor entre 0 y 1.
+De esta expresión puede arribarse a 
+\[
+	\log {\frac{P(x)}{1-P(x)}}= \beta_0 + \sum\limits_{j=1}^p \beta_j X_j,
+\]
+cuyo lado izquierdo es el logaritmo de los \emph{odds} y se llama \emph{logit}. 
+
+La funcíón \verb'glm' de la biblioteca \verb'glmnet' permite crear un modelo lineal generalizado (Generalized Linear Model).
+Al igual que la función de modelo lineal \verb'lm' toma como argumentos una \emph{formula} y los \emph{datos} pero también se debe especificar el argumento \emph{family}: indicamos la distribución del error y la función link que vamos a utilizar en el modelo según la distribución que corresponde a la variable a predecir 
+\begin{itemize}
+	\item Binomial: link=logit
+	\item Poisson: link=log
+	\item Gaussiana: link=identidad
+\end{itemize}
+Como estamos trabajando con un fenómeno que suponemos tiene una distribución binomial, así lo especificamos en el parámetro \emph{family}.
+
+Aunque se parte de pocas variables independientes, se ensayará forzar una mayor simplificación del mismo mediante la técnica de regularización tipo Lasso (L1) que fuerza a que los coeficientes de las variables independientes que menos aportan a predicción vayan anulándose.
+
+
+\subsection{XGBoost para una predicción binaria}
+
+En otro extremo entre las herramientas de ciencia de datos por su complijidad se ensayará utilizar máquinas de potenciacion de gradiente, más conocidos por su nombre en inglés Gradient Boosting Machines (GBM) para la predicción
 Las distintas implementaciones de estos algoritmos, como XGBoost, LightGBM o CatBoost son capaces de producir un único modelo con fuerte poder predictivo a partir de la síntesis de resultados de modelos de predicción débiles, típicamente árboles de decisión. 
-% Se planea utilizar la implementación de XGBoost en lenguaje R para este trabajo.
+En particular se utiliza la implementación de XGBoost en lenguaje R para este trabajo.
 
-Puesto que los GBM carecen de un mecanísmo para evidenciar la importancia de las variables en la clasificación como la que evidencian los pesos de la regresión logística, se planea utilizar los valores del método SHAP comentado en la sección anterior para tal fin.
-Para el lenguaje R está disponible la biblioteca \emph{shapr} para tal fin \cite{camilla_lingjaerde_shapr_nodate}.
+%Puesto que los GBM carecen de un mecanísmo para evidenciar la importancia de las variables en la clasificación como la que evidencian los pesos de la regresión logística, se planea utilizar los valores del método SHAP comentado en la sección anterior para tal fin.
+%Para el lenguaje R está disponible la biblioteca \emph{shapr} para tal fin \cite{camilla_lingjaerde_shapr_nodate}.
 
-El disponer de una herramienta de explicación de los modelos de predección aplicable al resultado de los dos a ensayar, el de regresión lógistica y el XGBoost, permitirá comparar la relevancia de las variables que asignará cada uno para la percepción de los sismos por parte de la población.
+%El disponer de una herramienta de explicación de los modelos de predección aplicable al resultado de los dos a ensayar, el de regresión lógistica y el XGBoost, permitirá comparar la relevancia de las variables que asignará cada uno para la percepción de los sismos por parte de la población.
+
 
 
 
@@ -229,13 +262,21 @@ Se hizo una copia de la tabla sin registros duplicados ejecutando \verb'sismos_a
 
 
 \paragraph{Datos atípicos}
-La detección y potenciales acciones sobre datos atípicos se tratan una vez iniciado un análisis exploratorio de datos temática de la sección \ref{sec:AED}.\\
+La detección y potenciales acciones sobre datos atípicos se tratan una vez iniciado un análisis exploratorio de datos temática de la sección \ref{sec:AED}.
 
 
-\subsection{Modificaciones de los datos (ingeniería de características)}
+
+\section{Ingeniería de características}
 
 Por otra parte el preprocesamiento comprende la generación de nuevas variables a partir de las existentes que se consideren relevantes para el análisis, lo que recibe el nombre de ingeniería de características (feature engineering).
-Se generaron dos nuevas columnas a partir de las existentes en el conjunto de datos original, una en función al formato de los datos en la columna \verb'Hora' y otra en función de la escala física utilizada en la columna \verb'Magnitud'.
+
+Esto comprende tareas de distinta naturaleza.
+Por un lado las que se realizan para adecuar el formato de datos para las herramientas a utilizar como el que se describe en el próximo párrafo.
+Otras de estas es una modificación basada en un conocimiento del sistema que genera los datos.
+En estos casos se hace uso de un críterio que parte de condicionamientos sobre el sistema físico o se implementa un modelo en base a la física del sistema.
+Dos de las variables de este conjunto de datos son afectadas por este tipo de modificación, que se decribe posteriormente en una subsección.
+
+% Se generaron dos nuevas columnas a partir de las existentes en el conjunto de datos original, una en función al formato de los datos en la columna \verb'Hora' y otra en función de la escala física utilizada en la columna \verb'Magnitud'.
 
 
 \paragraph{Decimalización de la hora del sismo}
@@ -245,17 +286,25 @@ Para ello se escribió una función \verb'convert_to_seconds' centrada en la fun
 Se verificó que la columna generada con aplicación a través de \verb'sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]' estuvieron en el rango de \num{0} a \SI{86400}{\second}, es decir, el de un día completo.
 
 
+\subsection{Modificaciones inspiradas en la física del sistema}
+% \section{Descripción de las técnicas de análisis y, si corresponde, de modelado}
+
+
 \paragraph{Recorte por profundidad}
+
+Puesto que hay sismos que no tienen origen en terromotos.
+Pueden tener origen en desplazamientos superficiales de tierra, explosiones para la minera o el fracturado hidráulico para la extracción de hidrocarburos.
+Se busca omitir tales origenes en los datos informados.
 
 \begin{wrapfigure}[17]{r}{0.4\textwidth}
 	\includegraphics[width=0.4\textwidth]{histograma_profundidad_menos50.png}
 	\caption{Los sismos con produndidad de \SI{0}{km} son pocos.}
 	\label{fig:histograma_profundidad}
 \end{wrapfigure}
+Con ese fin se decidió trabajar solo con los sismos que se originaron a una profundidad mayor a \SI{0}{\kilo\metre} filtrando con \verb'sismos <- sismos[Profundidad > 0]'.
 
-Puesto que hay sismos que tienen su origen en desplazamientos de tierra, explosiones artificiales para la minera, fracturado hidráulico para la extracción de hidrocarburos que no son terremotos, se omiten los datos informados con una profundidad de \SI{0}{\kilo\metre} con simple un filtado \verb'sismos <- sismos[Profundidad > 0]'.
-Esta es una práctica usual en el análisis de datos orientados a sismos originados en terremotos \cite{hu_applying_2024}.
 Siendo que la variable se informa como enteros de kilometros, estos representarían los hipocentros hasta una profundidad de \SI{500}{\metre}, compatibles con estas actividades artificiales.
+Esta es una práctica usual en el análisis de datos orientados a sismos originados en terremotos \cite{hu_applying_2024}.
 Esto es un número muy pequeño de los sismos en el conjunto de datos como la muestra el histograma según su profundidad que reproduce la figura \ref{fig:histograma_profundidad}.
 
 
@@ -289,9 +338,10 @@ No se encontró otra alternativa que asumir que todos los fenómenos registrados
 Así realizando despejes a partir de la ecuación \ref{eq:richter} asumiendo tales condicionantes todo cuanto puede aproximarse a un valor relacionado la amplitud será una lineal con registrada por un sismógrafo, \(A_\text{máx}\),
 \begin{equation}
 	\left( \frac{A_\text{máx}}{T_\text{constante}} \right) = 10^{(m_b - 2.5)}.
-	\label{eq:linealizacionMagnitud} 
+	\label{eq:linealizacionMagnitud_final} 
 \end{equation}
 Con el comando \verb'sismos[, proxy_amplitud := 10^(Magnitud- 2.5)]' se generó una columna para este valor denominada \verb'proxy_amplitud'.
+
 
 
 \section{Análisis exploratorio de datos (AED)}\label{sec:AED}
@@ -329,11 +379,12 @@ Esto la ilustra el número por año de sismos representado en una esacala logar�
 \label{fig:acumulado_anual_magnitud}
 \end{figure}
 
+De esta observación no se desprende una acción a realizar en el preprocesamiento o selección de los datos.
+
 
 \paragraph{Horario de los percibidos}
 Puede hipotetizarse que en los horarios de sueño de la mayoría de la población sea menor la proporción de sismos percibidos.
-Para ver si esto es se segmentaron los fenómenos con la variable \verb'Hora_decimal' en intervalos de una hora.
-En cada intervalo calculó la proporción entre casos percibidos o no y se graficaron las 24 proporciones generando la figura \ref{fig:histograma_percibidos_por_hora}. 
+Segmentando la \verb'Hora_decimal' de los registros en intervalos de una hora se calculó la proporción entre casos percibidos o no para graficar las 24 proporciones en la figura \ref{fig:histograma_percibidos_por_hora}. 
 \begin{figure}[!h]
 \centering
 \input{graphs/histograma_percibidos_por_hora.tex}
@@ -341,9 +392,11 @@ En cada intervalo calculó la proporción entre casos percibidos o no y se grafi
 \label{fig:histograma_percibidos_por_hora}
 \end{figure}
 
-Contrariando la hipótesis se observa enque si hay una merma en percepciones de sismos esta es muy ligera y se produce entre las 10 y 19 horas.
-Donde es claro un cambio llamativo es en el incremento durante las tres horas que comienzan a las 23 de cada día.
+Contrariando la hipótesis la única merma observada se produce entre las 10 y 19 horas, y es muy ligera.
+Donde es claro un cambio llamativo es durante las tres horas que comienzan a las 23 de cada día en que hay un incremento de percepciones. 
 Habría que ver si tal variación es estadísticamente significativa, pero por sobre todo buscar una posible causa sociológica o fisiológica relacionada a que sean las primeras horas de sueño nocturo de la mayor parte de la población.
+
+No surge una acción a realizar en función de esta observación.
 
 
 \paragraph{Distribución geográfica}
@@ -366,14 +419,14 @@ La ubicación solo de los percibidos en un mapa político que muestra la figura 
 \label{fig:mapa_percibidos}
 \end{figure}
 
+De lo observado en estas figuras se hace una selección del área geográfica de los datos a trabajar que se discute en la sección siguiente.
 
 
 
-\section{Descripción de las técnicas de análisis y, si corresponde, de modelado}
 
 
-
-\section{Descripción de la selección de características (si corresponde)}
+\section{Características relevantes a la predicción}
+% \section{Descripción de la selección de características (si corresponde)}
 
 \paragraph{El problema de la distancia}
 Evidentemente la proximidad de un epicentro a una población es un factor relevante en la percepción de un sismo.
@@ -446,54 +499,87 @@ Para esto se utiliza la función \verb'ovun.sample' de la biblioteca \verb'ROSE'
 Se generó así un nuevo conjunto de datos de entrenamiento \verb'entrenamiento_SJ_balanceado' con \num{23934} registros.
 
 
-\section{Descripción de las métricas de evaluación de los modelos (si corresponde)}
-
-
-\section{Descripción de los métodos estadísticos utilizados (si corresponde)}
-
-\subsection{Regresión logística para la predicción binaria}
-
-La siguiente es un resumen del material de la novena clase de la asignatua \emph{Enfoque estadístico del aprendizaje} titulada 
-\emph{Regresión Logística} elaborodo por Juan Barriola, Azul Villanueva y Franco Mastelli. 
-
-Un modelo de regresión lineal con coeficientes \(beta_i\) para cada variable \(X_i\) que busque la probabilidad de una dependiente binaria \(P(Y)\)  
-\[
-P(Y) = \beta_0 + \sum\limits_{j=1}^p \beta_j X_j,	
-\]
-no presentaría un punto de corte claro para clasificar los datos en dos categorías.
-Para sortear esta dificulta se toma la salida de esta regresión como la variable dependiente de una regresión logística,
-\[
-P(Y|X)= \frac{e^{\beta_0 + \sum\limits_{j=1}^p \beta_j X_j}}{1+e^{\beta_0 + \sum\limits_{j=1}^p \beta_j X_j}},
-\]
-lo que asegura un valor entre 0 y 1.
-De esta expresión puede arribarse a 
-\[
-	\log {\frac{P(x)}{1-P(x)}}= \beta_0 + \sum\limits_{j=1}^p \beta_j X_j,
-\]
-cuyo lado izquierdo es el logaritmo de los \emph{odds} y se llama \emph{logit}. 
-
-La funcíón \verb'glm' de la biblioteca \verb'glmnet' permite crear un modelo lineal generalizado (Generalized Linear Model).
-Al igual que la función de modelo lineal \verb'lm' toma como argumentos una \emph{formula} y los \emph{datos} pero también se debe especificar el argumento \emph{family}: indicamos la distribución del error y la función link que vamos a utilizar en el modelo según la distribución que corresponde a la variable a predecir 
-\begin{itemize}
-	\item Binomial: link=logit
-	\item Poisson: link=log
-	\item Gaussiana: link=identidad
-\end{itemize}
-Como estamos trabajando con un fenómeno que suponemos tiene una distribución binomial, así lo especificamos en el parámetro \emph{family}.
 
 
 
-\subsection{XGBoost para una predicción binaria}
 
-\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+% \section{Descripción de los métodos estadísticos utilizados (si corresponde)}
 
 
+
+\section{Métricas de evaluación de los modelos}
+% \section{Descripción de las métricas de evaluación de los modelos (si corresponde)}
+
+Independientemente del modelo de clasificación que se utilice, la evaluación de su desempeño se realiza a partir de la comparación de las predicciones del modelo con los valores reales de la variable objetivo.
+Se reservará un subconjunto de los datos para evaluar el desempeño del modelo, el conjunto de prueba y generar una matriz de confusión.
+
+\paragraph{Matriz de confusión}
+La matriz de confusión es una tabla que muestra el número de verdaderos positivos, falsos positivos, verdaderos negativos y falsos negativos del modelo.
+A partir de esta matriz se pueden calcular como razones entre verdaderos y falso positivos y negativos la exactitud, precisión, sensibilidad, especificidad y el valor F1.
+
+\paragraph{Exactitud (accuracy)}
+La exactitud es la proporción de predicciones correctas sobre el total de casos.
+Se calcula como
+\begin{equation}
+	\text{Exactitud} = \frac{\text{Verdaderos positivos} + \text{Verdaderos negativos}}{\text{Verdaderos pos} + \text{Falsos pos} + \text{Verdaderos neg} + \text{Falsos neg}}.
+\end{equation}
+
+\paragraph{Precisión}
+La precisión es la proporción de predicciones correctas sobre el total de predicciones realizadas.
+Se calcula como
+\begin{equation}
+	\text{Precisión} = \frac{\text{Verdaderos positivos} + \text{Verdaderos negativos}}{\text{Verdaderos pos} + \text{Falsos pos} + \text{Verdaderos neg} + \text{Falsos neg}}.
+\end{equation}
+
+\paragraph{Sensibilidad (recall)}
+La sensibilidad es la proporción de verdaderos positivos sobre el total de casos positivos.
+Se calcula como
+\begin{equation}
+	\text{Sensibilidad} = \frac{\text{Verdaderos positivos}}{\text{Verdaderos positivos} + \text{Falsos negativos}}.
+\end{equation}
+
+\paragraph{Especificidad}
+La especificidad es la proporción de verdaderos negativos sobre el total de casos negativos.
+Se calcula como
+\begin{equation}
+	\text{Especificidad} = \frac{\text{Verdaderos negativos}}{\text{Verdaderos negativos} + \text{Falsos positivos}}.
+\end{equation}
+
+\paragraph{F1-score}
+El \emph{F1-score} es la media armónica de la precisión y la sensibilidad (recall).
+Se calcula como
+\begin{equation}
+	\text{F1-score} = 2 \times \frac{\text{Precisión} \times \text{Recall}}{\text{Precisión} + \text{Recall}}.
+\end{equation}
+
+Con un grafico de estas métricas en función del punto de corte entre clases se elige manualmente este que permita clasificar las instancias en una de las dos clases.
+
+Como complemento se pueden trazar las curvas ROC y PR para evaluar el desempeño de los modelos en separar las clases.
+
+\paragraph{Área bajo la curva ROC}
+El área bajo la curva ROC (AUC-ROC) es una métrica que evalúa la capacidad de un modelo de clasificación para discriminar entre clases.
+Se calcula como el área bajo la curva ROC, que es la curva que representa la tasa de verdaderos positivos en función de la tasa de falsos positivos.
+El valor de AUC-ROC varía entre 0 y 1, donde 0 indica un modelo que clasifica todas las instancias de la clase positiva como negativas y viceversa, y 1 indica un modelo que clasifica perfectamente las instancias de ambas clases.
+
+\paragraph{Área bajo la curva PR}
+El área bajo la curva PR (AUC-PR) es una métrica que evalúa la capacidad de un modelo de clasificación para discriminar entre clases.
+Se calcula como el área bajo la curva PR, que es la curva que representa la precisión en función del \emph{recall}.
+El valor de AUC-PR varía entre 0 y 1, donde 0 indica un modelo que clasifica todas las instancias de la clase positiva como negativas y viceversa, y 1 indica un modelo que clasifica perfectamente las instancias de ambas clases.
+
+%\paragraph{Validación cruzada}
+%La validación cruzada es una técnica que se utiliza para evaluar el desempeño de un modelo de clasificación.
+%Consiste en dividir el conjunto de datos en \(k\) subconjuntos, entrenar el modelo en \(k-1\) subconjuntos y evaluarlo en el subconjunto restante.
+%Este proceso se repite \(k\) veces, de modo que cada subconjunto se utiliza una vez como conjunto de prueba.
+%
+
+% En este trabajo se utilizará la AUC-ROC la utilizada para de los modelos de clasificación ajustados en este trabajo.
 
 \chapter{Resultados y discusión}
 
-\section{Presentación y análisis de resultados obtenidos}
+\section{Presentación de resultados}
+% \section{Presentación y análisis de resultados obtenidos}
 
-\subsection{Regresión logística}
+\subsection{Predictor por regresión logística}
 
 \subsubsection*{Múltiple sin interacción entre variables}
 
@@ -517,11 +603,49 @@ proxy_amplitud  0.167536   0.006263  26.750   <2e-16 ***
 \end{verbatim} 
 Esto indica que excepto el coeficiente \(\beta_1\) para la \verb'Hora_decimal', todos son significativos ya que sus probabilidades de que no tengan esos valores y se cumpla la hipótesis nula \(Pr(>|z|)\) para el estadístico \(z = \frac{\beta}{\sigma_\beta}\) se indican como muy inferiores a \(0.05\).
 
+Para definir el punto de corte entre las clases se graficaron las métricas de evaluación en función de este como ilustra la figura \ref{fig:múltiple_metrics}.
+Si en base a la inspección de esa figura eligiera el punto de corte en \(0.5\) se obtendrían las métricas de evaluación que se resumen en la tabla \ref{tab:múltiple_metrics}.
 
-\section{Discusión de los resultados y su relevancia}
+\begin{figure}[!h]
+	\centering
+	\input{graphs/múltiple_metrics.tex}
+	\caption{Métricas de evaluación para definir manualmente el punto de corte entre clases para el modelo de regresión logística múltiple sin interacción entre variables.}
+	\label{fig:múltiple_metrics}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lllll}
+\toprule
+corte & exactitud & sensitividad & especificidad & precisión \\
+\midrule
+\num{0.5} & \num{0.8726179} & \num{0.5365854} & \num{0.8796723} & \num{0.08560311} \\
+\bottomrule
+\end{tabular}
+\caption{Métricas de evaluación para el modelo de regresión logística múltiple sin interacción entre variables con punto de corte en \(0.5\).}
+\label{tab:múltiple_metrics}
+\end{table}
+
+
+Continuando con el análisis de la regresión logística ahora vería si logro mejorar estas métricas con un modelo que incluya interacción entre las variables.
+
+\subsubsection{Múltiple con interacción entre variables}
+\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+
+
+\subsection{Predictor por XGBoost}
+\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+
+
+
+\section{Relevancia de los resultados}
+% \section{Discusión de los resultados y su relevancia}
+\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+
+
 
 \section{Limitaciones y posibles mejoras}
-
+\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
 
 
 
@@ -529,10 +653,19 @@ Esto indica que excepto el coeficiente \(\beta_1\) para la \verb'Hora_decimal', 
 \chapter{Conclusión}
 
 \section{Resumen de los hallazgos principales}
+\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+
+
 
 \section{Conclusiones generales y su relación con los objetivos del trabajo}
+\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+
+
 
 \section{Aplicaciones y relevancia de los resultados}
+\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+
+
 
 % \backmatter
 
@@ -548,9 +681,19 @@ Esto indica que excepto el coeficiente \(\beta_1\) para la \verb'Hora_decimal', 
 \chapter*{Anexos (opcionales)}
 \addcontentsline{toc}{chapter}{Anexos (opcionales)}
 
-\section{Código fuente utilizado en el análisis (link a un repositorio)}
+
+\section{Código fuente utilizado en el análisis}
+Enlace al \href{https://github.com/bettachini/tallerTesis/tree/main/sismosURL}{repositorio en GitHub} que aloja el código fuente utilizado en el análisis de los datos.
+% \textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+
+
+
 \section{Tablas y gráficos adicionales}
+\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+
+
 \section{Otros materiales relevantes}
+\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
 
 
 \end{document}
