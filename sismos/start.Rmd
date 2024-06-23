@@ -194,10 +194,13 @@ summary(sismos[ ,Hora_decimal, ])
 
 ## Recorte por produndidad
 
-```{r histograma de Profundidad}
-hist(sismos$Profundidad, main = "Histograma de Profundidad", xlab = "Profundidad", ylab = "Frecuencia", breaks = 50)
-# save the plot
-# png("histograma_profundidad.png")
+```{r save plot as TikZ}
+# install.packages('tikzDevice')
+library(tikzDevice)
+if (!require("tikzDevice")) {
+  install.packages("tikzDevice")
+}
+library("tikzDevice")
 ```
 
 ```{r histograma de Profundidad con barras más finas}
@@ -207,6 +210,14 @@ profundidad_menos50 <- recordPlot()
 #png("graphs/histograma_profundidad_menos50.png", width = 400, height = 400, res = 100)
 #replayPlot(profundidad_menos50)
 #dev.off()
+
+# save as TikZ
+tikz('graphs/histograma_profundidad_menos50.tex',width=2.5,height=2.5)
+replayPlot(profundidad_menos50)
+dev.off()
+```
+
+```{r histograma de Profundidad con barras más finas}
 ```
 
 ```{r solo registros con profundidad no nula}
@@ -264,7 +275,8 @@ sum(sismos$Percibido == "FALSE") / nrow(sismos)
 ## Magnitud: distribución lineal y escala de Richter
 
 ```{r histograma de Magnitud con barras más finas}
-hist(sismos$Magnitud, main = "Histograma de Magnitud", xlab = "Magnitud", ylab = "Frecuencia", breaks = 50)
+#hist(sismos$Magnitud, main = "Histograma de Magnitud", xlab = "Magnitud", ylab = "Frecuencia", breaks = 50)
+
 ## save the plot
 # png("graphs/histograma_magnitud.png")
 ```
@@ -297,26 +309,19 @@ if (!require("plotly")) {
 }
 library("plotly")
 
-ggplotly(
-  ggplot(data = df2, aes(
-    x = Magnitud, y = log(nacum, 10), colour = Año, key = nacum
-  )) +
-    labs(x = "Magnitud [escala Richter]", y = "(Log 10) sismos") +
-    geom_point() +
-    theme_classic(),
-  source = "select",
-  tooltip = c("key")
-)
+#ggplotly(
+#  ggplot(data = df2, aes(
+#    x = Magnitud, y = log(nacum, 10), colour = Año, key = nacum
+#  )) +
+#    labs(x = "Magnitud [escala Richter]", y = "(Log 10) sismos") +
+#    geom_point() +
+#    theme_classic(),
+#  source = "select",
+#  tooltip = c("key")
+#)
 
 # # save as pdf
 # pdf("graphs/acumulado_anual_magnitud.pdf", width = 12, height = 6, units = "cm")
-
-# install.packages('tikzDevice')
-library(tikzDevice)
-if (!require("tikzDevice")) {
-  install.packages("tikzDevice")
-}
-library("tikzDevice")
 
 #tikz('graphs/acumulado_anual_magnitud.tex',width=5,height=2)
 ## plot(1,main='Hello World!')
@@ -397,16 +402,31 @@ c(nrow(sismos), nrow(sismos_SJ), nrow(sismos_SJ)/nrow(sismos))
 ```{r head de sismos_SJ}
 ```
 
+### Latitud y longitud
+
+```{r latitud San Juan}
+# find out correlation between latitud and Percibido
+cor(sismos_SJ$Latitud, sismos_SJ$Percibido)
+```
+
+```{r longitud San Juan}
+cor(sismos_SJ$Longitud, sismos_SJ$Percibido)
+```
+
+
+
+
 Quedan así un total de tres variables a trabajar en el modelo de clasificación del estado de \verb'Percibido': \verb'Hora_decimal', \verb'Profundidad' y  \verb'proxy_amplitud'.
 
 Podría verse si hay puede hacerse un heat map de correlaciones entre estas variables con 'Percibido'.
 
 ```{r correlación variables}
 # use any tool
-corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, proxy_amplitud, Percibido)], use = "complete.obs")
+corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, proxy_amplitud, Latitud, Longitud, Percibido)], use = "complete.obs")
+# corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, proxy_amplitud, Percibido)], use = "complete.obs")
 str(corr_alles)
 # only the last column
-corr_alles[, 4]
+corr_alles[, 6]
 ```
 
 
