@@ -269,7 +269,7 @@ La detección y potenciales acciones sobre datos atípicos se tratan una vez ini
 
 
 
-\section{Ingeniería de características}
+\section{Ingeniería de características}\label{sec:ingeniería}
 
 Por otra parte el preprocesamiento comprende la generación de nuevas variables a partir de las existentes que se consideren relevantes para el análisis, lo que recibe el nombre de ingeniería de características (feature engineering).
 
@@ -282,11 +282,14 @@ Dos de las variables de este conjunto de datos son afectadas por este tipo de mo
 % Se generaron dos nuevas columnas a partir de las existentes en el conjunto de datos original, una en función al formato de los datos en la columna \verb'Hora' y otra en función de la escala física utilizada en la columna \verb'Magnitud'.
 
 
-\paragraph{Decimalización de la hora del sismo}
-La columna ``Hora'' está codificada como una cadena de caracteres.
-Para poder utilizarla en un análisis de regresión se la convirtió a un número entero de segundos transcurridos desde la medianoche del día en que se produjo el sismo. 
-Para ello se escribió una función \verb'convert_to_seconds' centrada en la función \verb'strptime' del paquete base de R.
-Se verificó que la columna generada con aplicación a través de \verb'sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]' estuvieron en el rango de \num{0} a \SI{86400}{\second}, es decir, el de un día completo.
+\paragraph{Fecha y hora del sismo}
+A partir de la varible Hora se escribió una función que genera otra continua contando el número entero de segundos transcurridos desde la medianoche del día en que se produjo el terremoto, \emph{Segundos en el día}, apoyandose para esto en la función \verb'strptime' del paquete base de R.
+Esto habilita posibles análisis segmentando el día en franjas horarias.
+% Se verificó que los valores en la columna generada con \verb'sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]' estuvieran en el rango de \num{0} a \SI{86400}{\second}, es decir, el de un día completo.
+
+La fecha se pasó del formato ISO 8601 a dos variables.
+Una guarda el número consecutivo de día del año, \emph{Día del año}, lo que permite segmentar por rangos del año.
+La otra simplemente guarda \emph{Año}, para hacer contrastaciones interanuales.
 
 
 \subsection{Modificaciones inspiradas en la física del sistema}
@@ -295,7 +298,7 @@ Se verificó que la columna generada con aplicación a través de \verb'sismos[,
 
 \paragraph{Recorte por profundidad}
 
-%\begin{figure}[!h]
+%\begin{figure}[!ht]
 \begin{wrapfigure}[22]{r}[10pt]{0.48\textwidth}
 	\centering
 	\input{graphs/histograma_profundidad_menos50.tex}
@@ -346,7 +349,7 @@ Así realizando despejes a partir de la ecuación \ref{eq:richter} y asumiendo t
 	\left( \frac{A_\text{máx}}{T_\text{constante}} \right) = 10^{(m_b - 2.5)}.
 	\label{eq:linealizacionMagnitud_final} 
 \end{equation}
-Con el comando \verb'sismos[, proxy_amplitud := 10^(Magnitud- 2.5)]' se generó una columna para este valor denominada \verb'proxy_amplitud'.
+Con el comando \verb'sismos[, Proxy\_amplitud := 10^(Magnitud- 2.5)]' se generó una columna para este valor denominada \verb'Proxy\_amplitud'.
 
 
 
@@ -376,7 +379,7 @@ Esto la ilustra el número por año de sismos representado en una escala logarí
 %% \end{wrapfigure}
 %\end{figure}
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 % The output from tikz()
 % is imported here.
@@ -391,7 +394,7 @@ De esta observación no se desprende una acción a realizar en el preprocesamien
 \paragraph{Horario de los percibidos}
 Se puede hipotetizar que en los horarios de sueño de la mayoría de la población sea menor la proporción de sismos percibidos.
 Segmentando la \verb'Hora_decimal' de los registros en intervalos de una hora se calculó la proporción entre casos percibidos o no para graficar las 24 proporciones en la figura \ref{fig:histograma_percibidos_por_hora}. 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \input{graphs/histograma_percibidos_por_hora.tex}
 \caption{Proporción de sismos percibidos por la población en función de la hora del día.}
@@ -409,7 +412,7 @@ No surge una acción a realizar en función de esta observación.
 Como es esperable la mayor parte de los hipocentros se ubican en regiones con orografía elevada, como la cordillera de los Andes, producto de la subducción de la placa de Nazca bajo la placa Sudamericana, o las sierras cordobesas producto de procesos mucho más antiguos. 
 Una ubicación de los mismos sobre un mapa físico lo ilustra en la figura \ref{fig:mapa_sismos}.
 Esto conlleva a que la mayor parte de los terremotos estén alejados de las mayores urbanizaciones reduciendo la probabilidad de que sean percibidos por la población.
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.8\textwidth]{mapa_sismos.png}
 \caption{Superponer las ubicaciones de los terremotos en un mápa físico muestra que la mayoría de los terremotos se registran en zonas de montaña o cerros en su mayoría alejados de las mayores urbanizaciones lo que afecta negativamente la estadística de los percibidos.
@@ -419,7 +422,7 @@ Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
 \end{figure}
 
 La ubicación de los terremotos sobre un mapa político que muestra la figura \ref{fig:terremotosMapa} deja a las claras que no tienen una distribución homogénea aún en provincias con abundante actividad.
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.8\textwidth]{terremotosMapa.png}
 \caption{Sobre este mapa político se representan las ubicaciones de los terremotos como puntos. Esto permite apreciar que en algunas provincias, como San Luís, se omiten datas como evidencia el corte abrupto de reportes en su frontera. En otras se hacen más claros sesgos geográficos, como en Córdoba, Salta o Jujuy, 
@@ -441,7 +444,7 @@ Evidentemente la proximidad de un epicentro a una población es un factor releva
 El INPRES tiene una metodología operativa para registrar la ubicación de los usuarios que reportan haber percibido un sismo a través de su página web \cite{noauthor_acerca_nodate}.
 Su buscador de sismos indica los sismos ``sentidos'' por usuarios con un color en sus resultados de búsqueda como ilustra la figura \ref{fig:resultado_búsqueda}.
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=\textwidth]{resultado_búsqueda.png}
 \caption{Resultados de una búsqueda manual de sismos en el sitio del INPRES. El indicado en rojo fue percibido por la población. En la columna \emph{intensidad} se dan datos de ubicación de la población que lo percibió.}
@@ -464,7 +467,7 @@ Con \num{29916} registros es aún un número suficiente para realizar análisis 
 
 \paragraph{Latitud y longitud}
 La distribución de terremotos en la provincia de San Juna dista de ser homogénea pues hay una preponderancia de las ubicaciones meridionales como puede apreciarse en la figura \ref{fig:sanJuan}. 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.8\textwidth]{sanJuan.png}
 \caption{Ampliación del área de San Juan en la figura \ref{fig:terremotosMapa}.
@@ -490,27 +493,32 @@ Nuevamente será una virtud de los modelos si pueden explotar tal información p
 
 
 \paragraph{Variables a correlacionar con la percepción}
-De las originales referidas al tiempo en que se produce el terremoto \verb'Fecha' y \verb'Hora' se trabajará solo con la generada a partir de la segunda \verb'Hora_decimal' obviando la primera pues no es esperable que la percepción de un sismo por parte de la población.
-De las originales referidas a la magnitud y profundidad del sismo se trabajará con la generada a partir de la primera \verb'proxy_amplitud' y la segunda sin modificación.
-Quedan así un total de cinco variables a trabajar en el modelo de clasificación del estado de \verb'Percibido': \verb'Hora_decimal', \verb'Latitud', \verb'Longitud', \verb'Profundidad' y  \verb'proxy_amplitud'.
+De las originales referidas al fecha y hora en que se produce el terremoto Fecha y Hora se trabajará solo con la generada a partir de la segunda Hora\_decimal obviando la primera pues no es esperable que la percepción de un sismo por parte de la población.
 
-Con la función \verb'cor' se verificó que lo covarianza de \verb'Percibido' con \verb'Hora_decimal' es casi nula, que cuanto más profundo es el terremoto es menos percibido y que \verb'proxy_amplitud' tiene una correlación positiva, como era de esperarse, con la percepción de los sismos.
+De los datos sobre parámetros físicos del terremoto, Magnitud y Profundidad, se trabajará con la segunda sin modificación, en tanto que se espera un mejor desempeño en modelos que se basen en la variable elaborada a partir de la primera, Proxy\_amplitud por lo expuesto en la sección \ref{sec:ingeniería}.
+De todas formas, como la relación entre ambas no es lineal, la covarianza entre ambas es elevada, \(\approx 0.233\), pero no es perfecta por lo que podría ensayarse el impacto de usar alternativamente Magnitud o Proxy\_amplitud en distintos modelos.
+
+Quedan así potenciales seis variables para trabajar en el modelo de clasificación del estado de Percibido: Hora\_decimal, Latitud, Longitud, Profundidad, Magnitud y Proxy\_amplitud.
+
+Con la función \verb'cor' se verificó que lo covarianza de Percibido con Hora\_decimal es casi nula, que cuanto más profundo es el terremoto es menos percibido y que era de esperarse que terremotos que liberan más energía sean más percibidos, Magnitud y Proxy\_amplitud muestran una correlación positiva.
 La correlación de la percepción con la latitud resultó ser menos significativa que con la longitud.
 Se resume esto en el cuadro \ref{tab:correlaciones}.
 \begin{table}[h]
-	\centering
-	\begin{tabular}{lllll}
-		\toprule
-		\verb'Hora_decimal' & \verb'Profundidad'  & \verb'proxy_amplitud' & \verb'Latitud' & \verb'Longitud' \\ 
-		\midrule
-		-0.004116917 & -0.142358740 & 0.165371903 & -0.010351411 & 0.055488097\\ \bottomrule
-	\end{tabular}
-	\caption{La fila para la variable de percepción de la matriz de covarianza entre las variables de los sismos a analizarán muestra una débil correlación positiva con la variable que depende de la amplitud de las ondas sísmicas y una negativa con la profundidad del terremoto en concordancia con las expectaciones lógicas que pueden tenerse sobre el fenómeno.
-	Un orden de magnitud menor hay una positiva con la longitud, lo que se esperaba por acercarse a la cordillera, y una menor en magnitud con la latitud.
-	Relativamente la hora a la largo de todo el día no prácticamente correlación con la percepción de los sismos.
-	Para analizar esto último hay que segmentar por bandas horarias. 
-}
-\label{tab:correlaciones}
+	% \resizebox{\textwidth}{!}{%
+		% \centering
+		\begin{tabular}{lllll}
+			\toprule
+			Hora\_decimal & Profundidad  & Proxy\_amplitud & Latitud & Longitud \\ 
+			\midrule
+			-0.004116917 & -0.142358740 & 0.165371903 & -0.010351411 & 0.055488097\\ \bottomrule
+		\end{tabular}
+		\caption{La fila para la variable de percepción de la matriz de covarianza entre las variables de los sismos a analizarán muestra una débil correlación positiva con la variable que depende de la amplitud de las ondas sísmicas y una negativa con la profundidad del terremoto en concordancia con las expectaciones lógicas que pueden tenerse sobre el fenómeno.
+		Un orden de magnitud menor hay una positiva con la longitud, lo que se esperaba por acercarse a la cordillera, y una menor en magnitud con la latitud.
+		Relativamente la hora a la largo de todo el día no prácticamente correlación con la percepción de los sismos.
+		Para analizar esto último hay que segmentar por bandas horarias. 
+		}
+		\label{tab:correlaciones}
+	%}
 \end{table}
 
 
@@ -518,15 +526,23 @@ Se resume esto en el cuadro \ref{tab:correlaciones}.
 \section{Preprocesamiento}
 
 
-Las evaluaciones sobre la calidad de los modelos de clasificación generados se realizarán sobre un subconjuntos de ensayo (test) del \(20 \%\) de los datos de la provincia de San Juan, el resto se utilizará para el entrenamiento (train).
+
+
 
 \paragraph{Escalamiento}
-Previo a la partición (splitting) se realiza un escalado uniforme sobre todo el conjunto de datos (scaling) de las tres características numéricas. 
-El objeto de hacer esto previo a un ajuste lineal es que los coeficientes de la regresión sean comparables entre sí, con lo que la convergencia será más rápida y estable.
-Para esto se hace uso de la función `scale` de la biblioteca `caret` para generar \verb'sismos_SJ_escalado' 
+Previo a la partición (splitting) se realiza un escalado uniforme sobre todo el conjunto de datos (scaling) de las características numéricas.
+Con esto variables de entrada a los modelos tendrán una media de cero y una desviación estándar de uno, lo que tiene consecuencias para interpretabilidad del modelo de regresión:
+\begin{itemize}
+	\item los coeficientes serán comparables entre sí, no dependiendo de la escala de los datos,
+	\item el intercepto del modelo será la predicción esperada para el caso en que los factores contemplados sean nulos, es decir, no tengan efecto,
+	\item y finalmente si se hace uso de regularización se evita que los coeficientes de las variables de mayor escala tengan un peso desproporcionado en la función de pérdida \cite[sección 3.4.1]{hastie_elements_2009}.
+\end{itemize}
+Para esto se hace uso de \verb'scale' función del conjunto base de R para generar \verb'sismos_SJ_escalado' 
 
 
 \paragraph{Partición con estratificación}
+Las evaluaciones sobre la calidad de los modelos de clasificación generados se realizarán sobre un subconjuntos de ensayo (test) del \(20 \%\) de los datos de la provincia de San Juan, el resto se utilizará para el entrenamiento (train).
+
 Dado el fuerte desequilibrio de la clase Percibido comentado en la sección \ref{sec:AED}, ante una división de los datos en subconjuntos entrenamiento y prueba estocástica está el riesgo de que el subconjunto de prueba quede con muy pocos casos positivos y no sea representativo de la distribución de la clase en el conjunto de datos. 
 Para evitar esto se realiza una división estratificada de los datos en subconjuntos de entrenamiento y prueba usando la función \verb'CreateDataPartion' que indicó los índices para generar los conjuntos de datos \verb'entrenamiento_SJ' y \verb'ensayo_SJ' este último con un número aún adecuado para su función de \num{5982} registros.
 
@@ -594,15 +610,18 @@ Con un gráfico de estas métricas en función del punto de corte entre clases s
 
 Como complemento se pueden trazar las curvas ROC y PR para evaluar el desempeño de los modelos en separar las clases.
 
+
 \paragraph{Área bajo la curva ROC}
 El área bajo la curva ROC (AUC-ROC) es una métrica que evalúa la capacidad de un modelo de clasificación para discriminar entre clases.
 Se calcula como el área bajo la curva ROC, que es la curva que representa la tasa de verdaderos positivos en función de la tasa de falsos positivos.
 El valor de AUC-ROC varía entre 0 y 1, donde 0 indica un modelo que clasifica todas las instancias de la clase positiva como negativas y viceversa, y 1 indica un modelo que clasifica perfectamente las instancias de ambas clases.
 
+
 \paragraph{Área bajo la curva PR}
 El área bajo la curva PR (AUC-PR) es una métrica que evalúa la capacidad de un modelo de clasificación para discriminar entre clases.
 Se calcula como el área bajo la curva PR, que es la curva que representa la precisión en función del \emph{recall}.
 El valor de AUC-PR varía entre 0 y 1, donde 0 indica un modelo que clasifica todas las instancias de la clase positiva como negativas y viceversa, y 1 indica un modelo que clasifica perfectamente las instancias de ambas clases.
+
 
 %\paragraph{Validación cruzada}
 %La validación cruzada es una técnica que se utiliza para evaluar el desempeño de un modelo de clasificación.
@@ -612,21 +631,26 @@ El valor de AUC-PR varía entre 0 y 1, donde 0 indica un modelo que clasifica to
 
 % En este trabajo se utilizará la AUC-ROC la utilizada para de los modelos de clasificación ajustados en este trabajo.
 
+
+
 \chapter{Resultados y discusión}
+
 
 \section{Presentación de resultados}
 % \section{Presentación y análisis de resultados obtenidos}
 
+
 \subsection{Predictor por regresión logística}
+
 
 \subsubsection*{Múltiple sin interacción entre variables}
 
-El primer modelo ensayado es uno múltiple de regresión logística con las variables \verb'Hora_decimal', \verb'Profundidad' y \verb'proxy_amplitud' como predictores sin interacción entre ellos,
+El primer modelo ensayado es uno múltiple de regresión logística con las variables \verb'Hora_decimal', \verb'Profundidad' y \verb'Proxy\_amplitud' como predictores sin interacción entre ellos,
 
 \begin{align}
 	\log \left( \frac{p}{1-p} \right) = &
 	 \beta_0 + \beta_1\, \text{Hora\_decimal} + \beta_2 \, \text{Profundidad}\notag\\
-	& + \beta_3 \, \text{proxy\_amplitud},
+	& + \beta_3 \, \text{Proxy\_amplitud},
 	\label{eq:regresion_logistica}
 \end{align}
 
@@ -637,14 +661,14 @@ La función \verb'summary' produce un resumen de los resultados arroja para los 
 (Intercept)    -0.311098   0.014614 -21.287   <2e-16 ***
 Hora_decimal   -0.015398   0.013362  -1.152    0.249    
 Profundidad    -0.555176   0.010705 -51.863   <2e-16 ***
-proxy_amplitud  0.167536   0.006263  26.750   <2e-16 ***
+Proxy_amplitud  0.167536   0.006263  26.750   <2e-16 ***
 \end{verbatim} 
 Esto indica que excepto el coeficiente \(\beta_1\) para la \verb'Hora_decimal', todos son significativos ya que sus probabilidades de que no tengan esos valores y se cumpla la hipótesis nula \(Pr(>|z|)\) para el estadístico \(z = \frac{\beta}{\sigma_\beta}\) se indican como muy inferiores a \(0.05\).
 
 Para definir el punto de corte entre las clases se graficaron las métricas de evaluación en función de este como ilustra la figura \ref{fig:múltiple_metrics}.
 Si en base a la inspección de esa figura eligiera el punto de corte en \(0.5\) se obtendrían las métricas de evaluación que se resumen en la tabla \ref{tab:múltiple_metrics}.
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 	\centering
 	\input{graphs/múltiple_metrics.tex}
 	\caption{Métricas de evaluación para definir manualmente el punto de corte entre clases para el modelo de regresión logística múltiple sin interacción entre variables.}

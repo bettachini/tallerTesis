@@ -168,8 +168,8 @@ Ver sección de Análisis exploratorio de datos.
 ### Modificaciones de los datos (ingeniería de características)
 
 
-#### Decimalización de la hora
-```{r función de decimalización de la hora}
+#### Escala continua para fecha y hora del sismo
+```{r Segundos del día}
 # Function to convert hh:mm:ss to seconds past midnight
 convert_to_seconds <- function(time_str) {
   time_posix <- strptime(time_str, format="%H:%M:%S")
@@ -178,17 +178,30 @@ convert_to_seconds <- function(time_str) {
              as.numeric(format(time_posix, "%S"))
   return(seconds)
 }
-```
 
-```{r aplicación de la función}
 # Apply the function to the time_str column
-sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]
-# Print the result
-head(sismos)
+sismos[, `Segundos del día` := sapply(Hora, convert_to_seconds)]
+
+summary(sismos[ ,`Segundos del día`, ])
 ```
 
-```{r descripción de la nueva columna}
-summary(sismos[ ,Hora_decimal, ])
+```{r día del año}
+if (!require("lubridate")) {
+  install.packages("lubridate")
+}
+library("lubridate")
+
+# consecutive day at the year
+sismos[, `Día del año` := lubridate::yday(as.Date(Fecha, format = "%Y-%m-%d")), ]
+  
+# sismos[, Dia_del_año := as.numeric(as.Date(Fecha, format = "%Y-%m-%d"))]
+summary(sismos[, "Día del año", ], )
+```
+
+
+```{r año}
+sismos[, Año := year(as.Date(Fecha, format = "%Y-%m-%d"))]
+summary(sismos$Año)
 ```
 
 
@@ -247,15 +260,15 @@ min(sismos[,Magnitud, ])
 ```
 
 ```{r Linealizar la escala de Richter}
-sismos[, proxy_amplitud := 10^(Magnitud- 2.5)]
+sismos[, "Proxy amplitud" := 10^(Magnitud- 2.5)]
 ```
 
-```{r head de la data.table tras generar proxy_amplitud}
+```{r head de la data.table tras generar Proxy_amplitud}
 head(sismos)
 ```
 
 ```{r descripción para magnitud lineal}
-summary(sismos$proxy_amplitud)
+summary(sismos$"Proxy amplitud")
 ```
 
 
@@ -344,8 +357,8 @@ dt_false <- sismos[Percibido == FALSE]
 breaks <- seq(0, 86400, by = 3600)
 
 # Create histograms for TRUE and FALSE cases
-hist_true <- hist(dt_true$Hora_decimal, breaks = breaks, plot = FALSE)
-hist_false <- hist(dt_false$Hora_decimal, breaks = breaks, plot = FALSE)
+hist_true <- hist(dt_true$`Segundos del día`, breaks = breaks, plot = FALSE)
+hist_false <- hist(dt_false$`Segundos del día`, breaks = breaks, plot = FALSE)
 
 # Calculate the ratio of counts in each bin
 ratio <- hist_true$counts / hist_false$counts
@@ -392,15 +405,13 @@ Hay código en (https://daniellaparada.github.io/IC-datasets-docencia/04_visuali
 
 ### El problema de la distancia -> San Juan 
 ```{r select rows with Provincia == San Juan}
-sismos_SJ <- sismos[Provincia == "San Juan", , ]
+sismos_SJ <- sismos[Provincia == "San Juan", ]
 ```
 
 ```{r registros SJ}
 c(nrow(sismos), nrow(sismos_SJ), nrow(sismos_SJ)/nrow(sismos))
 ```
 
-```{r head de sismos_SJ}
-```
 
 ### Latitud y longitud
 
@@ -414,16 +425,22 @@ cor(sismos_SJ$Longitud, sismos_SJ$Percibido)
 ```
 
 
+```{r test}
+# correlation between columns Magnitud and Proxy_amplitud
+cor(sismos_SJ$`Proxy amplitud`, sismos_SJ_escalado$Magnitud)
+```
 
 
-Quedan así un total de tres variables a trabajar en el modelo de clasificación del estado de \verb'Percibido': \verb'Hora_decimal', \verb'Profundidad' y  \verb'proxy_amplitud'.
+
+
+Quedan así un total de tres variables a trabajar en el modelo de clasificación del estado de \verb'Percibido': \verb'Segundos del día', \verb'Profundidad' y  \verb'Proxy amplitud'.
 
 Podría verse si hay puede hacerse un heat map de correlaciones entre estas variables con 'Percibido'.
 
 ```{r correlación variables}
 # use any tool
-corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, proxy_amplitud, Latitud, Longitud, Percibido)], use = "complete.obs")
-# corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, proxy_amplitud, Percibido)], use = "complete.obs")
+corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, "Proxy amplitud", Latitud, Longitud, Percibido)], use = "complete.obs")
+# corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, Proxy_amplitud, Percibido)], use = "complete.obs")
 str(corr_alles)
 # only the last column
 corr_alles[, 6]
@@ -440,23 +457,29 @@ Para esto se hace uso de la función `scale` de la biblioteca `caret`.
 El objeto de hacer esto previo a un ajuste lineal es que los coeficientes de la regresión sean comparables entre sí.
 
 ```{r escalamiento}
+# no utilizo la biblioteca caret
 if (!require("caret")) {
   install.packages("caret")
 }
 library("caret")
 
 # copy only some columns
-sismos_SJ_escalado <- sismos_SJ[, .(Hora_decimal, Profundidad, proxy_amplitud, Percibido)]
+# sismos_SJ_escalado <- sismos_SJ[, .(Hora_decimal, Profundidad, Proxy_amplitud, Percibido)]
+# sismos_SJ_escalado <- sismos_SJ[, .(Hora_decimal, Profundidad, Proxy_amplitud, Percibido)]
 
 # # copia
-# sismos_SJ_escalado <- copy(sismos_SJ)
+sismos_SJ_escalado <- copy(sismos_SJ)
 
 # Scale numerical features
-numerical_features <- c("Hora_decimal", "Profundidad", "proxy_amplitud")
+numerical_features <- c("Hora_decimal", "Profundidad", "Magnitud", 
+"Proxy amplitud", "Latitud", "Longitud")
+# numerical_features <- c("Hora_decimal", "Profundidad", "Proxy_amplitud")
 sismos_SJ_escalado[, (numerical_features) := lapply(.SD, scale), .SDcols = numerical_features]
 
 head(sismos_SJ_escalado)
 ```
+
+
 
 
 ### División con estratificación
@@ -526,7 +549,8 @@ library("glmnet")
 ```{r múltiple definición}
 # Fit a logistic regression model
 logit_model <- glm(
-  Percibido ~ Hora_decimal + Profundidad + proxy_amplitud,
+  # Percibido ~ Hora_decimal + Profundidad + Proxy_amplitud,
+  Percibido ~ Hora_decimal + Profundidad + `Proxy amplitud`  + Latitud + Longitud,
    data = entrenamiento_SJ_balanceado,
   family = "binomial"
   )
@@ -537,7 +561,7 @@ logit_model <- glm(
 # Print the summary of the model
 summary(logit_model)
 ```
-Del sumario se indica con p-values que las variables `Profundidad` y `proxy_amplitud` son significativas, pero no `Hora_decimal`.
+Del sumario se indica con p-values que las variables `Profundidad` y `Proxy_amplitud` son significativas, pero no `Hora_decimal`.
 
 ```{r múltiple predicciones}
 # Make predictions on the test set
