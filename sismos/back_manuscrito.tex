@@ -161,6 +161,12 @@ Se estructuró en los siguientes capítulos con temáticas diferenciadas
 %La respuesta fisiológica a oscilaciones del suelo es central en la muy activa área de la predicción de terremotos de gran importancia basada en la capacidad sensorial, pero no de humanos, sino la de animales.
 %Hay una abultada historia de observaciones que avalan que muchos animales son sensibles a señales que dan alarma anticipada de próximos sismos \cite{kirschvink_earthquake_2000}.
 
+
+
+% HAY QUE INCLUIR ALGO DE INTENSIDAD, 
+% Pero en la búsqueda superficial de literatura realizada para este trabajo no encontré antecedentes que cubrieran todo el arco desde características que describen el terremoto hasta la determinación excluyente de si los correspondientes sismos son o no percibidos por la población.
+
+
 En la prensa general se busca transmitir la importancia de un fenómeno según que valor se le confirió en la escala de Richter o de Mercalli.
 Lejos de ser intercambiables la primera se refiere a la magnitud, una característica física del terremoto (ver definición en la sección \ref{sec:ingeniería}), en tanto que la segunda se refiere a una caracterización subjetiva del sismo, la llamada intensidad.
 Esta última cuantidad es función de fenómenos percibidos por el público como si hubo grietas en el suelo o vidrios o si temblaron edificios \cite[sección 4.2.3]{fowler_solid_1990}.
@@ -169,10 +175,14 @@ Los organismos de monitoreo de sismos cuentan con portales en la world-wide web 
 Tal es el caso de los portale ``Encuesta de sismos'' del INPRES \cite{noauthor_encuesta_nodate} y ``Felt Report - Tell Us!'' \cite{noauthor_felt_nodate} parte del programa de riesgo de terremos del Geological Survey de los Estados Unidos de América (USGS) \cite{david_jay_usgs_2012}. 
 Este último aporta a la sistematización de reportes del público denominado ``Did you fell it?'' (DYFI) que ha nutrido en la último década y media a varios estudios relacionando la intensidad con diversos fenómenos citados en \cite{noauthor_dyfi_nodate}.
 
-La intensidad calculada en la base de datos DYFI moestró estár bien correlacionada con medidas de espectro de oscilación, lo que permitió generar ecuaciones de predicción de intensidad (IPE) en función de la distancia entre quién reportó y epicentro, así como la magnitud del momento, \(M_w\) \cite{atkinson_did_2007}.
+La intensidad calculada en la base de datos DYFI moestró estár bien correlacionada con medidas de espectro de oscilación, lo que permitió generar ecuaciones de predicción de intensidad (IPE) en función de la distancia entre quién reportó y epicentro, así como la magnitud del momento (M) en la escala de Gutemberg-Richter \cite{atkinson_did_2007}.
+Para esto los autores utilizaron la 
 
 
-agruparon los valores promedio de intensidad en la escala modificado de Mercalli (MMI) en cada código postal para tener una función de distancia para cada evento al epicentro, \(D_h\), y obtuvieron un buen acuerdo a través de un modelo de regresión lineal múltiple \cite{atkinson_did_2007}.
+agruparon los valores promedio de intensidad en la escala modificado de Mercalli (MMI) en cada código postal para tener una función de distancia para cada evento al epicentro, \(D_h\), y obtuvieron un buen acuerdo a través de un modelo de regresión lineal múltiple.
+
+\cite{atkinson_did_2007}
+
 
 
 Para esto los autores agruparon los valores promedio de intensidad en la escala modificado de Mercalli (MMI) en cada código postal para tener una función de distancia para cada evento al epicentro, \(D_h\), y obtuvieron un buen acuerdo a través de un modelo de regresión lineal múltiple.
@@ -268,7 +278,7 @@ En el sitio de publicación de los datos se indica que el conjunto de datos comp
 
 Allí mismo se describe que el conjunto de datos reducido y curado denominado ``sismos'', el que se utilizó en este trabajo, es accesible a través de la importación de la biblioteca \texttt{datosIC} en lenguaje R \cite[sección 5.1.1]{daniela_parada_ic-datasets-docencia_nodate}.
 %\cite[sección 5.1.1]{daniela_parada_ic-datasets-docencia_nodate}.
-Este mismo conjunto reducido puede descargarse en formato de texto separado por comas (CSV) apuntando a su URL en el repositorio alojado en GitHub \cite{daniela_parada_sismos-arg_nodate}. 
+Este mismo conjunto reducido puede descargarse en formato de texto separado por comas (CSV) apuntando a su URL en el repositorio alojado en GitHub \footfullcite{daniela_parada_sismos-arg_nodate}. 
 
 Las variables reportadas para cada sismo son:
 \begin{itemize}
@@ -286,15 +296,8 @@ Esta última variable es la que se busca predecir en este trabajo en función de
 \paragraph{Unidad de magnitud en el conjunto de datos}
 
 Hay una multitud de especificaciones derivadas de la escala logarítmica originalmente propuesta por Richter en 1935 \cite[sección 4.2.3]{fowler_solid_1990}.
-Sin embargo no hay una especificación de en cual de estas se expresa la \emph{magnitud} del conjunto de datos, ni en \cite{daniela_parada_ic-datasets-docencia_nodate}.
-Tampoco hay una nota adjunta que lo indque junto a los datos en el repositorio \cite{daniela_parada_sismos-arg_nodate}. 
+Sin embargo no hay una especificación de en cual de estas se expresa la \emph{magnitud} del conjunto de datos, ni en \cite{daniela_parada_ic-datasets-docencia_nodate}, ni en nota adjunta a los datos en el repositorio. 
 
-según se interpretó de otra documentación en el sitio del INPRES
-
-
-
-
-\paragraph{Unidad de magnitud más utilizada en la actualidad}
 A medida que se fueron instalando más estaciones sismográficas en todo el mundo, se hizo evidente que el método desarrollado por Richter sólo era estrictamente válido para determinados rangos de frecuencia y distancia.
 Para aprovechar el creciente número de estaciones sismográficas distribuidas por todo el mundo, se desarrollaron nuevas escalas de magnitud que son una extensión de la idea original de Richter en adelante denominada \(M_L\).
 Entre ellas se incluyen la magnitud de onda de cuerpo, \(m_b\) y la magnitud de onda de superficie \(M_s\) (ver sección \ref{sec:ingeniería}).
@@ -304,6 +307,9 @@ Debido a las limitaciones de las tres escalas de magnitud, \(M_L, m_b y M_s\), s
 En particular, para los terremotos de gran magnitud, \(M_w\) ofrece la estimación más fiable de la importancia de mismo \cite{noauthor_moment_nodate}.
 	
 
+
+No hay una indic
+según se interpretó de otra documentación en el sitio del INPRES
 
 
 \section{Limpieza de los datos}

@@ -224,8 +224,9 @@ profundidad_menos50 <- recordPlot()
 #replayPlot(profundidad_menos50)
 #dev.off()
 
-# save as TikZ
-tikz('graphs/histograma_profundidad_menos50.tex',width=2.5,height=2.5)
+# save as TikZ 
+# tikz('graphs/histograma_profundidad_menos50.tex',width=2.5,height=2.5) # petite
+tikz('graphs/histograma_profundidad_menos50.tex',width=5,height=4) # petite
 replayPlot(profundidad_menos50)
 dev.off()
 ```
