@@ -208,7 +208,6 @@ summary(sismos$Año)
 ## Recorte por produndidad
 
 ```{r save plot as TikZ}
-# install.packages('tikzDevice')
 library(tikzDevice)
 if (!require("tikzDevice")) {
   install.packages("tikzDevice")
@@ -217,22 +216,19 @@ library("tikzDevice")
 ```
 
 ```{r histograma hasta 50 km profundidad con barras más finas}
-hist(sismos[Profundidad < 50]$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
-profundidad_menos50 <- recordPlot()
+#hist(sismos[Profundidad < 50]$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
+#profundidad_menos50 <- recordPlot()
 
 #png("graphs/histograma_profundidad_menos50.png", width = 400, height = 400, res = 100)
 #replayPlot(profundidad_menos50)
 #dev.off()
 
 # save as TikZ 
-# tikz('graphs/histograma_profundidad_menos50.tex',width=2.5,height=2.5) # petite
-tikz('graphs/histograma_profundidad_menos50.tex',width=5,height=4) # petite
-replayPlot(profundidad_menos50)
-dev.off()
+#tikz('graphs/histograma_profundidad_menos50.tex',width=5,height=4) # petite
+#replayPlot(profundidad_menos50)
+#dev.off()
 ```
 
-```{r histograma de Profundidad con barras más finas}
-```
 
 ```{r solo registros con profundidad no nula}
 # copy of data.table
@@ -253,18 +249,13 @@ nrow(sismos[Profundidad > 50])/  nrow(sismos)
 ```
 
 ```{r histograma de Profundidad}
-hist(sismos$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
-histograma_profundidad750km <- recordPlot()
-
-#png("graphs/histograma_profundidad_menos50.png", width = 400, height = 400, res = 100)
-#replayPlot(profundidad_menos50)
+#hist(sismos$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
+#histograma_profundidad750km <- recordPlot()
+#
+## save as TikZ 
+#tikz('graphs/histograma_profundidad750km.tex',width=5,height=4) # petite
+#replayPlot(histograma_profundidad750km)
 #dev.off()
-
-# save as TikZ 
-# tikz('graphs/histograma_profundidad_menos50.tex',width=2.5,height=2.5) # petite
-tikz('graphs/histograma_profundidad750km.tex',width=5,height=4) # petite
-replayPlot(histograma_profundidad750km)
-dev.off()
 ```
 
 
@@ -366,9 +357,8 @@ library("plotly")
 # pdf("graphs/acumulado_anual_magnitud.pdf", width = 12, height = 6, units = "cm")
 
 #tikz('graphs/acumulado_anual_magnitud.tex',width=5,height=2)
-## plot(1,main='Hello World!')
 #ggplot(data = df2, aes(x = Magnitud, y = log(nacum, 10), colour = Año)) +
-#  labs(x = "Magnitud [escala Richter]", y = "(Log 10) sismos") +
+#  labs(x = "Magnitud [escala Richter]", y = "($Log_{10}$) sismos") +
 #  geom_point() +
 #  theme_classic()
 #dev.off()
