@@ -216,7 +216,7 @@ if (!require("tikzDevice")) {
 library("tikzDevice")
 ```
 
-```{r histograma de Profundidad con barras más finas}
+```{r histograma hasta 50 km profundidad con barras más finas}
 hist(sismos[Profundidad < 50]$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
 profundidad_menos50 <- recordPlot()
 
@@ -241,7 +241,35 @@ sismos <- sismos[Profundidad > 0]
 ```
 
 
-#### Linealización de la magnitud
+#### Linealización de la Magnitud
+```{r máxima profundidad}
+max(sismos$Profundidad)
+```
+
+```{r proporción más profundos que 50 km}
+# only those with Profundidad > 50
+c( nrow(sismos[Profundidad > 50]), nrow(sismos[Profundidad < 50]) )
+nrow(sismos[Profundidad > 50])/  nrow(sismos)
+```
+
+```{r histograma de Profundidad}
+hist(sismos$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
+histograma_profundidad750km <- recordPlot()
+
+#png("graphs/histograma_profundidad_menos50.png", width = 400, height = 400, res = 100)
+#replayPlot(profundidad_menos50)
+#dev.off()
+
+# save as TikZ 
+# tikz('graphs/histograma_profundidad_menos50.tex',width=2.5,height=2.5) # petite
+tikz('graphs/histograma_profundidad750km.tex',width=5,height=4) # petite
+replayPlot(histograma_profundidad750km)
+dev.off()
+```
+
+
+
+
 Puesto que la escala de Richter es una escala logarítmica me interesaría pasarla a una escala lineal.
 
 > The Richter magnitude of an earthquake is determined from the logarithm of the amplitude of waves recorded by seismographs. Adjustments are included to compensate for the variation in the distance between the various seismographs and the epicenter of the earthquake. The original formula is:

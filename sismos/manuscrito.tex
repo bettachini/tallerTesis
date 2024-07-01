@@ -257,7 +257,7 @@ Para este trabajo se utiliza XGBoost implementado en lenguaje R por la bibliotec
 
 \chapter{Metodología}
 
-\section{Presentación y descripción de los datos utilizados}
+\section{Presentación y descripción de los datos utilizados}\label{sec:datos}
 
 En el marco de los \emph{Proyectos de Asistencia Estadística} del \emph{Instituto de Cálculo} (IC) de la \emph{Facultad de Ciencias Exactas y Naturales} (FCEyN) de la \emph{Universidad de Buenos Aires} (UBA) se publicaron conjuntos de datos en un repositorio curado con el objeto de ser aplicados a la enseñanza de la estadística y la ciencia de datos por Daniela Parada, investigadora del IC \cite{noauthor_ic-datasets-docencia_nodate}.
 De estos conjuntos el utilizado en este trabajo es el que se publica en el apartado ``Visualización'' que corresponden a datos de sismos de Argentina de la última década \cite{daniela_parada_ic-datasets-docencia_nodate}. 
@@ -268,7 +268,7 @@ En el sitio de publicación de los datos se indica que el conjunto de datos comp
 
 Allí mismo se describe que el conjunto de datos reducido y curado denominado ``sismos'', el que se utilizó en este trabajo, es accesible a través de la importación de la biblioteca \texttt{datosIC} en lenguaje R \cite[sección 5.1.1]{daniela_parada_ic-datasets-docencia_nodate}.
 %\cite[sección 5.1.1]{daniela_parada_ic-datasets-docencia_nodate}.
-Este mismo conjunto reducido puede descargarse en formato de texto separado por comas (CSV) apuntando a su URL en el repositorio alojado en GitHub \cite{daniela_parada_sismos-arg_nodate}. 
+Este mismo conjunto reducido puede descargarse en formato de valores numéricos separado por comas (csv) apuntando a su URL en el repositorio alojado en GitHub \cite{daniela_parada_sismos-arg_nodate}. 
 
 Las variables reportadas para cada sismo son:
 \begin{itemize}
@@ -286,21 +286,22 @@ Esta última variable es la que se busca predecir en este trabajo en función de
 \paragraph{Unidad de magnitud en el conjunto de datos}
 
 Hay una multitud de especificaciones derivadas de la escala logarítmica originalmente propuesta por Richter en 1935 \cite[sección 4.2.3]{fowler_solid_1990}.
-Sin embargo no hay una especificación de en cual de estas se expresa la \emph{magnitud} del conjunto de datos, ni en \cite{daniela_parada_ic-datasets-docencia_nodate}.
-Tampoco hay una nota adjunta que lo indque junto a los datos en el repositorio \cite{daniela_parada_sismos-arg_nodate}. 
+Sin embargo no hay una especificación de en cual de estas se expresa la \emph{magnitud} del conjunto de datos en \cite{daniela_parada_ic-datasets-docencia_nodate}.
+Tampoco hay una nota adjunta a los datos que lo indique en el repositorio \cite{daniela_parada_sismos-arg_nodate}. 
+Asimismo, en la fuente original de donde se hizo el previamente mencionado \emph{scrapping}, el buscador de sismos del INPRES \cite{noauthor_buscador_nodate}, al solicitar datos solo se indica el término \emph{magnitud} sin más detalle.
 
-según se interpretó de otra documentación en el sitio del INPRES
+A pesar de carecer de una indicación explícita al respecto se opta por asumir que la magnitud en el conjunto de datos corresponde a la escala de magnitud de momento (\(M_w\)) que es la más comúnmente utilizada en la actualidad como se detalla en el párrafo siguiente.
+Avala tal suposición que en la página \emph{Cálculo de la Magnitud} de la sección de educación del sitio del INPRES se la presenta como una escala englobadora \cite{noauthor_calculo_2022}.
+Pero se considera un avala más crucial un documento de la \emph{Comisión de trabajo de gestión de riesgo} en que el INPRES figura no solo como el \emph{organismo con responsabilidad operativa} sino también entre los \emph{organismos que generan información de base} en \cite[anéxo X]{noauthor_sismos_2015} detalla ``actualmente la más utilizada es la magnitud momento, \(M_w\)''.  
 
 
-
-
-\paragraph{Unidad de magnitud más utilizada en la actualidad}
+\paragraph{Unidad de magnitud más corrientemente utilizada}
 A medida que se fueron instalando más estaciones sismográficas en todo el mundo, se hizo evidente que el método desarrollado por Richter sólo era estrictamente válido para determinados rangos de frecuencia y distancia.
 Para aprovechar el creciente número de estaciones sismográficas distribuidas por todo el mundo, se desarrollaron nuevas escalas de magnitud que son una extensión de la idea original de Richter en adelante denominada \(M_L\).
 Entre ellas se incluyen la magnitud de onda de cuerpo, \(m_b\) y la magnitud de onda de superficie \(M_s\) (ver sección \ref{sec:ingeniería}).
 Cada una de ellas es válida para un rango de frecuencias y un tipo de señal sísmica concretos.
 En su rango de validez, cada una es equivalente a la magnitud Richter.
-Debido a las limitaciones de las tres escalas de magnitud, \(M_L, m_b y M_s\), se desarrolló una nueva extensión de la escala de magnitud, conocida como magnitud de momento o \(M_w\), de aplicación más uniforme.
+Debido a las limitaciones de las tres escalas de magnitud, \(M_L, m_b\) y \(M_s\), se desarrolló una nueva extensión de la escala de magnitud, conocida como magnitud de momento o \(M_w\), de aplicación más uniforme.
 En particular, para los terremotos de gran magnitud, \(M_w\) ofrece la estimación más fiable de la importancia de mismo \cite{noauthor_moment_nodate}.
 	
 
@@ -359,14 +360,14 @@ La otra simplemente guarda \emph{Año}, para hacer contrastaciones interanuales.
 % \section{Descripción de las técnicas de análisis y, si corresponde, de modelado}
 
 
-\paragraph{Recorte por profundidad}
+\paragraph{Recorte de poca profundidad}
 
 Hay sismos cuyo origen no son terremotos sino desplazamientos superficiales de tierra, explosiones para la minera o el fracturado hidráulico para la extracción de hidrocarburos.
 Se busca omitir tales orígenes en los datos informados.
 
 Siendo que la variable se informa como enteros de kilómetros, estos representarían los hipocentros hasta una profundidad de \SI{500}{\metre}, compatibles con estas actividades artificiales.
 La omisión de estas fuentes a baja profundidad es una práctica usual en el análisis de datos orientados a sismos originados en terremotos \cite{hu_applying_2024}.
-El pequeño número que estos representan  el conjunto de datos se aprecia en el histograma según profundidad en la figura \ref{fig:histograma_profundidad}.
+El pequeño número que estos representan  el conjunto de datos se aprecia en el histograma según profundidad en la figura \ref{fig:histograma_profundidad50km}.
 Son filtrados con la instrucción \verb'sismos <- sismos[Profundidad > 0]'.
 \begin{figure}[!ht]
 % \begin{wrapfigure}[22]{r}[10pt]{0.48\textwidth}
@@ -375,20 +376,49 @@ Son filtrados con la instrucción \verb'sismos <- sismos[Profundidad > 0]'.
 	% \includegraphics[width=0.4\textwidth]{histograma_profundidad_menos50.png}
   \vspace{-1cm} % Adjust the value as needed
 	\caption{Los sismos con origen a profundidad de \SI{0}{\kilo\metre} son pocos en el conjunto de datos de terremotos con hipocentros poco profundos, < \SI{50}{\kilo\metre}.}
-	\label{fig:histograma_profundidad}
+	\label{fig:histograma_profundidad50km}
 % \end{wrapfigure}
 \end{figure}
 
 
 
 \paragraph{Linealización de la magnitud}
-Todas las escalas de magnitud de los sismos son logarítmicas con una forma genérica
+Todas las escalas de magnitud buscan dar cuenta de la energía liberada en el terremoto.
+La escala utilizada en los datos del INPRES es la de magnitud de momento (ver sección \ref{sec:datos}) definida como \cite[ec. 4.23]{fowler_solid_1990}
+\begin{equation}
+	M_w = \frac{2}{3} \log_{10} \left( \mu A u \right) - 6.0,
+	\label{eq:momento}
+\end{equation}
+donde \(\mu\) es el módulo de cizalladura, \(A\) el área de falla involucrada y \(u\) su desplazamiento promedio, todas características del fenómeno en profundidad.
+
+Sin embargo el objetivo de este trabajo es predecir la percepción por personas en la superficie, que puede asumirse guarda una relación con la amplitud de oscilación de los sismos en superficie, variable que figura en las escalas de magnitud derivadas de la origina de Richter de 1935.
+Todas estas tienen como forma genérica
 \begin{equation}
 	M = \log_{10} \left( \frac{A}{T} \right) + q(\Delta, h) + a,
 	\label{eq:magnitud}
 \end{equation}
-donde \(M\) es la magnitud, \(A\) es la amplitud de las ondas, \(T\) es el período de oscilación, \(q\) es una función de ajuste para el ángulo desde la vertical desde el sismógrafo al \(\Delta\) y su profundidad \(h\), y \(a\) es una constante de ajuste \cite[ecuación 4.13]{fowler_solid_1990}.
-Las distintas ondas tienen distintos coeficientes de ajuste en la ecuación \ref{eq:magnitud}, esto es lo que da lugar a distintas escalas de magnitud.
+donde \(M\) es la magnitud, \(A\) es la amplitud de las ondas sismicas detectadas, \(T\) su período de oscilación, \(q\) es función de la profundidad del hipocentro, \(h\), \(\Delta\) el ángulo entre éste y el sismógrafo y la vertical, y \(a\) es una constante de ajuste \cite[ecuación 4.13]{fowler_solid_1990}.
+Si \(h< \SI{50}{\kilo\metre}\) la mayor parte del aporte a la sismicidad la hacen ondas de propagación superficial por lo que se utiliza la \emph{magnitud de onda superficial}, \(M_s\), con distintos coeficientes de ajuste en la ecuación \ref{eq:magnitud}, que la \emph{magnitud de onda de cuerpo}, \(m_b\), que se usa para mayores profundidades.
+
+Existen relaciones empíricas entre \(M_w\) y \(M_s\) y \(m_b\) que permiten hacer una conversión entre estas magnitudes.
+Cual utilizar dependería de que profundidades tengan los terremotos en el conjunto de datos.
+La figura \ref{fig:histograma_profundidad50km} mostró que los hay con \(h < \SI{50}{\kilo\metre}\), pero los hay hasta con \(h= \SI{750}{\kilo\metre}\) siendo los de \(h > \SI{50}{\kilo\metre}\) \(\approx 79\%\) del total como evidencia el histograma que reproduce la figura \ref{fig:histograma_profundidad750km}.
+
+\begin{figure}[!ht]
+% \begin{wrapfigure}[22]{r}[10pt]{0.48\textwidth}
+	\centering
+	\input{graphs/histograma_profundidad750km.tex}
+	% \includegraphics[width=0.4\textwidth]{histograma_profundidad_menos50.png}
+  \vspace{-1cm} % Adjust the value as needed
+	\caption{Los sismos con origen a mayor profundidad de \SI{50}{\kilo\metre} son mayoritarios en el conjunto de datos.}
+	\label{fig:histograma_profundidad750km}
+% \end{wrapfigure}
+\end{figure}
+
+
+
+
+
 Para la de tipo S y P, las que contribuyen a los sismos percibidos en superficie (ver sección \ref{sec:contexto}) se puede hacer uso de la escala propuesta originalemente por Guntenberg en 1945 con la función de calibración para \(q(\Delta, h)\) propuesta por \emph{Gutemberg-Richter} en 1956 \cite[ecuación 4.18]{fowler_solid_1990} en la que se se omite de la expresión \ref{eq:magnitud} la constante de ajuste \(a\) y para definir la razón \(\frac{A}{T}\) se toma la mayor registrada por los sismógrafos,
 \begin{equation}
 	m_b = \log_{10} \left( \frac{A}{T} \right)_\text{máx} + q(\Delta, h).
@@ -396,7 +426,6 @@ Para la de tipo S y P, las que contribuyen a los sismos percibidos en superficie
 \end{equation}
 Para \(q(\Delta, h)\) se usan valoren tabulados, e.g. para ondas P en \(\Delta = \SIrange{10}{110}{} ^\circ\) corresponden \(q(\Delta, h) \approx \SIrange{6}{8}{}\) \cite{willian_l_ellsworth_earthquake_1991}.
 
-Toda escala busca dar cuenta de la energía liberada en el terremoto.
 Sin embargo el objetivo de este trabajo es busca predecir la percepción de los sismos por personas en la superficie, por lo que es de interés obtener un valor que sea lineal con la amplitud registrada por los sismógrafos en superficie, \(A\).
 Para obtener un valor lineal \(A\) a partir de la escala \ref{eq:richter}, que es la utilizada en los datos de magnitud del INPRES, se consideró usar una valor medio del rango comentado en el párrafo anterior, \(\overline{q}(\Delta,h)\), con lo que podría despejarse
 \begin{equation}
