@@ -119,16 +119,17 @@ Tanto esta amplitud como el período de oscilación son mucho mayores que el de 
 Como resultado, estructuras artificiales pueden agitarse poniendo en riesgo su estabilidad estructural y haciendo caer elementos que no estaban fijados a esta o perdieron tal adhesión a causa de la agitación misma.
 Como consecuencia, los sismos más fuertes pueden generar graves daños, poniendo en riesgo la integridad física y la seguridad de las personas al generar daños en las viviendas y edificios, derrumbes de puentes, rompimiento de vidrios, entre otros \cite{noauthor_que_2018}.
 
-La mayor parte de los sismos son de muy pequeña magnitud y no generan daños materiales.
+La mayor parte de los sismos presentan ondas de pequeña amplitud y no generan daños materiales.
 Que sean o no detectados por la población es un factor relevante en su percepción de confianza vis-à-vís de los organismos de monitoreo y prevención de riesgos.
 Cuando informar a la población de la ocurrencia de un sismo es una decisión de política pública que debiera apuntar a no alertar innecesariamente sobre sismos menores imperceptibles \cite{saunders_j_k_twist_nodate}.
 El caso inverso es también problemático, en que ante una carencia de una comunicación oficial de la poca importancia de un evento sísmico llevó a la autoevacuación por parte de la población que lo percibió \cite{vaiciulyte_population_2022}. 
 
 
+
 \section{Objetivos del trabajo / Pregunta}\label{sec:objetivo}
 
 Contar con una estimación rápida a partir de los datos sísmicos registrados por instrumental de si un dado evento será percibido por la población o no permitiría a las autoridades tomar decisiones informadas sobre la comunicación a la población.
-Este trabajo busca determinar el grado de certeza con que ciertos métodos de ciencias de datos pueden predecir si la población percibirá actividad sísmica producto de terremotos a partir de unos pocos datos básicos sobre los mismos publicados por el Instituto Nacional de Prevención Sísmica (INPRES) que es el organismo público de Argentina que realiza estudios e investigaciones básicas y aplicadas de sismología \cite{noauthor_instituto_2022}.
+Este trabajo busca determinar el grado de certeza con que ciertos métodos de ciencias de datos pueden predecir si la población percibirá actividad sísmica producto de terremotos a partir de unos pocos datos básicos sobre los mismos publicados por el Instituto Nacional de Prevención Sísmica (INPRES) que es el organismo público de la República Argentina que realiza estudios e investigaciones básicas y aplicadas de sismología \cite{noauthor_instituto_2022}.
 
 
 
@@ -161,33 +162,31 @@ Se estructuró en los siguientes capítulos con temáticas diferenciadas
 %La respuesta fisiológica a oscilaciones del suelo es central en la muy activa área de la predicción de terremotos de gran importancia basada en la capacidad sensorial, pero no de humanos, sino la de animales.
 %Hay una abultada historia de observaciones que avalan que muchos animales son sensibles a señales que dan alarma anticipada de próximos sismos \cite{kirschvink_earthquake_2000}.
 
-En la prensa general se busca transmitir la importancia de un fenómeno según que valor se le confirió en la escala de Richter o de Mercalli.
-Lejos de ser intercambiables la primera se refiere a la magnitud, una característica física del terremoto (ver definición en la sección \ref{sec:ingeniería}), en tanto que la segunda se refiere a una caracterización subjetiva del sismo, la llamada intensidad.
+En la prensa general se busca transmitir la importancia de un fenómeno sísmico informando un valor sea en la escala de Richter o de Mercalli como si fueran intercambiables.
+La primera se refiere a la magnitud, una característica física del terremoto (ver definición en la sección \ref{sec:ingeniería}), en tanto que la segunda se refiere a una caracterización subjetiva del sismo, la llamada intensidad.
 Esta última cuantidad es función de fenómenos percibidos por el público como si hubo grietas en el suelo o vidrios o si temblaron edificios \cite[sección 4.2.3]{fowler_solid_1990}.
 % Como tal es una caracterización posterior al fenómeno por lo que su valor numérico no es útil a los efectos del objetivo descripto en la sección \ref{sec:objetivo}.
 Los organismos de monitoreo de sismos cuentan con portales en la world-wide web para que el público ofrezca tal información voluntariamente en formularios con preguntas de elección múltiple.
-Tal es el caso de los portale ``Encuesta de sismos'' del INPRES \cite{noauthor_encuesta_nodate} y ``Felt Report - Tell Us!'' \cite{noauthor_felt_nodate} parte del programa de riesgo de terremos del Geological Survey de los Estados Unidos de América (USGS) \cite{david_jay_usgs_2012}. 
+Tal es el caso de los portales ``Encuesta de sismos'' del INPRES \cite{noauthor_encuesta_nodate} y ``Felt Report - Tell Us!'' \cite{noauthor_felt_nodate} parte del programa de riesgo de terremos del Geological Survey de los Estados Unidos de América (USGS) \cite{david_jay_usgs_2012}. 
 Este último aporta a la sistematización de reportes del público denominado ``Did you fell it?'' (DYFI) que ha nutrido en la último década y media a varios estudios relacionando la intensidad con diversos fenómenos citados en \cite{noauthor_dyfi_nodate}.
 
-La intensidad calculada en la base de datos DYFI moestró estár bien correlacionada con medidas de espectro de oscilación, lo que permitió generar ecuaciones de predicción de intensidad (IPE) en función de la distancia entre quién reportó y epicentro, así como la magnitud del momento, \(M_w\) \cite{atkinson_did_2007}.
-
-
-agruparon los valores promedio de intensidad en la escala modificado de Mercalli (MMI) en cada código postal para tener una función de distancia para cada evento al epicentro, \(D_h\), y obtuvieron un buen acuerdo a través de un modelo de regresión lineal múltiple \cite{atkinson_did_2007}.
-
-
-Para esto los autores agruparon los valores promedio de intensidad en la escala modificado de Mercalli (MMI) en cada código postal para tener una función de distancia para cada evento al epicentro, \(D_h\), y obtuvieron un buen acuerdo a través de un modelo de regresión lineal múltiple.
-
-Una actualización posterior por los mismos autores llevó a  función de predicción de intensidad  
+La intensidad expresada en la escala modificada de Mercalli (MMI) \cite{noauthor_intensidad_2022} en la base de datos DYFI mostró estar bien correlacionada con medidas de espectro de oscilación lo que impulsó a buscar un modelo que le relacione con parámetros físicos de terremoto.
+Una regresión múltiple basada en el método de máxima verosimilitud se encontraron los factores \(c_{1\dots7}\) de la \cite[ecuación 1]{atkinson_did_2007}
 \begin{equation}
-	MMI = c_1 + c_2 M + c_3 \log{R} + c_4 R + c_5 B + c_6 M \log{R},
+	MMI = c_1 + c_2 (M_w - 6) + c_3 (M_w - 6)^2 + c_4\log{R} + c_5 R + c_6 B + c_7 M_w \log{R}, 
+	\label{eq:atkinson2007}
+\end{equation}
+donde \(M_w\) es la magnitud del momento, según la definición discutida en la sección \ref{sec:magnitud}, \(R = \sqrt{D + h}\) es la distancia entre observador e hipocentro en función de la distancia del primer al epicentro \(D\) y profundidad del segundo \(h\), y \(B\) es nulo para \(R < R_t\) una distancia de transición en la forma de atencuación de las ondas 
+Una posterior actualización de este modelo por los mismos autores se basó en agrupar los valores promedio de MMI en cada código postal
+\begin{equation}
+	MMI = c_1 + c_2 M_w + c_3 \log{R} + c_4 R + c_5 B + c_6 M_w\log{R},
 	\label{eq:atkinson2014}
 \end{equation}
-donde \(R = \sqrt{D_h^2 + 14^2 }\) es medida de distancia efectiva, en el que este 
-
-
-
-
-
+con \(R = \sqrt{D + h + 14^2 }\) donde el factor adicional, \(14^2\) da cuenta de la saturación a cortas distancias permitiendo simplificar el factor \(B = \text{máx}(0, \log(R/50))\) que ya no requiere establecer un valor de transición \(R_t\) \cite{atkinson_intensity_2014}. 
+	
+Lo anterior muestra que hay antecedentes de que un ajuste permite predecir la percepción de los mismos por parte de la población a partir datos físicos de los terremotos 
+Para este trabajo lo que busca determinarse es una decisión binaria entre lo que correspondería a la intensidad 0 y 1 de la escala MMI, respectivamente una percepción solo con instrumentos o una por al menos una fracción de la población \cite{noauthor_intensidad_2022}.
+No es el enfoque a seguir discriminar con un umbral tras una predicción del valor MMI sino utilizar las técnicas de aprendizaje automático que generen una decisión binaria directamente desde los datos de parámetros físicos.
 
 % La aplicación más usual de herramientas de aprendizaje automático a la temática de terremotos ha perseguido la históricamente esquiva predección de sismos de gran magnitud \cite{allie_hutchison_how_2023}.
 % En menor medida presiguen mejoras en la precisión y exactitud en la detección a través de mejoras en el análisis de datos generados por el instrumental.
@@ -197,6 +196,8 @@ donde \(R = \sqrt{D_h^2 + 14^2 }\) es medida de distancia efectiva, en el que es
 %Un trabajo interesante, no porque sea un antecedente del enfoque o temática de este trabajo pero sí por tocar al aspecto social de la percepción de sismos, hace uso del método conocido como SHAP (contracción de SHapley Additive exPlanations, explicaciones aditivas de Shapley) que determina la contribución de cada característica en un conjunto de datos a una determinada predicción \cite{molnar_96_2024}.
 %Los datos son características sociológicas de los individuos y la predicción es sobre la percepción personal del riesgo sismológico.
 %Los autores muestran un resultado estadístico que avala el que se incrementa la percepción del riesgo de esta fuente tras haber percibido un sismo \cite{bedle_recognizing_2022}.
+
+
 
 
 \section{Conceptos y técnicas de ciencia de datos utilizados en el trabajo}
@@ -211,19 +212,19 @@ Se utilizan en este trabajo dos técnicas con aplicación a la predicción pero 
 Lo siguiente es un resumen del material de la novena clase de la asignatura \emph{Enfoque estadístico del aprendizaje} titulada \emph{Regresión Logística} elaborado por Juan Barriola, Azul Villanueva y Franco Mastelli. 
 
 Un modelo de regresión lineal con coeficientes \(\beta_j\) para cada variable \(X_j\) que busque la probabilidad de una dependiente binaria \(P(Y)\)  
-\[
+\begin{equation}
 P(Y) = \beta_0 + \sum\limits_{j=1}^p \beta_j X_j,	
-\]
+\end{equation}
 no presentaría un punto de corte claro para clasificar los datos en dos categorías.
 Para sortear esta dificulta se toma la salida de esta regresión como la variable dependiente de una regresión logística,
-\[
+\begin{equation}
 P(Y|X)= \frac{e^{\beta_0 + \sum\limits_{j=1}^p \beta_j X_j}}{1+e^{\beta_0 + \sum\limits_{j=1}^p \beta_j X_j}},
-\]
+\end{equation}
 lo que asegura un valor entre 0 y 1.
 De esta expresión puede arribarse a 
-\[
-	\log {\frac{P(x)}{1-P(x)}}= \beta_0 + \sum\limits_{j=1}^p \beta_j X_j,
-\]
+\begin{equation}
+	\log \left( \frac{P(x)}{1-P(x)} \right) = \beta_0 + \sum\limits_{j=1}^p \beta_j X_j,
+\end{equation}
 cuyo lado izquierdo es la función \emph{logit}, la inversa de lo que sería la logística de la probabilidad \(\left(1 + e^{-{P(x)}}\right)^{-1}\).
 
 Para implementar tal función en código en lenguaje \emph{R}, el utilizado en este trabajo, se hace uso de la función \emph{glm} provista por la biblioteca \emph{glmnet} \cite{friedman_glmnet_2023}. 
@@ -268,7 +269,7 @@ En el sitio de publicación de los datos se indica que el conjunto de datos comp
 
 Allí mismo se describe que el conjunto de datos reducido y curado denominado ``sismos'', el que se utilizó en este trabajo, es accesible a través de la importación de la biblioteca \texttt{datosIC} en lenguaje R \cite[sección 5.1.1]{daniela_parada_ic-datasets-docencia_nodate}.
 %\cite[sección 5.1.1]{daniela_parada_ic-datasets-docencia_nodate}.
-Este mismo conjunto reducido puede descargarse en formato de valores numéricos separado por comas (csv) apuntando a su URL en el repositorio alojado en GitHub \cite{daniela_parada_sismos-arg_nodate}. 
+Este mismo conjunto reducido puede descargarse en formato de valores numéricos separado por comas (CSV) apuntando a su URL en el repositorio alojado en GitHub \cite{daniela_parada_sismos-arg_nodate}. 
 
 Las variables reportadas para cada sismo son:
 \begin{itemize}
@@ -283,8 +284,8 @@ Las variables reportadas para cada sismo son:
 \end{itemize}
 Esta última variable es la que se busca predecir en este trabajo en función de las demás. 
 
-\paragraph{Unidad de magnitud en el conjunto de datos}
 
+\subsection{Unidad de magnitud en el conjunto de datos}\label{sec:magnitud}
 Hay una multitud de especificaciones derivadas de la escala logarítmica originalmente propuesta por Richter en 1935 \cite[sección 4.2.3]{fowler_solid_1990}.
 Sin embargo no hay una especificación de en cual de estas se expresa la \emph{magnitud} del conjunto de datos en \cite{daniela_parada_ic-datasets-docencia_nodate}.
 Tampoco hay una nota adjunta a los datos que lo indique en el repositorio \cite{daniela_parada_sismos-arg_nodate}. 
@@ -330,6 +331,145 @@ Se hizo una copia de la tabla sin registros duplicados ejecutando \verb'sismos_a
 
 \paragraph{Datos atípicos}
 La detección y potenciales acciones sobre datos atípicos se tratan una vez iniciado un análisis exploratorio de datos temática de la sección \ref{sec:AED}.
+
+
+\section{Análisis exploratorio de datos (AED)}\label{sec:AED}
+
+Un primer vistazo sobre los datos con \verb'summary(sismos)' permitió obtener un resumen de las variables numéricas y categóricas.
+Saltan a la vista que hay valores extremos en el extremo suporior de la variable \verb'Magnitud' bastante alejados de la mediana y que hay un fuerte desequilibrio en la variable ``Percibido'', la de clase de clasificación, en favor de los terremotos no percibidos.
+
+
+\paragraph{Desequilibrio en la clase de clasificación}
+Sobre el total de 55794 registros únicos solo un valor cercano al \(96.6\%\) fueron percibidos por el instrumental y no por la población.
+Restan tan solo unos 1905 registros, \(3.4\%\) del total, que efectivamente fueron percibidos por la población.
+Este desequilibrio llama al uso de técnicas de balanceo de clases en los modelos de clasificación a utilizar.
+
+
+\paragraph{Distribución de la magnitud}
+La magnitud de terremotos forzosamente presenta una distribución asimétrica por el hecho de que cuanto mayor es la energía liberada, más infrecuente es el fenómeno.
+Esto la ilustra el número por año de sismos representado en una escala logarítmica en función de la magnitud generado con código provisto junto con los datos \cite[sección 4.2.1]{daniela_parada_ic-datasets-docencia_nodate}, que se reproduce en la figura \ref{fig:acumulado_anual_magnitud}.
+
+%\begin{figure}[!ht]
+%% \begin{wrapfigure}[13]{r}{0.5\textwidth}
+%\centering
+%\includegraphics{acumulado_anual_magnitud.pdf}
+%% \includegraphics[width=0.5\textwidth]{acumulado_anual_magnitud.pdf}
+%\caption{Los sismos de mayor magnitud son más infrecuentes.}
+%\label{fig:acumulado_anual_magnitud}
+%% \end{wrapfigure}
+%\end{figure}
+
+\begin{figure}[!ht]
+\centering
+% The output from tikz()
+% is imported here.
+\input{graphs/acumulado_anual_magnitud.tex}
+\caption{Los sismos de mayor magnitud son más infrecuentes. Reproducido con el código provisto en \cite{daniela_parada_sismos-arg_nodate}.}
+\label{fig:acumulado_anual_magnitud}
+\end{figure}
+
+De esta observación no se desprende una acción a realizar en el preprocesamiento o selección de los datos.
+
+
+\paragraph{Horario de los percibidos}
+Se puede hipotetizar que en los horarios de sueño de la mayoría de la población sea menor la proporción de sismos percibidos.
+Segmentando la \verb'Hora_decimal' de los registros en intervalos de una hora se calculó la proporción entre casos percibidos o no para graficar las 24 proporciones en la figura \ref{fig:histograma_percibidos_por_hora}. 
+\begin{figure}[!ht]
+\centering
+\input{graphs/histograma_percibidos_por_hora.tex}
+\caption{Proporción de sismos percibidos por la población en función de la hora del día.}
+\label{fig:histograma_percibidos_por_hora}
+\end{figure}
+
+Contrariando la hipótesis, la única merma observada se produce entre las 10 y las 19 horas, y es muy ligera.
+Donde es claro un cambio llamativo es durante las tres horas que comienzan a las 23 de cada día, en las que hay un incremento de percepciones. 
+Habría que ver si tal variación es estadísticamente significativa, pero por sobre todo, buscar una posible causa sociológica o fisiológica relacionada a que sean las primeras horas de sueño nocturno de la mayor parte de la población.
+
+No surge una acción a realizar en función de esta observación.
+
+
+\paragraph{Distribución geográfica}
+Como es esperable la mayor parte de los hipocentros se ubican en regiones con orografía elevada, como la cordillera de los Andes, producto de la subducción de la placa de Nazca bajo la placa Sudamericana, o las sierras cordobesas producto de procesos mucho más antiguos. 
+Una ubicación de los mismos sobre un mapa físico lo ilustra en la figura \ref{fig:mapa_sismos}.
+Esto conlleva a que la mayor parte de los terremotos estén alejados de las mayores urbanizaciones reduciendo la probabilidad de que sean percibidos por la población.
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.8\textwidth]{mapa_sismos.png}
+\caption{Superponer las ubicaciones de los terremotos en un mápa físico muestra que la mayoría de los terremotos se registran en zonas de montaña o cerros en su mayoría alejados de las mayores urbanizaciones lo que afecta negativamente la estadística de los percibidos.
+La escala de colores muestra los más superficiales en azul y profundos en rojo.
+Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
+\label{fig:mapa_sismos}
+\end{figure}
+
+La ubicación de los terremotos sobre un mapa político que muestra la figura \ref{fig:terremotosMapa} deja a las claras que no tienen una distribución homogénea aún en provincias con abundante actividad.
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.8\textwidth]{terremotosMapa.png}
+\caption{Sobre este mapa político se representan las ubicaciones de los terremotos como puntos. Esto permite apreciar que en algunas provincias, como San Luís, se omiten datas como evidencia el corte abrupto de reportes en su frontera. En otras se hacen más claros sesgos geográficos, como en Córdoba, Salta o Jujuy, 
+Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
+\label{fig:terremotosMapa}
+\end{figure}
+
+% De lo observado en estas figuras se hace una selección del área geográfica de los datos a trabajar que se discute en la sección siguiente.
+
+
+
+
+
+\section{Características relevantes a la predicción}
+% \section{Descripción de la selección de características (si corresponde)}
+
+\paragraph{El problema de la distancia}
+Evidentemente la proximidad de un epicentro a una población es un factor relevante en la percepción de un sismo.
+El INPRES tiene una metodología operativa para registrar la ubicación de los usuarios que reportan haber percibido un sismo a través de su página web \cite{noauthor_acerca_nodate}.
+Su buscador de sismos indica los sismos ``sentidos'' por usuarios con un color en sus resultados de búsqueda como ilustra la figura \ref{fig:resultado_búsqueda}.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\textwidth]{resultado_búsqueda.png}
+\caption{Resultados de una búsqueda manual de sismos en el sitio del INPRES. El indicado en rojo fue percibido por la población. En la columna \emph{intensidad} se dan datos de ubicación de la población que lo percibió.}
+\label{fig:resultado_búsqueda}
+\end{figure}
+
+Lamentablemente en el conjunto de datos curados no figura la ubicación de la población que informó haberles percibido lo que imposibilita incorporar la distancia al epicentro como una variable en el modelo.%sin realizar un nuevo \emph{scrapping} de estos datos en el sitio del INPRES.
+Puesto que no se tiene control posible sobre la posición de quienes potencialmente percibieron un sismo se decidió para reducir el impacto del parámetro distancia limitar el espacio geográfico de los terremotos.
+Las posibles fuentes de datos para realizar tal operación son su latitud, longitud y provincia.
+
+
+\paragraph{Elección de la provincia de San Juan}
+Respondiendo a la discutido en el párrafo anterior se buscó trabajar en un extensión geográfica relativamente limitada, pero cuidando que el un número de sismos restantes sea aún elevado.
+Tras una inspección visual de la figura \ref{fig:terremotosMapa} se determinó  que la provincia de San Juan cumple con tales requisitos, por lo que se procedió a filtrar los datos con el comando \verb'sismos_SJ <- sismos[Provincia == "San Juan"]'.
+El subconjunto de datos de esta provincia representa un \(\approx 53 \%\) de los datos hasta aquí disponibles.
+Con \num{29916} registros es aún un número suficiente para realizar análisis cono los métodos elegidos.
+
+% Se eligió entonces la provincia de San Juan por presentar un elevado número de casos percibidos o no en el conjunto de datos, por tener una extensión geográfica reducida en comparación con otras así como contar con una alta homogeneidad espacial en el reporte de sismos hace que el factor distancia entre epicentro y población que reporta tenga menor impacto que en otras provincias.
+
+
+\paragraph{Latitud y longitud}
+La distribución de terremotos en la provincia de San Juan dista de ser homogénea pues hay una preponderancia de las ubicaciones meridionales como puede apreciarse en la figura \ref{fig:sanJuan}. 
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.8\textwidth]{sanJuan.png}
+\caption{Ampliación del área de San Juan en la figura \ref{fig:terremotosMapa}.
+	Los terremotos que figuran en el conjunto de datos registrados en la provincia de San Juan se presentan mayoritarialmente en su región meridional.
+	Los puntos rojos son los percibidos por personal, los amarillos solo por instrumental. 
+	Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
+\label{fig:sanJuan}
+\end{figure}
+
+Lo anterior podría hacer sospechar de un sesgo con la latitud, pero la inspección visual de la figura muestra que la proporción de puntos rojos y amarillos, los de terremotos percibidos o no es similar con la que hay en el norte.
+En función de esto se decidió no eliminar las variable de latitud en este estadío y analizar más adelante su correlación con la percepción de los sismos.
+A fin de cuentas el objetivo del trabajo es determinar si un modelo puede predecir la percepción de un sismo por parte de la población y no determinar los factores que influyen en la percepción de los sismos por parte de la población.
+En caso de que haya factores geográficos regionales, estos serán capturados por el modelo de clasificación y no necesariamente por la variable de latitud.
+
+Un razonamiento similar se aplica para no coartar la variable de longitud.
+Como se comentó al presentar la figura \ref{fig:mapa_sismos}, son esperables más terremotos y de mayor intensidad en las regiones occidentales de la provincia de San Juan.
+Nuevamente será una virtud de los modelos si pueden explotar tal información para mejorar la clasificación de los sismos percibidos por la población.
+
+% y que el reporte de sismos percibidos  no tenga sesgos geográficos, es decir una mayor preponderancia en regiones meridionales y/o orientales que en los sentidos opuestos.
+
+%Por tal razón para este trabajo se obvian las variables de latitud y longitud del epicentro.
+%Para que esto no sea una factor de sesgo en el modelo se decidió filtrar por la variable ``Provincia'' y trabajar con un subconjunto de los datos que correspondan a una provincia en particular.
 
 
 
@@ -446,146 +586,8 @@ Con el comando \verb'sismos[, Proxy\_amplitud := 10^(Magnitud- 2.5)]' se generó
 
 
 
-\section{Análisis exploratorio de datos (AED)}\label{sec:AED}
 
-Un primer vistazo sobre los datos con \verb'summary(sismos)' permitió obtener un resumen de las variables numéricas y categóricas.
-Saltan a la vista que hay valores extremos en la variable \verb'Magnitud' y un fuerte desequilibrio en la variable ``Percibido'', la de clase de clasificación.
-
-
-\paragraph{Desequilibrio en la clase de clasificación}
-Sobre el total de 55794 registros únicos, un \(\approx 96.6\%\) solo fueron percibidos por el instrumental y no por la población.
-Restan tan solo unos 1905 registros, un \(\approx 3.4\%\), que efectivamente fueron percibidos por la población.
-Este desequilibrio llama al uso de técnicas de balanceo de clases en los modelos de clasificación a utilizar.
-
-
-\paragraph{Distribución de la magnitud}
-La magnitud de terremotos forzosamente presenta una distribución asimétrica por el hecho de que cuanto mayor es la energía liberada, más infrecuente es el fenómeno.
-Esto la ilustra el número por año de sismos representado en una escala logarítmica en función de la magnitud generado con código provisto junto con los datos \cite[sección 4.2.1]{daniela_parada_ic-datasets-docencia_nodate}, que se reproduce en la figura \ref{fig:acumulado_anual_magnitud}.
-
-%\begin{figure}[h]
-%% \begin{wrapfigure}[13]{r}{0.5\textwidth}
-%\centering
-%\includegraphics{acumulado_anual_magnitud.pdf}
-%% \includegraphics[width=0.5\textwidth]{acumulado_anual_magnitud.pdf}
-%\caption{Los sismos de mayor magnitud son más infrecuentes.}
-%\label{fig:acumulado_anual_magnitud}
-%% \end{wrapfigure}
-%\end{figure}
-
-\begin{figure}[!ht]
-\centering
-% The output from tikz()
-% is imported here.
-\input{graphs/acumulado_anual_magnitud.tex}
-\caption{Los sismos de mayor magnitud son más infrecuentes.}
-\label{fig:acumulado_anual_magnitud}
-\end{figure}
-
-De esta observación no se desprende una acción a realizar en el preprocesamiento o selección de los datos.
-
-
-\paragraph{Horario de los percibidos}
-Se puede hipotetizar que en los horarios de sueño de la mayoría de la población sea menor la proporción de sismos percibidos.
-Segmentando la \verb'Hora_decimal' de los registros en intervalos de una hora se calculó la proporción entre casos percibidos o no para graficar las 24 proporciones en la figura \ref{fig:histograma_percibidos_por_hora}. 
-\begin{figure}[!ht]
-\centering
-\input{graphs/histograma_percibidos_por_hora.tex}
-\caption{Proporción de sismos percibidos por la población en función de la hora del día.}
-\label{fig:histograma_percibidos_por_hora}
-\end{figure}
-
-Contrariando la hipótesis la única merma observada se produce entre las 10 y 19 horas, y es muy ligera.
-Donde es claro un cambio llamativo es durante las tres horas que comienzan a las 23 de cada día en que hay un incremento de percepciones. 
-Habría que ver si tal variación es estadísticamente significativa, pero por sobre todo buscar una posible causa sociológica o fisiológica relacionada a que sean las primeras horas de sueño nocturno de la mayor parte de la población.
-
-No surge una acción a realizar en función de esta observación.
-
-
-\paragraph{Distribución geográfica}
-Como es esperable la mayor parte de los hipocentros se ubican en regiones con orografía elevada, como la cordillera de los Andes, producto de la subducción de la placa de Nazca bajo la placa Sudamericana, o las sierras cordobesas producto de procesos mucho más antiguos. 
-Una ubicación de los mismos sobre un mapa físico lo ilustra en la figura \ref{fig:mapa_sismos}.
-Esto conlleva a que la mayor parte de los terremotos estén alejados de las mayores urbanizaciones reduciendo la probabilidad de que sean percibidos por la población.
-\begin{figure}[!ht]
-\centering
-\includegraphics[width=0.8\textwidth]{mapa_sismos.png}
-\caption{Superponer las ubicaciones de los terremotos en un mápa físico muestra que la mayoría de los terremotos se registran en zonas de montaña o cerros en su mayoría alejados de las mayores urbanizaciones lo que afecta negativamente la estadística de los percibidos.
-La escala de colores muestra los más superficiales en azul y profundos en rojo.
-Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
-\label{fig:mapa_sismos}
-\end{figure}
-
-La ubicación de los terremotos sobre un mapa político que muestra la figura \ref{fig:terremotosMapa} deja a las claras que no tienen una distribución homogénea aún en provincias con abundante actividad.
-\begin{figure}[!ht]
-\centering
-\includegraphics[width=0.8\textwidth]{terremotosMapa.png}
-\caption{Sobre este mapa político se representan las ubicaciones de los terremotos como puntos. Esto permite apreciar que en algunas provincias, como San Luís, se omiten datas como evidencia el corte abrupto de reportes en su frontera. En otras se hacen más claros sesgos geográficos, como en Córdoba, Salta o Jujuy, 
-Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
-\label{fig:terremotosMapa}
-\end{figure}
-
-% De lo observado en estas figuras se hace una selección del área geográfica de los datos a trabajar que se discute en la sección siguiente.
-
-
-
-
-
-\section{Características relevantes a la predicción}
-% \section{Descripción de la selección de características (si corresponde)}
-
-\paragraph{El problema de la distancia}
-Evidentemente la proximidad de un epicentro a una población es un factor relevante en la percepción de un sismo.
-El INPRES tiene una metodología operativa para registrar la ubicación de los usuarios que reportan haber percibido un sismo a través de su página web \cite{noauthor_acerca_nodate}.
-Su buscador de sismos indica los sismos ``sentidos'' por usuarios con un color en sus resultados de búsqueda como ilustra la figura \ref{fig:resultado_búsqueda}.
-
-\begin{figure}[!ht]
-\centering
-\includegraphics[width=\textwidth]{resultado_búsqueda.png}
-\caption{Resultados de una búsqueda manual de sismos en el sitio del INPRES. El indicado en rojo fue percibido por la población. En la columna \emph{intensidad} se dan datos de ubicación de la población que lo percibió.}
-\label{fig:resultado_búsqueda}
-\end{figure}
-
-Lamentablemente en el conjunto de datos curados no figura la ubicación de la población que informó haberles percibido lo que imposibilita incorporar la distancia al epicentro como una variable en el modelo.%sin realizar un nuevo \emph{scrapping} de estos datos en el sitio del INPRES.
-Puesto que no se tiene control posible sobre la posición de quienes potencialmente percibieron un sismo se decidió para reducir el impacto del parámetro distancia limitar el espacio geográfico de los terremotos.
-Las posibles fuentes de datos para realizar tal operación son su latitud, longitud y provincia.
-
-
-\paragraph{Elección de la provincia de San Juan}
-Respondiendo a la discutido en el párrafo anterior se buscó trabajar en un extensión geográfica relativamente limitada, pero cuidando que el un número de sismos restantes sea aún elevado.
-Tras una inspección visual de la figura \ref{fig:terremotosMapa} se determinó  que la provincia de San Juan cumple con tales requisitos, por lo que se procedió a filtrar los datos con el comando \verb'sismos_SJ <- sismos[Provincia == "San Juan"]'.
-El subconjunto de datos de esta provincia representa un \(\approx 53 \%\) de los datos hasta aquí disponibles.
-Con \num{29916} registros es aún un número suficiente para realizar análisis cono los métodos elegidos.
-
-% Se eligió entonces la provincia de San Juan por presentar un elevado número de casos percibidos o no en el conjunto de datos, por tener una extensión geográfica reducida en comparación con otras así como contar con una alta homogeneidad espacial en el reporte de sismos hace que el factor distancia entre epicentro y población que reporta tenga menor impacto que en otras provincias.
-
-
-\paragraph{Latitud y longitud}
-La distribución de terremotos en la provincia de San Juna dista de ser homogénea pues hay una preponderancia de las ubicaciones meridionales como puede apreciarse en la figura \ref{fig:sanJuan}. 
-\begin{figure}[!ht]
-\centering
-\includegraphics[width=0.8\textwidth]{sanJuan.png}
-\caption{Ampliación del área de San Juan en la figura \ref{fig:terremotosMapa}.
-	Los terremotos que figuran en el conjunto de datos registrados en la provincia de San Juan se presentan mayoritarialmente en su región meridional.
-	Los puntos rojos son los percibidos por personal, los amarillos solo por instrumental. 
-	Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
-\label{fig:sanJuan}
-\end{figure}
-
-Lo anterior podría hacer sospechar de un sesgo con la latitud, pero la inspección visual de la figura muestra que la proporción de puntos rojos y amarillos, los de terremotos percibidos o no es similar con la que hay en el norte.
-En función de esto se decidió no eliminar las variable de latitud en este estadío y analizar más adelante su correlación con la percepción de los sismos.
-A fin de cuentas el objetivo del trabajo es determinar si un modelo puede predecir la percepción de un sismo por parte de la población y no determinar los factores que influyen en la percepción de los sismos por parte de la población.
-En caso de que haya factores geográficos regionales, estos serán capturados por el modelo de clasificación y no necesariamente por la variable de latitud.
-
-Un razonamiento similar se aplica para no coartar la variable de longitud.
-Como se comentó al presentar la figura \ref{fig:mapa_sismos}, son esperables más terremotos y de mayor intensidad en las regiones occidentales de la provincia de San Juan.
-Nuevamente será una virtud de los modelos si pueden explotar tal información para mejorar la clasificación de los sismos percibidos por la población.
-
-% y que el reporte de sismos percibidos  no tenga sesgos geográficos, es decir una mayor preponderancia en regiones meridionales y/o orientales que en los sentidos opuestos.
-
-%Por tal razón para este trabajo se obvian las variables de latitud y longitud del epicentro.
-%Para que esto no sea una factor de sesgo en el modelo se decidió filtrar por la variable ``Provincia'' y trabajar con un subconjunto de los datos que correspondan a una provincia en particular.
-
-
-\paragraph{Variables a correlacionar con la percepción}
+\section{Variables a correlacionar con la percepción}
 De las originales referidas al fecha y hora en que se produce el terremoto Fecha y Hora se trabajará solo con la generada a partir de la segunda Hora\_decimal obviando la primera pues no es esperable que la percepción de un sismo por parte de la población.
 
 De los datos sobre parámetros físicos del terremoto, Magnitud y Profundidad, se trabajará con la segunda sin modificación, en tanto que se espera un mejor desempeño en modelos que se basen en la variable elaborada a partir de la primera, Proxy\_amplitud por lo expuesto en la sección \ref{sec:ingeniería}.
@@ -596,7 +598,7 @@ Quedan así potenciales seis variables para trabajar en el modelo de clasificaci
 Con la función \verb'cor' se verificó que lo covarianza de Percibido con Hora\_decimal es casi nula, que cuanto más profundo es el terremoto es menos percibido y que era de esperarse que terremotos que liberan más energía sean más percibidos, Magnitud y Proxy\_amplitud muestran una correlación positiva.
 La correlación de la percepción con la latitud resultó ser menos significativa que con la longitud.
 Se resume esto en el cuadro \ref{tab:correlaciones}.
-\begin{table}[h]
+\begin{table}[!ht]
 	% \resizebox{\textwidth}{!}{%
 		% \centering
 		\begin{tabular}{lllll}
@@ -768,7 +770,7 @@ Si en base a la inspección de esa figura eligiera el punto de corte en \(0.5\) 
 	\label{fig:múltiple_metrics}
 \end{figure}
 
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
 \begin{tabular}{lllll}
 \toprule

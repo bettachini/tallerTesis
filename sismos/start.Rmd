@@ -122,6 +122,10 @@ Aquí si figura el booleano de si fue percibido
 str(sismos_arg)
 ```
 
+```{r sumario sismos_arg}
+summary(sismos_arg)
+```
+
 
 
 #### Valores faltantes o duplicados
@@ -346,7 +350,7 @@ library("plotly")
 #  ggplot(data = df2, aes(
 #    x = Magnitud, y = log(nacum, 10), colour = Año, key = nacum
 #  )) +
-#    labs(x = "Magnitud [escala Richter]", y = "(Log 10) sismos") +
+#    labs(x = "Magnitud [$M_w$]", y = "($Log_{10}$) sismos") +
 #    geom_point() +
 #    theme_classic(),
 #  source = "select",
@@ -358,7 +362,7 @@ library("plotly")
 
 #tikz('graphs/acumulado_anual_magnitud.tex',width=5,height=2)
 #ggplot(data = df2, aes(x = Magnitud, y = log(nacum, 10), colour = Año)) +
-#  labs(x = "Magnitud [escala Richter]", y = "($Log_{10}$) sismos") +
+#  labs(x = "Magnitud ($M_w$)", y = "($Log_{10}$) sismos") +
 #  geom_point() +
 #  theme_classic()
 #dev.off()
