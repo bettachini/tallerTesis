@@ -48,7 +48,7 @@ Sistematizados por Daniela Parada del Instituto de cálculo, FCEyN, UBA. [Presen
 
 
 
-## Adquisición y formateo de los datos}
+## Preprocesamiento y limpieza de los datos
 
 
 ### Carga de los datos
@@ -101,20 +101,34 @@ sismos_all <- fread("./sismos_all.csv", sep = ",") # este no tiene la columna de
 sismos_arg <- fread("./sismos-arg.csv", sep = ",")
 ```
 
+
+### Limpieza de datos 
+
+
+#### Inspección de tipos de datos
 Se verifica que se cargó
+
 ```{r head de la data.table}
 head(sismos_all)
 ```
+En `sismos_all`  los formatos son distintos, pero crucialmente no figura la columna de si fue percibido.
 
 ```{r nombres columnas iguales a publicado}
 colnames(sismos_arg)
 ```
 Aquí si figura el booleano de si fue percibido
 
+```{r tipo de dato}
+str(sismos_arg)
+```
+
+```{r sumario sismos_arg}
+summary(sismos_arg)
+```
 
 
-### Verificación de faltantes o duplicados
 
+#### Valores faltantes o duplicados
 ```{r datos faltantes}
 sum(is.na(sismos_arg))
 ```
@@ -124,7 +138,12 @@ No hay registros con "no números" ("not a number" o NA).
 # check at each column for any instance of 0
 sapply(sismos_arg, function(x) sum(x == 0))
 ```
-No hay registros idénticos a '0' en ninguna columna.
+
+```{r registros igulas a cero}
+# show rows with Profundidad == 0
+sismos_arg[Profundidad == 0]
+```
+
 
 ```{r datos duplicados número}
 nrow(sismos_arg)
@@ -146,11 +165,11 @@ sismos <- sismos_arg[!duplicated(sismos_arg)]
 En `sismos` queda un data.table sin duplicados.
 
 
+#### Datos atípicos
+Ver sección de Análisis exploratorio de datos.
 
-### Inspección y formateo de datos
-```{r tipo de dato}
-str(sismos)
-```
+
+### Modificaciones de los datos (ingeniería de características)
 
 
 #### Escala continua para fecha y hora del sismo
@@ -190,250 +209,15 @@ summary(sismos$Año)
 ```
 
 
+## Recorte por produndidad
 
-### Delimitación del espacio geográfico
-
-#### Distribución geográfica de los datos
-Hay código en (https://daniellaparada.github.io/IC-datasets-docencia/04_visualizacion.html#exploraci%C3%B3n-inicial) pero se tomaron las imágenes de allí.
-
-
-
-### El problema de la distancia
-
-### Elección de la provincia de San Juan
-```{r select rows with Provincia == San Juan}
-sismos_SJ <- sismos[Provincia == "San Juan", ]
-```
-
-```{r registros SJ}
-c(nrow(sismos), nrow(sismos_SJ), nrow(sismos_SJ)/nrow(sismos))
-```
-
-
-### Latitud y longitud
-
-```{r latitud San Juan}
-# find out correlation between latitud and Percibido
-cor(sismos_SJ$Latitud, sismos_SJ$Percibido)
-```
-
-```{r longitud San Juan}
-cor(sismos_SJ$Longitud, sismos_SJ$Percibido)
-```
-
-
-```{r test}
-# correlation between columns Magnitud and Proxy_amplitud
-cor(sismos_SJ$`Proxy amplitud`, sismos_SJ_escalado$Magnitud)
-```
-
-
-
-# Análisis exploratorio de datos
-Una básica estadística descriptiva de los datos
-```{r resumen de la data.table}
-summary(sismos_SJ)
-```
-Hay un fuerte desbalance en la variable `percibido` que indica si el sismo fue percibido o no hacia este último caso.
-  
-```{r fracción de no percibidos}
-n_percibidos <- sum(sismos_SJ$Percibido == "TRUE")
-c(n_percibidos,  n_percibidos / nrow(sismos_SJ) )
-```
-
-
-
-
-## Magnitud: distribución lineal y escala de Richter
-```{r dplyr}
-if (!require("dplyr")) {
-  install.packages("dplyr")
-}
-library("dplyr")
-```
-
-```{r Magnitud San Juan}
-sismos_SJaux <- sismos_SJ %>%
-  mutate(Año = format(Fecha, format = "%Y"))
-
-df <- sismos_SJaux %>%
-  filter(Año > 2011,
-         Año < 2023) %>%
-  group_by(Año, Magnitud) %>%
-  summarize(n = n())
-
-
-df2 <- df %>%
-  group_by(Año) %>%
-  arrange(-Magnitud) %>%
-  summarize(Magnitud = Magnitud,
-            nacum = cumsum(n))
-```
-
-```{r plotly}
-if (!require("plotly")) {
-  install.packages("plotly")
-}
-library("plotly")
-```
-
-```{r plot acumulado anuales por magnitud San Juan}
-#ggplotly(
-#  ggplot(data = df2, aes(
-#    x = Magnitud, y = log(nacum, 10), colour = Año, key = nacum
-#  )) +
-#    labs(x = "Magnitud", y = "(Log 10) Cantidad acumulada de sismos") +
-#    geom_point() +
-#    theme_classic(),
-#  source = "select",
-#  tooltip = c("key")
-#)
-```
-
-```{r TikZ}
+```{r save plot as TikZ}
 library(tikzDevice)
 if (!require("tikzDevice")) {
   install.packages("tikzDevice")
 }
 library("tikzDevice")
 ```
-
-```{r output acumulado anuales por magnitud San Juan tikz}
-#tikz('graphs/acumulado_anual_magnitud.tex',width=5,height=3)
-#  ggplot(data = df2, aes(
-#    x = Magnitud, y = log(nacum, 10), colour = Año)) +
-#    labs(x = "Magnitud ($M_w$)", y = "Número sismos (Log$_{10}$)") +
-#    geom_point() +
-#    theme_classic()
-#dev.off()
-```
-
-
-```{r Magnitud San Juan percibidos}
-df_detectados <- sismos_SJaux %>%
-  filter(Año > 2011,
-         Año < 2023,
-         Percibido == TRUE) %>%
-  group_by(Año, Magnitud) %>%
-  summarize(n = n())
-
-df2_detectados <- df_detectados %>%
-  group_by(Año) %>%
-  arrange(-Magnitud) %>%
-  summarize(Magnitud = Magnitud,
-            nacum = cumsum(n))
-
-ggplotly(
-  ggplot(data = df2_detectados, aes(
-    x = Magnitud, y = log(nacum, 10), colour = Año, key = nacum
-  )) +
-    labs(x = "Magnitud", y = "(Log 10) Cantidad acumulada de sismos") +
-    geom_point() +
-    theme_classic(),
-  source = "select",
-  tooltip = c("key")
-)
-#  # add grid
-#  ggplot2::theme(panel.grid.major = element_line(colour = "grey", size = 0.5)
-```
-
-```{r output acumulado anuales por magnitud San Juan percibidos tikz}
-tikz('graphs/acumulado_anual_magnitud_percibidos.tex',width=5,height=3)
-  ggplot(data = df2_detectados, aes(
-    x = Magnitud, y = log(nacum, 10), colour = Año)) +
-    labs(x = "Magnitud ($M_w$)", y = "Número sismos (Log$_{10}$)") +
-    geom_point() +
-    theme_classic()
-dev.off()
-```
- 
-
-
-
-### Horario de los percibidos
-```{r percibidos segmentados por hora}
-# Create two separate data.tables for TRUE and FALSE cases
-dt_true <- sismos[Percibido == TRUE]
-dt_false <- sismos[Percibido == FALSE]
-
-# Define the breaks for the 24 hours of the day (0 to 86400 seconds)
-breaks <- seq(0, 86400, by = 3600)
-
-# Create histograms for TRUE and FALSE cases
-hist_true <- hist(dt_true$`Segundos del día`, breaks = breaks, plot = FALSE)
-hist_false <- hist(dt_false$`Segundos del día`, breaks = breaks, plot = FALSE)
-
-# Calculate the ratio of counts in each bin
-ratio <- hist_true$counts / hist_false$counts
-
-# Create a data.table to hold the result
-percibidos_hora <- data.table(
-  Hora = floor(hist_true$mids / 3600), # Convert bin midpoints to hours
-  Porcentaje = ratio * 100
-)
-
-# Handle possible Inf or NA values in the ratio
-percibidos_hora[is.infinite(Porcentaje) | is.na(Porcentaje), Porcentaje := NA]
-
-# Print the result
-print(percibidos_hora)
-```
-
-
-```{r histograma percibidos segmentados por hora}
-# generate a vertical bar plot to reproduce an histogram on data at result
-ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
-  geom_bar(stat = "identity") +
-  # labs(title = "Razón de sismos percibidos a no percibidos por hora",
-  labs(
-       x = "Hora",
-       y = "Percibidos [%]")
-
-## save it to tikz file
-#tikz('graphs/histograma_percibidos_por_hora.tex',width= 4.8,height=2)
-#ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
-#  geom_bar(stat = "identity") +
-#  labs(x = "Hora", y = "Percibidos [\\%]"
-#  )
-#dev.off()
-```
-
-
-
-
-Quedan así un total de tres variables a trabajar en el modelo de clasificación del estado de \verb'Percibido': \verb'Segundos del día', \verb'Profundidad' y  \verb'Proxy amplitud'.
-
-Podría verse si hay puede hacerse un heat map de correlaciones entre estas variables con 'Percibido'.
-
-```{r correlación variables}
-# use any tool
-corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, "Proxy amplitud", Latitud, Longitud, Percibido)], use = "complete.obs")
-# corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, Proxy_amplitud, Percibido)], use = "complete.obs")
-str(corr_alles)
-# only the last column
-corr_alles[, 6]
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Modificaciones de los datos (ingeniería de características)
-
-
-
-
-
-## Recorte por profundidad
 
 ```{r histograma hasta 50 km profundidad con barras más finas}
 #hist(sismos[Profundidad < 50]$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
@@ -513,10 +297,177 @@ summary(sismos$"Proxy amplitud")
 
 
 
+# Análisis exploratorio de datos
+Una básica estadística descriptiva de los datos
+```{r resumen de la data.table}
+summary(sismos)
+```
+Hay un fuerte desbalance en la variable `percibido` que indica si el sismo fue percibido o no hacia este último caso.
+  
+```{r fracción de no percibidos}
+sum(sismos$Percibido == "FALSE") / nrow(sismos)
+```
+
+
+## Magnitud: distribución lineal y escala de Richter
+
+```{r histograma de Magnitud con barras más finas}
+#hist(sismos$Magnitud, main = "Histograma de Magnitud", xlab = "Magnitud", ylab = "Frecuencia", breaks = 50)
+
+## save the plot
+# png("graphs/histograma_magnitud.png")
+```
+
+```{r acumulado anuales por magnitud}
+if (!require("dplyr")) {
+  install.packages("dplyr")
+}
+library("dplyr")
+
+sismos_SJ <- sismos %>%
+# sismos_SJ <- sismos_SJ %>%
+  mutate(Año = format(Fecha, format = "%Y"))
+
+df <- sismos_SJ %>%
+  filter(Año > 2012,
+         Año < 2022) %>%
+  group_by(Año, Magnitud) %>%
+  summarize(n = n())
+
+
+df2 <- df %>%
+  group_by(Año) %>%
+  arrange(-Magnitud) %>%
+  summarize(Magnitud = Magnitud,
+            nacum = cumsum(n))
+
+if (!require("plotly")) {
+  install.packages("plotly")
+}
+library("plotly")
+
+#ggplotly(
+#  ggplot(data = df2, aes(
+#    x = Magnitud, y = log(nacum, 10), colour = Año, key = nacum
+#  )) +
+#    labs(x = "Magnitud [$M_w$]", y = "($Log_{10}$) sismos") +
+#    geom_point() +
+#    theme_classic(),
+#  source = "select",
+#  tooltip = c("key")
+#)
+
+# # save as pdf
+# pdf("graphs/acumulado_anual_magnitud.pdf", width = 12, height = 6, units = "cm")
+
+#tikz('graphs/acumulado_anual_magnitud.tex',width=5,height=2)
+#ggplot(data = df2, aes(x = Magnitud, y = log(nacum, 10), colour = Año)) +
+#  labs(x = "Magnitud ($M_w$)", y = "($Log_{10}$) sismos") +
+#  geom_point() +
+#  theme_classic()
+#dev.off()
+```
+
+
+
+### Horario de los percibidos
+```{r percibidos segmentados por hora}
+# Create two separate data.tables for TRUE and FALSE cases
+dt_true <- sismos[Percibido == TRUE]
+dt_false <- sismos[Percibido == FALSE]
+
+# Define the breaks for the 24 hours of the day (0 to 86400 seconds)
+breaks <- seq(0, 86400, by = 3600)
+
+# Create histograms for TRUE and FALSE cases
+hist_true <- hist(dt_true$`Segundos del día`, breaks = breaks, plot = FALSE)
+hist_false <- hist(dt_false$`Segundos del día`, breaks = breaks, plot = FALSE)
+
+# Calculate the ratio of counts in each bin
+ratio <- hist_true$counts / hist_false$counts
+
+# Create a data.table to hold the result
+percibidos_hora <- data.table(
+  Hora = floor(hist_true$mids / 3600), # Convert bin midpoints to hours
+  Porcentaje = ratio * 100
+)
+
+# Handle possible Inf or NA values in the ratio
+percibidos_hora[is.infinite(Porcentaje) | is.na(Porcentaje), Porcentaje := NA]
+
+# Print the result
+print(percibidos_hora)
+```
+
+
+```{r histograma percibidos segmentados por hora}
+# generate a vertical bar plot to reproduce an histogram on data at result
+ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
+  geom_bar(stat = "identity") +
+  # labs(title = "Razón de sismos percibidos a no percibidos por hora",
+  labs(
+       x = "Hora",
+       y = "Percibidos [%]")
+
+## save it to tikz file
+#tikz('graphs/histograma_percibidos_por_hora.tex',width= 4.8,height=2)
+#ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
+#  geom_bar(stat = "identity") +
+#  labs(x = "Hora", y = "Percibidos [\\%]"
+#  )
+#dev.off()
+```
+
+
+### Distribución geográfica
+Hay código en (https://daniellaparada.github.io/IC-datasets-docencia/04_visualizacion.html#exploraci%C3%B3n-inicial) pero se tomaron las imágenes de allí.
+
+
+
+## Descripción de la selección de características (si corresponde)
+
+### El problema de la distancia -> San Juan 
+```{r select rows with Provincia == San Juan}
+sismos_SJ <- sismos[Provincia == "San Juan", ]
+```
+
+```{r registros SJ}
+c(nrow(sismos), nrow(sismos_SJ), nrow(sismos_SJ)/nrow(sismos))
+```
+
+
+### Latitud y longitud
+
+```{r latitud San Juan}
+# find out correlation between latitud and Percibido
+cor(sismos_SJ$Latitud, sismos_SJ$Percibido)
+```
+
+```{r longitud San Juan}
+cor(sismos_SJ$Longitud, sismos_SJ$Percibido)
+```
+
+
+```{r test}
+# correlation between columns Magnitud and Proxy_amplitud
+cor(sismos_SJ$`Proxy amplitud`, sismos_SJ_escalado$Magnitud)
+```
 
 
 
 
+Quedan así un total de tres variables a trabajar en el modelo de clasificación del estado de \verb'Percibido': \verb'Segundos del día', \verb'Profundidad' y  \verb'Proxy amplitud'.
+
+Podría verse si hay puede hacerse un heat map de correlaciones entre estas variables con 'Percibido'.
+
+```{r correlación variables}
+# use any tool
+corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, "Proxy amplitud", Latitud, Longitud, Percibido)], use = "complete.obs")
+# corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, Proxy_amplitud, Percibido)], use = "complete.obs")
+str(corr_alles)
+# only the last column
+corr_alles[, 6]
+```
 
 
 ## Preprocesamiento
