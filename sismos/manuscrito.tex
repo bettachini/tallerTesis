@@ -2,6 +2,29 @@
 % \documentclass[a4paper,twoside,openright]{report}
 % \documentclass[a4paper]{book}
 
+% \linespread{1.25}
+
+%% listado de código
+%% https://es.wikibooks.org/wiki/Manual_de_LaTeX/Listados_de_c%C3%B3digo/Listados_con_listings
+\usepackage{listings}
+\lstset{literate=
+  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+  {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+  {ã}{{\~a}}1 {ẽ}{{\~e}}1 {ĩ}{{\~i}}1 {õ}{{\~o}}1 {ũ}{{\~u}}1
+  {Ã}{{\~A}}1 {Ẽ}{{\~E}}1 {Ĩ}{{\~I}}1 {Õ}{{\~O}}1 {Ũ}{{\~U}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+  {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+  {€}{{\euro}}1 {£}{{\pounds}}1 {«}{{\guillemotleft}}1
+  {»}{{\guillemotright}}1 {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1 {¡}{{!`}}1 
+}
+
 %% Spanska!
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}    % 8-bit encoding. Acentuados como único caracter.
@@ -163,7 +186,7 @@ Se estructuró en los siguientes capítulos con temáticas diferenciadas
 %Hay una abultada historia de observaciones que avalan que muchos animales son sensibles a señales que dan alarma anticipada de próximos sismos \cite{kirschvink_earthquake_2000}.
 
 En la prensa general se busca transmitir la importancia de un fenómeno sísmico informando un valor sea en la escala de Richter o de Mercalli como si fueran intercambiables.
-La primera se refiere a la magnitud, una característica física del terremoto (ver definición en la sección \ref{sec:ingeniería_física}), en tanto que la segunda se refiere a una caracterización subjetiva del sismo, la llamada intensidad.
+La primera se refiere a la magnitud, una característica física del terremoto (ver definición en la sección \ref{sec:ingeniería}), en tanto que la segunda se refiere a una caracterización subjetiva del sismo, la llamada intensidad.
 Esta última cuantidad es función de fenómenos percibidos por el público como si hubo grietas en el suelo o vidrios o si temblaron edificios \cite[sección 4.2.3]{fowler_solid_1990}.
 % Como tal es una caracterización posterior al fenómeno por lo que su valor numérico no es útil a los efectos del objetivo descripto en la sección \ref{sec:objetivo}.
 Los organismos de monitoreo de sismos cuentan con portales en la world-wide web para que el público ofrezca tal información voluntariamente en formularios con preguntas de elección múltiple.
@@ -273,7 +296,7 @@ Este mismo conjunto reducido puede descargarse en formato de valores numéricos 
 
 Las variables reportadas para cada sismo son:
 \begin{itemize}
-	\item \emph{Fecha}: en el formato verb'aaaa-mm-dd' de la norma ISO 8601 \cite{noauthor_iso_2019}.
+	\item \emph{Fecha}: en el formato \verb'aaaa-mm-dd' de la norma ISO 8601 \cite{noauthor_iso_2019}.
 	\item \emph{Hora}: una cadena de caracteres en formato \verb'hh:mm:ss' con una exactitud al segundo.
 	\item \emph{Latitud, Longitud}: un número con una exactitud de un decimal con grados como unidad.
 	\item \emph{Provincia}: cadena de caracteres del nombre de la provincia donde se produjo el sismo (no donde se ubicó quién potencialmente lo percibiera) según se afirma en el sitio de publicación \cite[5.1.1]{daniela_parada_ic-datasets-docencia_nodate}.
@@ -320,31 +343,35 @@ Tras descargar el archivo de datos en formato CSV se le importó en una estructu
 Esta estructura de datos permite una consulta de los datos análoga a la del lenguaje SQL de bases de datos relacionales lo que le hace una herramienta versátil para el análisis de datos tabulares \cite{noauthor_introduction_2024}.
 
 %\paragraph{Valores faltantes o duplicados}
-La presencia de valores faltantes indicados con el símbolo \verb'NA' se descartó cuando la ejecución \verb'sum(is.na(sismos_arg))' arrojó un cero como resultado.
-Por el contrario ejecutar \verb'sismos_arg[duplicated(sismos_arg, fromLast = TRUE)]' mostró unos \num{23} registros duplicadas sobre un total de \num{55817} registros.
+La presencia de valores faltantes indicados con el símbolo \verb'NA' se descartó cuando la ejecución \lstinline[language = R]'sum(is.na(sismos_arg))' arrojó un cero como resultado.
+Por el contrario ejecutar \lstinline[language = R]!sismos_arg[duplicated(sismos_arg, fromLast = TRUE)]! mostró unos \num{23} registros duplicadas sobre un total de \num{55817} registros.
 
-En una nueva tabla con nombre más corto, \verb'sismos' se copiaron los registros sin duplicados ejecutando \verb'sismos_arg[!duplicated(sismos_arg)]'.
+En una nueva tabla con nombre más corto, \lstinline[language = R]'sismos', se copiaron los registros sin duplicados ejecutando \lstinline[language = R]'sismos_arg[!duplicated(sismos_arg)]'.
 
 
-\subsection{Inspección y formateo de datos}
+\subsection{Inspección y cambio de formato de datos}\label{sec:formateo}
 % \paragraph{Inspección de tipos de datos}
-Ejecutar la función \verb'colnames' con la \emph{data.table} denominada \verb'sismos_arg' como argumento permitió verificar que contuviera las columnas con los nombres anunciados en el sitio que publica los datos en su sección \cite[Exploración inicial]{daniela_parada_ic-datasets-docencia_nodate}.
-Las transformaciones o ingeniería de características que se detallan luego en esta sección se realizaron en función de los tipos de datos de cada columnas constatados con la función \verb'str'.
+Ejecutar la función \lstinline[language = R]'colnames' con la \emph{data.table} denominada \lstinline[language = R]'sismos_arg' como argumento permitió verificar que contuviera las columnas con los nombres anunciados en el sitio que publica los datos en su sección \cite[Exploración inicial]{daniela_parada_ic-datasets-docencia_nodate}.
+Las transformaciones o ingeniería de características que se detallan luego en esta sección se realizaron en función de los tipos de datos de cada columnas constatados con la función \lstinline[language = R]'str'.
+
 
 \paragraph{Fecha y hora del sismo}
-A partir de la varible Hora se escribió una función que genera otra continua contando el número entero de segundos transcurridos desde la medianoche del día en que se produjo el terremoto, \emph{Segundos en el día}, apoyandose para esto en la función \verb'strptime' del paquete base de R.
+Si se quieren utilizar las variables \emph{Fecha} y \emph{Hora} para segmentar el día en franjas horarias, o comparar interanuales, es útil convertirles en funciones de continuas, días corridos en el año, para la primra, y segundos, para la segunda 
+
+La variable Fecha se reconocíó al importarse el conjunto de datos en formato ISO 8601 por lo que registrar una nueva variable para el año y otra para el día del año, fue sencillo con las funciones \lstinline[language = R]'year' y \lstinline[language = R]'yday' de la biblioteca base de R. 
+
+A partir de la varible Hora se escribió una función que genera otra continua contando el número entero de segundos transcurridos desde la medianoche del día en que se produjo el terremoto, \emph{Segundos del día}, apoyandose para esto en la función \lstinline[language = R]'strptime' del paquete base de R.
 Esto habilita posibles análisis segmentando el día en franjas horarias.
-% Se verificó que los valores en la columna generada con \verb'sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]' estuvieran en el rango de \num{0} a \SI{86400}{\second}, es decir, el de un día completo.
+% Se verificó que los valores en la columna generada con \lstinline[language = R]'sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]' estuvieran en el rango de \num{0} a \SI{86400}{\second}, es decir, el de un día completo.
 
-La fecha se pasó del formato ISO 8601 a dos variables.
-Una guarda el número consecutivo de día del año, \emph{Día del año}, lo que permite segmentar por rangos del año.
-La otra simplemente guarda \emph{Año}, para hacer contrastaciones interanuales.
 
-Resumiendo las nuevas características:
+Resumiendo las nuevas variable generadas fueron:
 \begin{itemize}
-	\item \emph{Segundos en el día}: número entero de 0 a 86399
-	\item \emph{Día del año}: número entero de 1 a 366
-	\item \emph{Año}: número entero de 2012 a 2022
+	\item \emph{Segundos del día}: número entero de 0 a 86399
+	\item \emph{Día del año}: número entero de 1 a 366\\
+		\lstinline[language = R]'sismos[, `Día del año` := yday(as.Date(Fecha, format = "%Y-%m-%d")), ]'
+	\item \emph{Año}: número entero de 2012 a 2022\\
+	\lstinline[language = R]'sismos[, Año := year(as.Date(Fecha, format = "%Y-%m-%d"))]'
 \end{itemize}
 
 
@@ -401,7 +428,7 @@ Las posibles fuentes de datos para realizar tal operación son su latitud, longi
 
 \paragraph{Elección de la provincia de San Juan}
 Respondiendo a la discutido en el párrafo anterior se buscó trabajar en un extensión geográfica relativamente limitada, pero cuidando que el un número de sismos restantes sea aún elevado.
-Tras una inspección visual de la figura \ref{fig:terremotosMapa} se determinó  que la provincia de San Juan cumple con tales requisitos, por lo que se procedió a filtrar los datos con el comando \verb'sismos_SJ <- sismos[Provincia == "San Juan"]'.
+Tras una inspección visual de la figura \ref{fig:terremotosMapa} se determinó  que la provincia de San Juan cumple con tales requisitos, por lo que se procedió a filtrar los datos con el comando \lstinline[language = R]'sismos_SJ <- sismos[Provincia == "San Juan"]'.
 El subconjunto de datos de esta provincia representa un \(\approx 54 \%\) de los datos hasta aquí disponibles.
 Con \num{29917} registros es aún un número suficiente para realizar análisis cono los métodos elegidos.
 
@@ -409,13 +436,14 @@ Con \num{29917} registros es aún un número suficiente para realizar análisis 
 
 
 \paragraph{Latitud y longitud}
-La distribución de terremotos en la provincia de San Juan dista de ser homogénea pues hay una preponderancia de las ubicaciones meridionales como puede apreciarse en la figura \ref{fig:sanJuan}. 
+La distribución de terremotos en la provincia de San Juan dista de ser homogénea pues hay una preponderancia de las ubicaciones meridionales como puede apreciarse en la figura \ref{fig:sanJuan}.
+
 \begin{figure}[!ht]
-\centering
-\includegraphics[width=0.8\textwidth]{sanJuan.png}
-\caption{Ampliación del área de San Juan en la figura \ref{fig:terremotosMapa}.
-	Los terremotos que figuran en el conjunto de datos registrados en la provincia de San Juan se presentan mayoritarialmente en su región meridional.
-	Los puntos rojos son los percibidos por personal, los amarillos solo por instrumental. 
+	\centering
+	\includegraphics[width=0.8\textwidth]{sanJuan.png}
+	\caption{Recorte de la figura \ref{fig:terremotosMapa} en torno a la provincia de San Juan.
+	Los terremotos se presentan mayoritarialmente en su región meridional.
+	Los puntos rojos son los percibidos por personas.
 	Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
 \label{fig:sanJuan}
 \end{figure}
@@ -438,10 +466,10 @@ Nuevamente será una virtud de los modelos si pueden explotar tal información p
 
 
 
-\section{Análisis exploratorio de datos (AED)}\label{sec:AED}
+\section{Análisis exploratorio de datos}\label{sec:AED}
 
-Un primer vistazo sobre los datos con \verb'summary(sismos_SJ)' permitió obtener un resumen de las variables numéricas y categóricas.
-Saltan a la vista que hay valores extremos en el extremo superior de la variable \verb'Magnitud' bastante alejados de la mediana y que hay un fuerte desequilibrio en la variable ``Percibido'', la de clase de clasificación, en favor de los terremotos no percibidos.
+Un primer vistazo sobre los datos con \lstinline[language = R]'summary(sismos_SJ)' permitió obtener un resumen de las variables numéricas y categóricas.
+Saltan a la vista que hay valores extremos en el extremo superior de la variable \lstinline[language = R]'Magnitud' bastante alejados de la mediana y que hay un fuerte desequilibrio en la variable ``Percibido'', la de clase de clasificación, en favor de los terremotos no percibidos.
 
 
 \paragraph{Desequilibrio en la clase de clasificación}
@@ -452,25 +480,25 @@ Este desequilibrio llama al uso de técnicas de balanceo de clases en los modelo
 
 \paragraph{Distribución de la magnitud}
 La magnitud de terremotos forzosamente presenta una distribución asimétrica por el hecho de que cuanto mayor es la energía liberada, más infrecuente es el fenómeno.
-Esta relación logarítmica de la frecuencia con la magnitud de los sismos que ilustra la figura \ref{fig:acumulado_anual_magnitud} para San Juan en los años 2012 a 2022 es universal y se conoce como la ley de Gutenberg-Richter \cite[ec. 4.24]{fowler_solid_1990}.
+La relación logarítmica de la frecuencia con la magnitud de los sismos que muestra la figura \ref{fig:acumulado_anual_magnitud} para San Juan en los años 2012 a 2022 es universal es coincidente con lo enunciado en la ley empírica de Gutenberg-Richter \cite[ec. 4.24]{fowler_solid_1990}.
 
 \begin{figure}[!ht]
 %% \begin{wrapfigure}[13]{r}{0.5\textwidth}
 \centering
 \input{graphs/acumulado_anual_magnitud.tex}
-% \includegraphics[width=0.5\textwidth]{acumulado_anual_magnitud.pdf}
-\caption{Los sismos de mayor magnitud son más infrecuentes. Generado con código provisto junto con los datos \cite[sección 4.2.1]{daniela_parada_ic-datasets-docencia_nodate}}
+\vspace{-0.8cm}
+\caption{Los sismos de mayor magnitud son más infrecuentes. Generado con código provisto junto con los datos para la provincia de San Juan \cite[sección 4.2.1]{daniela_parada_ic-datasets-docencia_nodate}}
 \label{fig:acumulado_anual_magnitud}
 %% \end{wrapfigure}
 \end{figure}
 
-Los sismos percibidos por la población no cumplen esta relación, quedando relegados los de menor magnitud dando cuenta de la dificultad en percibirlos en ese caso.
-La figura \ref{fig:acumulado_anual_magnitud_percibidos} parece sugirir que esto es aún más pronunciado para magnitudes inferiores a $\approx 4$.
+Los sismos percibidos por la población no cumplen esta relación logarítmica, quedando relegados los de menor magnitud dando cuenta de la dificultad en percibirlos en ese caso como ilustra la figura \ref{fig:acumulado_anual_magnitud_percibidos}.
 \begin{figure}[!ht]
 %% \begin{wrapfigure}[13]{r}{0.5\textwidth}
 \centering
 \input{graphs/acumulado_anual_magnitud_percibidos.tex}
 % \includegraphics[width=0.5\textwidth]{acumulado_anual_magnitud.pdf}
+\vspace{-0.8cm}
 \caption{El apartamiento de la tendencia de la ley de Gutenberg-Richter en los sismos percibidos por la población muestra que la dificultad para que esto se produzca se incrementa con la baja de la magnitud.}
 \label{fig:acumulado_anual_magnitud_percibidos}
 %% \end{wrapfigure}
@@ -478,26 +506,56 @@ La figura \ref{fig:acumulado_anual_magnitud_percibidos} parece sugirir que esto 
 
 
 
-\paragraph{Horario de los percibidos}
-Se puede hipotetizar que en los horarios de sueño de la mayoría de la población sea menor la proporción de sismos percibidos.
-Segmentando la \verb'Hora_decimal' de los registros en intervalos de una hora se calculó la proporción entre casos percibidos o no para graficar las 24 proporciones en la figura \ref{fig:histograma_percibidos_por_hora}. 
+\paragraph{Temporalidad de los percibidos}
+Se puede hipotetizar que en los horarios de sueño nocturno sea menor la proporción de sismos percibidos.
+Segmentando los registros con la variable Segundos del día (ver sección \ref{sec:formateo}) en intervalos de una hora se calculó la proporción entre casos percibidos o no.
+Contrariando la hipótesis, en la figura \ref{fig:histograma_percibidos_por_hora} no parece posible identificar una banda horaria, e.g. noche, en la que la proporción sea menor.
+
 \begin{figure}[!ht]
 \centering
 \input{graphs/histograma_percibidos_por_hora.tex}
+\vspace{-0.8cm}
 \caption{Proporción de sismos percibidos por la población en función de la hora del día.}
 \label{fig:histograma_percibidos_por_hora}
 \end{figure}
 
-Contrariando la hipótesis, la única merma observada se produce entre las 10 y las 19 horas, y es muy ligera.
-Donde es claro un cambio llamativo es durante las tres horas que comienzan a las 23 de cada día, en las que hay un incremento de percepciones. 
-Habría que ver si tal variación es estadísticamente significativa, pero por sobre todo, buscar una posible causa sociológica o fisiológica relacionada a que sean las primeras horas de sueño nocturno de la mayor parte de la población.
+Otra hipótesis que puede formularse es que en los meses de verano, enero y febrero, sea menor la proporción de sismos percibidos asumiendo que la población tiene más horas de actividades al aire libre, y es en interiores de construcciones altas donde más fácilmente se perciben los sismos \cite{noauthor_intensidad_2022}.
+Sin embargo la figura \ref{fig:percibidos_trimestre_histrograma} muestra que en el primer trimestre se halla la mayor proporción de sismos percibidos.
 
-No surge una acción a realizar en función de esta observación.
+\begin{figure}[!ht]
+	\centering
+	\input{graphs/percibidos_trimestre_histograma.tex}
+	\vspace{-0.8cm}
+	\caption{Proporción de sismos percibidos por trimestre.}
+	\label{fig:percibidos_trimestre_histrograma}
+\end{figure}
+
+Con el fin de explorar si los apartamientos trimestrales en las proporciones son signficativos se realizar un \emph{ensayo binomial} de cada proporción trimestral contra la media.
+Este se alimenta con la tabla de contingencia de la figura \ref{fig:tabla_contingencia_trimestre} que muestra una cantidad de muestras que se consideran suficientes para proceder con el ensayo.
+
+\begin{table}[!ht]
+	\centering
+	\begin{tabular}{lcccc}
+		\toprule
+		Trimestre & 1.ero & 2.do & 3.ero & 4.to \\
+		\midrule
+		Percibido & 215 & 154 & 112 & 138 \\
+		No percibido & 8046 & 7399 & 6745 & 7108 \\
+		\bottomrule
+	\end{tabular}
+	\caption{Tabla de contingencia de sismos percibidos por trimestre.}
+	\label{fig:tabla_contingencia_trimestre}
+\end{table}
+
+Para el primer y tercer cuatrimestre se obtuvieron valores p de \(0.000452\) y \(0.016623\) respectivamente, lo que indica que las proporciones de sismos percibidos en estos trimestres son significativamente distintas de la media.
+No se tiene una explicación para esta observación, que debe aclararse, debe tomarse con precaución pues se realiza sobre un número muy limitado de proporciones.
+
+Dado que se son apreciables variaciones internanuales en el número total de terremotos, como lo evidencia la figura \ref{fig:acumulado_anual_magnitud}, tal vez debieran tomarse los trimestres de cada año en forma independientes años y analizar su medía y dispersión.
+Pero es posible que el número de muestras en cada trimestre sea insuficiente para obtener resultados representativos. 
 
 
 
-
-\section{Ingeniería de características en función de la física del sistema}\label{sec:ingeniería_física}
+\section{Ingeniería de características}\label{sec:ingeniería}
 % \section{Descripción de las técnicas de análisis y, si corresponde, de modelado}
 
 
@@ -511,7 +569,45 @@ No surge una acción a realizar en función de esta observación.
 % En estos casos se hace uso de un criterio que parte de condicionamientos sobre el sistema físico o se implementa un modelo en base a la física del sistema.
 % Dos de las variables de este conjunto de datos son afectadas por este tipo de modificación, que se describe posteriormente en una subsección.
 
-% Se generaron dos nuevas columnas a partir de las existentes en el conjunto de datos original, una en función al formato de los datos en la columna \verb'Hora' y otra en función de la escala física utilizada en la columna \verb'Magnitud'.
+% Se generaron dos nuevas columnas a partir de las existentes en el conjunto de datos original, una en función al formato de los datos en la columna \lstinline[language = R]'Hora' y otra en función de la escala física utilizada en la columna \lstinline[language = R]'Magnitud'.
+
+
+\subsection{Descarte de terremotos de poca profundidad}
+% \paragraph{Recorte de poca profundidad}
+
+Hay sismos cuyo origen no son terremotos sino desplazamientos superficiales de tierra, explosiones para la minera o el fracturado hidráulico para la extracción de hidrocarburos.
+Se busca omitir tales orígenes en los datos informados.
+
+Siendo que la variable se informa como enteros de kilómetros, estos representarían los hipocentros hasta una profundidad de \SI{500}{\metre}, compatibles con estas actividades artificiales.
+La omisión de estas fuentes a baja profundidad es una práctica usual en el análisis de datos orientados a sismos originados en terremotos \cite{hu_applying_2024}.
+El pequeño número que estos representan  el conjunto de datos se aprecia en el histograma según profundidad en la figura \ref{fig:histograma_profundidad50km}.
+Son filtrados con la instrucción \lstinline[language = R]'sismos_SJ <- sismos_SJ[Profundidad > 0]'.
+\begin{figure}[!ht]
+% \begin{wrapfigure}[22]{r}[10pt]{0.48\textwidth}
+	\centering
+  \vspace{-1.5cm} % Adjust the value as needed
+	\input{graphs/histograma_profundidad_menos50.tex}
+	% \includegraphics[width=0.4\textwidth]{histograma_profundidad_menos50.png}
+  \vspace{-1cm} % Adjust the value as needed
+	\caption{Los sismos con origen a profundidad de \SI{0}{\kilo\metre} son pocos en el conjunto de datos de terremotos con hipocentros poco profundos, < \SI{50}{\kilo\metre}.}
+	\label{fig:histograma_profundidad50km}
+% \end{wrapfigure}
+\end{figure}
+
+Este recorte tiene un efecto cuasi-irrelevante en la distribución de la profundidad de los terremotos en el conjunto de datos para San Juan. 
+La figura \ref{fig:histograma_profundidad50km} mostró que los hay con \(h < \SI{50}{\kilo\metre}\), pero los hay hasta con \(h= \SI{750}{\kilo\metre}\) siendo los de \(h > \SI{50}{\kilo\metre}\) \(\approx 79\%\) del total como evidencia el histograma que reproduce la figura \ref{fig:histograma_profundidad750km}.
+
+\begin{figure}[!ht]
+% \begin{wrapfigure}[22]{r}[10pt]{0.48\textwidth}
+	\centering
+  \vspace{-1.5cm} % Adjust the value as needed
+	\input{graphs/histograma_profundidad750km.tex}
+	% \includegraphics[width=0.4\textwidth]{histograma_profundidad_menos50.png}
+  \vspace{-1cm} % Adjust the value as needed
+	\caption{Los sismos con origen a mayor profundidad de \SI{50}{\kilo\metre} son mayoritarios en el conjunto de datos.}
+	\label{fig:histograma_profundidad750km}
+% \end{wrapfigure}
+\end{figure}
 
 
 
@@ -555,87 +651,105 @@ Para obtener un valor lineal \(A\) a partir de la escala \ref{eq:richter}, que e
 	\left( \frac{A}{T} \right)_\text{máx} = 10^{(m_b - \overline{q}(\Delta,h) )}.
 	\label{eq:linealizacionMagnitud}
 \end{equation}
-Pero el menor \(m_b\) en el conjunto de datos es \num{2.5} por lo que si restase tal promedio, \(\overline{q}(\Delta,h) = 7\), se obtendrían valores negativos para el valor a la izquierda de la ecuación y esto sería algo sin validez física (¡amplitudes negativas!).
-Se decidió utilizar entonces un ficticio \(\tilde{q}(\Delta,h) = \num{2.5}\).  
+Pero la mínima magnitud, hallada con \lstinline[language = R]'magnitud_mínima = min(sismos_SJ[,Magnitud, ])' resultó ser menor que ese promedio, \(\overline{q}(\Delta,h) = 7\), por lo que si se lo restara se obtendrían valores negativos para el valor a la izquierda de la ecuación y esto sería algo sin validez física (¡amplitudes negativas!).
+Se decidió utilizar entonces un ficticio \(\tilde{q}(\Delta,h) = \) \lstinline[language = R]'magnitud_mínima'.  
 
 De querer despejar la amplitud de las ondas, \(A\), debiera tenerse información sobre el período de las ondas, \(T\), algo que no figura en el conjunto de datos.
 No se encontró otra alternativa que asumir que todos los fenómenos registrados tienen el mismo y en consecuencia asumir \(T_\text{constante}\).
 Así realizando despejes a partir de la ecuación \ref{eq:richter} y asumiendo tales condicionantes, se puede obtener un valor linealmente relacionado con amplitud registrada por un sismógrafo, \(A_\text{máx}\),
 \begin{equation}
-	\left( \frac{A_\text{máx}}{T_\text{constante}} \right) = 10^{(m_b - 2.5)}.
+	\left( \frac{A_\text{máx}}{T_\text{constante}} \right) = 10^{(m_b - \tilde{q}(\Delta, h))}.
 	\label{eq:linealizacionMagnitud_final} 
 \end{equation}
-Con el comando \verb'sismos[, Proxy\_amplitud := 10^(Magnitud- 2.5)]' se generó una columna para este valor denominada \verb'Proxy\_amplitud'.
+Con el comando
+%\lstinline[language = R]'
+\begin{lstlisting}[breaklines=true, language=R]
+sismos_SJ[, Proxy\_amplitud := 10^(Magnitud- magnitud_mínima)]
+\end{lstlisting}
+%'
+se generó una columna para este valor denominada \lstinline[language = R]'Proxy amplitud', que por lo comentado anteriorme tiene por valor mínimo \num{1}. 
 
 
 
-\subsection{Descarte de terremotos de poca profundidad}
-% \paragraph{Recorte de poca profundidad}
-
-Hay sismos cuyo origen no son terremotos sino desplazamientos superficiales de tierra, explosiones para la minera o el fracturado hidráulico para la extracción de hidrocarburos.
-Se busca omitir tales orígenes en los datos informados.
-
-Siendo que la variable se informa como enteros de kilómetros, estos representarían los hipocentros hasta una profundidad de \SI{500}{\metre}, compatibles con estas actividades artificiales.
-La omisión de estas fuentes a baja profundidad es una práctica usual en el análisis de datos orientados a sismos originados en terremotos \cite{hu_applying_2024}.
-El pequeño número que estos representan  el conjunto de datos se aprecia en el histograma según profundidad en la figura \ref{fig:histograma_profundidad50km}.
-Son filtrados con la instrucción \verb'sismos <- sismos[Profundidad > 0]'.
-\begin{figure}[!ht]
-% \begin{wrapfigure}[22]{r}[10pt]{0.48\textwidth}
-	\centering
-	\input{graphs/histograma_profundidad_menos50.tex}
-	% \includegraphics[width=0.4\textwidth]{histograma_profundidad_menos50.png}
-  \vspace{-1cm} % Adjust the value as needed
-	\caption{Los sismos con origen a profundidad de \SI{0}{\kilo\metre} son pocos en el conjunto de datos de terremotos con hipocentros poco profundos, < \SI{50}{\kilo\metre}.}
-	\label{fig:histograma_profundidad50km}
-% \end{wrapfigure}
-\end{figure}
-
-Este recorte tiene un efecto cuasi-irrelevante en la distribución de la profundidad de los terremotos en el conjunto de datos para San Juan. 
-La figura \ref{fig:histograma_profundidad50km} mostró que los hay con \(h < \SI{50}{\kilo\metre}\), pero los hay hasta con \(h= \SI{750}{\kilo\metre}\) siendo los de \(h > \SI{50}{\kilo\metre}\) \(\approx 79\%\) del total como evidencia el histograma que reproduce la figura \ref{fig:histograma_profundidad750km}.
-
-\begin{figure}[!ht]
-% \begin{wrapfigure}[22]{r}[10pt]{0.48\textwidth}
-	\centering
-	\input{graphs/histograma_profundidad750km.tex}
-	% \includegraphics[width=0.4\textwidth]{histograma_profundidad_menos50.png}
-  \vspace{-1cm} % Adjust the value as needed
-	\caption{Los sismos con origen a mayor profundidad de \SI{50}{\kilo\metre} son mayoritarios en el conjunto de datos.}
-	\label{fig:histograma_profundidad750km}
-% \end{wrapfigure}
-\end{figure}
-
-
+\subsection{Percecpión sísmica, ¿de amplitud o energía?}
+Es posible también que que en el límite entre percpeción o no (I o II de la escala MMI \cite{noauthor_intensidad_2022}) pueda explicarse mejor en función de la energía de la onda sísmica que de la amplitud, por lo que podría esperarse una mejor correlación con el cuadrado de esta última variable derivada.
+Para ensayarlo se generó con
+%\lstinline[language = R]'
+\begin{lstlisting}[breaklines=true, language=R]
+sismos_SJ[, `Proxy energía` := `Proxy amplitud`^2]
+\end{lstlisting}
+%' 
+la nueva variable \lstinline[language = R]'Proxy energía', 
 
 
 \section{Variables a correlacionar con la percepción}
-De las originales referidas al fecha y hora en que se produce el terremoto Fecha y Hora se trabajará solo con la generada a partir de la segunda Hora\_decimal obviando la primera pues no es esperable que la percepción de un sismo por parte de la población.
+De las variables originales, aquellas referidas al momento de detección del sismo, Fecha y Hora, y sus derivadas, Año, Día del año y Segundo del día, no se buscará explorar otra relación con la percepción que la presentado en el análisis exploratorio de datos, sección \ref{sec:AED}.
 
-De los datos sobre parámetros físicos del terremoto, Magnitud y Profundidad, se trabajará con la segunda sin modificación, en tanto que se espera un mejor desempeño en modelos que se basen en la variable elaborada a partir de la primera, Proxy\_amplitud por lo expuesto en la sección \ref{sec:ingeniería}.
-De todas formas, como la relación entre ambas no es lineal, la covarianza entre ambas es elevada, \(\approx 0.233\), pero no es perfecta por lo que podría ensayarse el impacto de usar alternativamente Magnitud o Proxy\_amplitud en distintos modelos.
+Restan, por un lado, las variables sobre la localización del terremoto, Latitud, Longitud y Profundidad, independientes entre sí.
+Por el otro, la única referida a la física del mismo, la Magnitud, y sus derivadas Proxy amplitud y Proxy energía, que se hipotetiza puede mostrar mejor relación con la percepción si ésta depende de la amplitud o energía de la oscilación sísmica.
+% De los datos sobre parámetros físicos del terremoto, Magnitud y Profundidad, se trabajará con la segunda sin modificación, en tanto que se espera un mejor desempeño en modelos que se basen en la variable elaborada a partir de la primera, Proxy\_amplitud por lo expuesto en la sección \ref{sec:ingeniería}.
+Como estas tres variables no tienen una relación lineal entre sí, se espera que puedan aportar información independiente al modelo de clasificación.
+% De todas formas, como la relación entre ambas no es lineal, la covarianza entre ambas es elevada, \(\approx 0.233\), pero no es perfecta por lo que podría ensayarse el impacto de usar alternativamente Magnitud o Proxy\_amplitud en distintos modelos.
 
-Quedan así potenciales seis variables para trabajar en el modelo de clasificación del estado de Percibido: Hora\_decimal, Latitud, Longitud, Profundidad, Magnitud y Proxy\_amplitud.
+Como una medida preliminar de la valía de cada variable para los fines de clasificación se calcularon sus covarianzas con la variable de percepción.
+ comando
+\begin{lstlisting}[breaklines=true, language=R]
+ cor(sismos_SJ[, .(`Latitud`, `Longitud`, `Magnitud`, `Profundidad`, `Proxy amplitud`, `Proxy energia`, Percibido)])
+\end{lstlisting}	
+ que generó los valores que muestra el cuadro \ref{tab:correlaciones}. 
 
-Con la función \verb'cor' se verificó que lo covarianza de Percibido con Hora\_decimal es casi nula, que cuanto más profundo es el terremoto es menos percibido y que era de esperarse que terremotos que liberan más energía sean más percibidos, Magnitud y Proxy\_amplitud muestran una correlación positiva.
-La correlación de la percepción con la latitud resultó ser menos significativa que con la longitud.
-Se resume esto en el cuadro \ref{tab:correlaciones}.
 \begin{table}[!ht]
-	% \resizebox{\textwidth}{!}{%
-		% \centering
-		\begin{tabular}{lllll}
+	\centering
+	\resizebox{\textwidth}{!}{
+		\begin{tabular}{llllll}
 			\toprule
-			Hora\_decimal & Profundidad  & Proxy\_amplitud & Latitud & Longitud \\ 
+      Magnitud & Proxy amplitud & Proxy energía & Longitud & Latitud & Profundidad\\ 
 			\midrule
-			-0.004116917 & -0.142358740 & 0.165371903 & -0.010351411 & 0.055488097\\ \bottomrule
+			0.40571008 & 0.16537190 &  0.06037060 & 0.05548810 & -0.01035141 & -0.14235874\\
+			\bottomrule
 		\end{tabular}
-		\caption{La fila para la variable de percepción de la matriz de covarianza entre las variables de los sismos a analizarán muestra una débil correlación positiva con la variable que depende de la amplitud de las ondas sísmicas y una negativa con la profundidad del terremoto en concordancia con las expectaciones lógicas que pueden tenerse sobre el fenómeno.
-		Un orden de magnitud menor hay una positiva con la longitud, lo que se esperaba por acercarse a la cordillera, y una menor en magnitud con la latitud.
-		Relativamente la hora a la largo de todo el día no prácticamente correlación con la percepción de los sismos.
-		Para analizar esto último hay que segmentar por bandas horarias. 
-		}
-		\label{tab:correlaciones}
-	%}
+	}
+	\caption{Covarianzas con la variable Percibido de las otras variables con las que buscará predecirse.}
+	\label{tab:correlaciones}
 \end{table}
 
+Respecto a la ubicación del terremoto se muestra el esperable resultado que cuanto más profundo menos percibido es.
+Menor impacto tiene donde está el epicentro.
+La latitud es casi irrelevante, siendo más relevante que cuanto al oeste se detecta un terremoto, esto es, con una mayor longitud, sean más percibidos.
+Cuanto más al oeste, se está más adentrado en la cordillera de los Andes, donde menos población se ubica, así que el incremento de la percepción no se debiera a una mayor proximidad entre terremoto y quién lo reporta.
+Lo que también cabe esperarse es que allí los terremotos sean de mayor magnitud, por lo que la explicación de la mayor percepción con mayor longitud tendría esta variable como mediadora en la relación.
+Sin embargo la correlación entre longitud y magnitud, calculada por
+%\lstinline[language = R]'
+\begin{lstlisting}[breaklines=true, language=R]
+cor(sismos_SJ[, .(`Longitud`,`Magnitud`)], use = "complete.obs")
+\end{lstlisting}
+%'
+de \num{0.008050125}, resulta ser despreciable, lo que lleva a abandonar esta explicación.
+
+La magnitud es la variable que mayor correlación tiene con la percepción de los sismos.
+En esto aventaja apreciablemente a las variables sintetizadas a partir de ella, las aproximaciones a la amplitud y energía de las ondas sísmicas.
+Puesto que las relaciones de esta últimas con la primera no son lineales, no están perfectamente correlacionadas entre sí, lo que mostró la ejecución de  
+\begin{lstlisting}[breaklines=true, language=R]
+cor(sismos_SJ[, .(`Magnitud`, `Proxy amplitud`, `Proxy energía`)], use = "complete.obs")
+\end{lstlisting}
+%'
+arrojando que esta es \num{0.2328335} y \num{0.09030076} respectivamente.
+Por lo que estas variables no son redundantes entre sí y se espera que aporten información independiente al modelo de clasificación.
+Se ensayará retira de entre las variables utiilizadas estas variables derivadas para generar distintos modelos y evaluar el impacto de su inclusión.
+
+
+
+
+
+%de los sismos a analizarán muestra una débil correlación positiva con la variable que depende de la amplitud de las ondas sísmicas y una negativa con la profundidad del terremoto en concordancia con las expectaciones lógicas que pueden tenerse sobre el fenómeno.
+
+%Un orden de magnitud menor hay una positiva con la longitud, lo que se esperaba por acercarse a la cordillera, y una menor en magnitud con la latitud.
+
+%Relativamente la hora a la largo de todo el día no prácticamente correlación con la percepción de los sismos.
+%Para analizar esto último hay que segmentar por bandas horarias. 
+
+%se verificó que lo covarianza de Percibido con Hora\_decimal es casi nula, que cuanto más profundo es el terremoto es menos percibido y que era de esperarse que terremotos que liberan más energía sean más percibidos, Magnitud y Proxy\_amplitud muestran una correlación positiva.
+% La correlación de la percepción con la latitud resultó ser menos significativa que con la longitud.
 
 
 \section{Preprocesamiento}
@@ -645,27 +759,30 @@ Se resume esto en el cuadro \ref{tab:correlaciones}.
 
 
 \paragraph{Escalamiento}
-Previo a la partición (splitting) se realiza un escalado uniforme sobre todo el conjunto de datos (scaling) de las características numéricas.
+Previo a la partición (splitting) se realiza un escalado uniforme sobre todo el conjunto de datos (scaling) de las variables numéricas, excluyendo las de fecha y hora con las que no se trabajará de aquí en adelante.
 Con esto variables de entrada a los modelos tendrán una media de cero y una desviación estándar de uno, lo que tiene consecuencias para interpretabilidad del modelo de regresión:
 \begin{itemize}
 	\item los coeficientes serán comparables entre sí, no dependiendo de la escala de los datos,
 	\item el intercepto del modelo será la predicción esperada para el caso en que los factores contemplados sean nulos, es decir, no tengan efecto,
 	\item y finalmente si se hace uso de regularización se evita que los coeficientes de las variables de mayor escala tengan un peso desproporcionado en la función de pérdida \cite[sección 3.4.1]{hastie_elements_2009}.
 \end{itemize}
-Para esto se hace uso de \verb'scale' función del conjunto base de R para generar \verb'sismos_SJ_escalado' 
+Para esto se hace uso de \lstinline[language = R]'scale', función del conjunto base de R, para generar \lstinline[language = R]'sismos_SJ_escalado' con el comando
+\begin{lstlisting}[breaklines=true, language=R]
+sismos_SJ_escalado <- scale(sismos_SJ[, .(Latitud, Longitud, Profundidad, Magnitud, `Proxy amplitud`, `Proxy energía`)])
+\end{lstlisting} 
 
 
 \paragraph{Partición con estratificación}
 Las evaluaciones sobre la calidad de los modelos de clasificación generados se realizarán sobre un subconjuntos de ensayo (test) del \(20 \%\) de los datos de la provincia de San Juan, el resto se utilizará para el entrenamiento (train).
 
 Dado el fuerte desequilibrio de la clase Percibido comentado en la sección \ref{sec:AED}, ante una división de los datos en subconjuntos entrenamiento y prueba estocástica está el riesgo de que el subconjunto de prueba quede con muy pocos casos positivos y no sea representativo de la distribución de la clase en el conjunto de datos. 
-Para evitar esto se realiza una división estratificada de los datos en subconjuntos de entrenamiento y prueba usando la función \verb'CreateDataPartion' que indicó los índices para generar los conjuntos de datos \verb'entrenamiento_SJ' y \verb'ensayo_SJ' este último con un número aún adecuado para su función de \num{5982} registros.
+Para evitar esto se realiza una división estratificada de los datos en subconjuntos de entrenamiento y prueba usando la función \lstinline[language = R]'CreateDataPartion' que indicó los índices para generar los conjuntos de datos \lstinline[language = R]'entrenamiento_SJ' y \lstinline[language = R]'ensayo_SJ' este último con un número aún adecuado para su función de \num{5982} registros.
 
 
 \paragraph{Desequilibrio en entrenamiento}
 Para contrarrestar el desequilibrio en la clase de clasificación se utilizará la técnica de sobremuestreo de la clase minoritaria que genera nuevos casos sintéticos de la clase minoritaria a partir de los existentes.
-Para esto se utiliza la función \verb'ovun.sample' de la biblioteca \verb'ROSE' que genera un conjunto de datos de entrenamiento con un número de casos de la clase minoritaria igual al de la clase mayoritaria.
-Se generó así un nuevo conjunto de datos de entrenamiento \verb'entrenamiento_SJ_balanceado' con \num{23934} registros.
+Para esto se utiliza la función \lstinline[language = R]'ovun.sample' de la biblioteca \lstinline[language = R]'ROSE' que genera un conjunto de datos de entrenamiento con un número de casos de la clase minoritaria igual al de la clase mayoritaria.
+Se generó así un nuevo conjunto de datos de entrenamiento \lstinline[language = R]'entrenamiento_SJ_balanceado' con \num{23934} registros.
 
 
 
@@ -721,8 +838,7 @@ Se calcula como
 	\text{F1-score} = 2 \times \frac{\text{Precisión} \times \text{Recall}}{\text{Precisión} + \text{Recall}}.
 \end{equation}
 
-Con un gráfico de estas métricas en función del punto de corte entre clases se elige manualmente este que permita clasificar las instancias en una de las dos clases.
-
+Con un gráfico de estas métricas en función del punto de corte entre clases se elige manualmente aquel que permita clasificar las instancias en una de las dos clases.
 Como complemento se pueden trazar las curvas ROC y PR para evaluar el desempeño de los modelos en separar las clases.
 
 
@@ -760,7 +876,7 @@ El valor de AUC-PR varía entre 0 y 1, donde 0 indica un modelo que clasifica to
 
 \subsubsection*{Múltiple sin interacción entre variables}
 
-El primer modelo ensayado es uno múltiple de regresión logística con las variables \verb'Hora_decimal', \verb'Profundidad' y \verb'Proxy\_amplitud' como predictores sin interacción entre ellos,
+El primer modelo ensayado es uno múltiple de regresión logística con las variables \lstinline[language = R]'Profundidad' y \lstinline[language = R]'Proxy amplitud' como predictores sin interacción entre ellos,
 
 \begin{align}
 	\log \left( \frac{p}{1-p} \right) = &
@@ -769,7 +885,7 @@ El primer modelo ensayado es uno múltiple de regresión logística con las vari
 	\label{eq:regresion_logistica}
 \end{align}
 
-La función \verb'summary' produce un resumen de los resultados arroja para los coeficientes:
+La función \lstinline[language = R]'summary' produce un resumen de los resultados arroja para los coeficientes:
 \begin{verbatim}
 	Coefficients:
                 Estimate Std. Error z value Pr(>|z|)    
@@ -778,7 +894,7 @@ Hora_decimal   -0.015398   0.013362  -1.152    0.249
 Profundidad    -0.555176   0.010705 -51.863   <2e-16 ***
 Proxy_amplitud  0.167536   0.006263  26.750   <2e-16 ***
 \end{verbatim} 
-Esto indica que excepto el coeficiente \(\beta_1\) para la \verb'Hora_decimal', todos son significativos ya que sus probabilidades de que no tengan esos valores y se cumpla la hipótesis nula \(Pr(>|z|)\) para el estadístico \(z = \frac{\beta}{\sigma_\beta}\) se indican como muy inferiores a \(0.05\).
+Esto indica que excepto el coeficiente \(\beta_1\) para la \lstinline[language = R]'Hora_decimal', todos son significativos ya que sus probabilidades de que no tengan esos valores y se cumpla la hipótesis nula \(Pr(>|z|)\) para el estadístico \(z = \frac{\beta}{\sigma_\beta}\) se indican como muy inferiores a \(0.05\).
 
 Para definir el punto de corte entre las clases se graficaron las métricas de evaluación en función de este como ilustra la figura \ref{fig:múltiple_metrics}.
 Si en base a la inspección de esa figura eligiera el punto de corte en \(0.5\) se obtendrían las métricas de evaluación que se resumen en la tabla \ref{tab:múltiple_metrics}.

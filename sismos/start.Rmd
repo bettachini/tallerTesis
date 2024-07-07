@@ -171,22 +171,23 @@ summary(sismos[ ,`Segundos del día`, ])
 ```
 
 ```{r día del año}
-if (!require("lubridate")) {
-  install.packages("lubridate")
-}
-library("lubridate")
-
 # consecutive day at the year
-sismos[, `Día del año` := lubridate::yday(as.Date(Fecha, format = "%Y-%m-%d")), ]
-  
-# sismos[, Dia_del_año := as.numeric(as.Date(Fecha, format = "%Y-%m-%d"))]
+
+# if (!require("lubridate")) {
+#   install.packages("lubridate")
+# }
+# library("lubridate")
+
+# sismos[, `Día del año` := lubridate::yday(as.Date(Fecha, format = "%Y-%m-%d")), ]
+
+sismos[, `Día del año` := yday(as.Date(Fecha, format = "%Y-%m-%d")), ]
 summary(sismos[, "Día del año", ], )
 ```
 
 
 ```{r año}
 sismos[, Año := year(as.Date(Fecha, format = "%Y-%m-%d"))]
-summary(sismos$Año)
+summary(sismos[,Año])
 ```
 
 
@@ -203,29 +204,14 @@ Hay código en (https://daniellaparada.github.io/IC-datasets-docencia/04_visuali
 ### Elección de la provincia de San Juan
 ```{r select rows with Provincia == San Juan}
 sismos_SJ <- sismos[Provincia == "San Juan", ]
+# delete column Provincia
+sismos_SJ <- sismos_SJ[, Provincia := NULL]
 ```
 
 ```{r registros SJ}
 c(nrow(sismos), nrow(sismos_SJ), nrow(sismos_SJ)/nrow(sismos))
 ```
 
-
-### Latitud y longitud
-
-```{r latitud San Juan}
-# find out correlation between latitud and Percibido
-cor(sismos_SJ$Latitud, sismos_SJ$Percibido)
-```
-
-```{r longitud San Juan}
-cor(sismos_SJ$Longitud, sismos_SJ$Percibido)
-```
-
-
-```{r test}
-# correlation between columns Magnitud and Proxy_amplitud
-cor(sismos_SJ$`Proxy amplitud`, sismos_SJ_escalado$Magnitud)
-```
 
 
 
@@ -323,28 +309,26 @@ df2_detectados <- df_detectados %>%
   summarize(Magnitud = Magnitud,
             nacum = cumsum(n))
 
-ggplotly(
-  ggplot(data = df2_detectados, aes(
-    x = Magnitud, y = log(nacum, 10), colour = Año, key = nacum
-  )) +
-    labs(x = "Magnitud", y = "(Log 10) Cantidad acumulada de sismos") +
-    geom_point() +
-    theme_classic(),
-  source = "select",
-  tooltip = c("key")
-)
-#  # add grid
-#  ggplot2::theme(panel.grid.major = element_line(colour = "grey", size = 0.5)
+#ggplotly(
+#  ggplot(data = df2_detectados, aes(
+#    x = Magnitud, y = log(nacum, 10), colour = Año, key = nacum
+#  )) +
+#    labs(x = "Magnitud", y = "(Log 10) Cantidad acumulada de sismos") +
+#    geom_point() +
+#    theme_classic(),
+#  source = "select",
+#  tooltip = c("key")
+#)
 ```
 
 ```{r output acumulado anuales por magnitud San Juan percibidos tikz}
-tikz('graphs/acumulado_anual_magnitud_percibidos.tex',width=5,height=3)
-  ggplot(data = df2_detectados, aes(
-    x = Magnitud, y = log(nacum, 10), colour = Año)) +
-    labs(x = "Magnitud ($M_w$)", y = "Número sismos (Log$_{10}$)") +
-    geom_point() +
-    theme_classic()
-dev.off()
+#tikz('graphs/acumulado_anual_magnitud_percibidos.tex',width=5,height=3)
+#  ggplot(data = df2_detectados, aes(
+#    x = Magnitud, y = log(nacum, 10), colour = Año)) +
+#    labs(x = "Magnitud ($M_w$)", y = "Número sismos (Log$_{10}$)") +
+#    geom_point() +
+#    theme_classic()
+#dev.off()
 ```
  
 
@@ -353,8 +337,8 @@ dev.off()
 ### Horario de los percibidos
 ```{r percibidos segmentados por hora}
 # Create two separate data.tables for TRUE and FALSE cases
-dt_true <- sismos[Percibido == TRUE]
-dt_false <- sismos[Percibido == FALSE]
+dt_true <- sismos_SJ[Percibido == TRUE]
+dt_false <- sismos_SJ[Percibido == FALSE]
 
 # Define the breaks for the 24 hours of the day (0 to 86400 seconds)
 breaks <- seq(0, 86400, by = 3600)
@@ -381,16 +365,16 @@ print(percibidos_hora)
 
 
 ```{r histograma percibidos segmentados por hora}
-# generate a vertical bar plot to reproduce an histogram on data at result
-ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
-  geom_bar(stat = "identity") +
-  # labs(title = "Razón de sismos percibidos a no percibidos por hora",
-  labs(
-       x = "Hora",
-       y = "Percibidos [%]")
-
-## save it to tikz file
+#ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
+#  geom_bar(stat = "identity") +
+#  # labs(title = "Razón de sismos percibidos a no percibidos por hora",
+#  labs(
+#       x = "Hora",
+#       y = "Percibidos [%]")
+## percibido_hora_histograma <- recordPlot() # no funca
+#
 #tikz('graphs/histograma_percibidos_por_hora.tex',width= 4.8,height=2)
+## replayPlot(percibido_hora_histograma) @ no funca
 #ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
 #  geom_bar(stat = "identity") +
 #  labs(x = "Hora", y = "Percibidos [\\%]"
@@ -399,80 +383,137 @@ ggplot(percibidos_hora, aes(x = Hora, y = Porcentaje)) +
 ```
 
 
-
-
-Quedan así un total de tres variables a trabajar en el modelo de clasificación del estado de \verb'Percibido': \verb'Segundos del día', \verb'Profundidad' y  \verb'Proxy amplitud'.
-
-Podría verse si hay puede hacerse un heat map de correlaciones entre estas variables con 'Percibido'.
-
-```{r correlación variables}
-# use any tool
-corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, "Proxy amplitud", Latitud, Longitud, Percibido)], use = "complete.obs")
-# corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, Proxy_amplitud, Percibido)], use = "complete.obs")
-str(corr_alles)
-# only the last column
-corr_alles[, 6]
+#### Distribución de los sismos percibidos por trimestre
+```{r percibidos por trimestre}
+trimestre_días = ceiling(366/4)
+#
+## Define the breaks for the 24 hours of the day (0 to 86400 seconds)
+breaks_trimestre <- seq(0, 400, by = trimestre_días)
+#
+## Create histograms for TRUE and FALSE cases
+hist_true_trimestre <- hist(dt_true$`Día del año`, breaks = breaks_trimestre, plot = FALSE)
+hist_false_trimestre <- hist(dt_false$`Día del año`, breaks = breaks_trimestre, plot = FALSE)
+#
+## Calculate the ratio of counts in each bin
+ratio_trimestre <- hist_true_trimestre$counts / hist_false_trimestre$counts
+#
+## Create a data.table to hold the result
+percibidos_trimestre <- data.table(
+  Trimestre = ceiling(hist_true_trimestre$mids / trimestre_días), # Convert bin midpoints to hours
+  Porcentaje_trimestre = ratio_trimestre * 100
+)
+#
+## Handle possible Inf or NA values in the ratio
+percibidos_trimestre[is.infinite(Porcentaje_trimestre) | is.na(Porcentaje_trimestre), Porcentaje_trimestre := NA]
+#
+## Print the result
+print(percibidos_trimestre)
 ```
 
 
+```{r histograma percibidos segmentados por trimestre}
+#ggplot(percibidos_trimestre, aes(x = Trimestre, y = Porcentaje_trimestre)) +
+#  geom_bar(stat = "identity") +
+##  # labs(title = "Razón de sismos percibidos por trimestre",
+#  labs(
+#       x = "Trimestre",
+#       y = "Percibidos [%]")
+### percibidos_trimestre_histograma <- recordPlot() # No funca
+#
+#tikz('graphs/percibidos_trimestre_histograma.tex',width= 4.8,height=2)
+### replayPlot(percibidos_trimestre_histograma) # No funca
+#ggplot(percibidos_trimestre, aes(x = Trimestre, y = Porcentaje_trimestre)) +
+#  geom_bar(stat = "identity") +
+#  labs(x = "", y = "Percibidos [\\%]"
+#  )
+#dev.off()
+```
+
+```{r trimestre}
+# data type percibidos_trimestre
+str(percibidos_trimestre)
+
+# z-scores
+data <- percibidos_trimestre[, Porcentaje_trimestre]
+z_scores <- (data - mean(data))/sd(data)
+z_scores
+
+# p-values
+p_values <- 2 * (1 - pnorm(abs(z_scores)))
+p_values
+```
+
+```{r trimestre test de Dixon}
+if (!require("outliers")) {
+  install.packages("outliers")
+}
+library("outliers")
+
+# Dixon's Q test
+outliers::dixon.test(data, opposite = FALSE)
+```
 
 
+```{r data.table with hist_false hist_true}
+hist_true_trimestre$counts
+hist_false_trimestre$counts
+trials = hist_true_trimestre$counts +hist_false_trimestre$counts
+prop.test(hist_true_trimestre$counts, trials)
+```
 
 
+```{r trimestre test exacta binomial}
+# Group data (successes and trials)
+groups <- list('1' = c(215, 8261), '2' = c(152, 7553), '3' = c(112, 6857), '4' = c(138, 7246))
+mean_proportion <- mean(sapply(groups, function(group) group[1] / group[2]))
+
+# Perform binomial tests for each group
+results <- lapply(names(groups), function(group) {
+  successes <- groups[[group]][1]
+  trials <- groups[[group]][2]
+  test <- binom.test(successes, trials, p = mean_proportion)
+  return(list(group = group, p_value = test$p.value, proportion = successes / trials))
+})
+
+# Print results
+for (result in results) {
+  cat(sprintf("Group %s: Proportion = %f, p-value = %f\n", result$group, result$proportion, result$p_value))
+}
+```
+
+### Ingeniería de características
 
 
-
-
-
-
-
-
-### Modificaciones de los datos (ingeniería de características)
-
-
-
-
-
-## Recorte por profundidad
+### Descarte de terromotos de poca profundidad
+```{r máxima profundidad}
+c(min(sismos_SJ$Profundidad),  max(sismos_SJ$Profundidad) )
+```
 
 ```{r histograma hasta 50 km profundidad con barras más finas}
-#hist(sismos[Profundidad < 50]$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
+#hist(sismos_SJ[Profundidad < 50]$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
 #profundidad_menos50 <- recordPlot()
-
-#png("graphs/histograma_profundidad_menos50.png", width = 400, height = 400, res = 100)
-#replayPlot(profundidad_menos50)
-#dev.off()
-
-# save as TikZ 
+#
+##png("graphs/histograma_profundidad_menos50.png", width = 400, height = 400, res = 100)
+##replayPlot(profundidad_menos50)
+##dev.off()
+#
+## save as TikZ 
 #tikz('graphs/histograma_profundidad_menos50.tex',width=5,height=4) # petite
 #replayPlot(profundidad_menos50)
 #dev.off()
 ```
 
-
 ```{r solo registros con profundidad no nula}
 # copy of data.table
-sismos_todasProfundidades <- copy(sismos)
-sismos <- sismos[Profundidad > 0]
-```
-
-
-#### Linealización de la Magnitud
-```{r máxima profundidad}
-max(sismos$Profundidad)
-```
-
-```{r proporción más profundos que 50 km}
-# only those with Profundidad > 50
-c( nrow(sismos[Profundidad > 50]), nrow(sismos[Profundidad < 50]) )
-nrow(sismos[Profundidad > 50])/  nrow(sismos)
+# sismos_todasProfundidades <- copy(sismos)
+sismos_SJ <- sismos_SJ[Profundidad > 0]
 ```
 
 ```{r histograma de Profundidad}
-#hist(sismos$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
+#hist(sismos_SJ$Profundidad, main = "", xlab = "Profundidad [km]", ylab = "Frecuencia", breaks = 50)
 #histograma_profundidad750km <- recordPlot()
 #
-## save as TikZ 
+### save as TikZ 
 #tikz('graphs/histograma_profundidad750km.tex',width=5,height=4) # petite
 #replayPlot(histograma_profundidad750km)
 #dev.off()
@@ -480,7 +521,7 @@ nrow(sismos[Profundidad > 50])/  nrow(sismos)
 
 
 
-
+#### Linealización de la Magnitud
 Puesto que la escala de Richter es una escala logarítmica me interesaría pasarla a una escala lineal.
 
 > The Richter magnitude of an earthquake is determined from the logarithm of the amplitude of waves recorded by seismographs. Adjustments are included to compensate for the variation in the distance between the various seismographs and the epicenter of the earthquake. The original formula is:
@@ -494,27 +535,76 @@ La presunción es que el umbral de percepción estará ligado a la amplitud de o
 Aunque también podría pensarse que sería con su potencia, es decir algo proporcional a $A^2$.  
 Algo para probar luego, por lo pronto a pasarle a una escala lineal.
 
+```{r proporción más profundos que 50 km}
+# only those with Profundidad > 50
+c( nrow(sismos_SJ[Profundidad > 50]), nrow(sismos_SJ[Profundidad < 50]) )
+nrow(sismos_SJ[Profundidad > 50])/  nrow(sismos_SJ)
+```
+
+
 Sin ponerme a investigar más genero una columna de magnitud_lineal con $10^{M_L}$
 ```{r min Magnitud}
-min(sismos[,Magnitud, ])
+magnitud_mínima = min(sismos_SJ[,Magnitud, ])
+magnitud_mínima
 ```
 
 ```{r Linealizar la escala de Richter}
-sismos[, "Proxy amplitud" := 10^(Magnitud- 2.5)]
-```
-
-```{r head de la data.table tras generar Proxy_amplitud}
-head(sismos)
+sismos_SJ[, "Proxy amplitud" := 10^(Magnitud- magnitud_mínima)]
 ```
 
 ```{r descripción para magnitud lineal}
-summary(sismos$"Proxy amplitud")
+# summary(sismos_SJ$"Proxy amplitud")
+summary(sismos_SJ[,'Proxy amplitud'])
+```
+
+
+### Percecpión sísmica, ¿de amplitud o energía?
+```{r proxy energía}
+sismos_SJ[, `Proxy energía` := `Proxy amplitud`^2]
 ```
 
 
 
+## Variables a correlacionar con la percepción 
+```{r variables posibles}
+colnames(sismos_SJ)
+```
 
 
+Podría verse si hay puede hacerse un heat map de correlaciones entre estas variables con 'Percibido'.
+
+```{r correlación variables}
+# use any tool
+corr_alles <- cor(
+  sismos_SJ[
+    ,
+    .(`Latitud`, `Longitud`, `Magnitud`, `Profundidad`, `Proxy amplitud`, `Proxy energía`, Percibido)
+    ]
+    , use = "complete.obs"
+    )
+# corr_alles <- cor(sismos_SJ[, .(Hora_decimal, Profundidad, Proxy_amplitud, Percibido)], use = "complete.obs")
+# percibido_correlación = str(corr_alles)
+
+# only the last column
+percibido_correlación = corr_alles[, 7]
+
+# remove Percibido from percibido_correlación
+percibido_correlación <- percibido_correlación[-7]
+
+# sort
+percibido_correlación <- percibido_correlación[order(percibido_correlación, decreasing = TRUE)]
+percibido_correlación
+```
+
+```{r correlación magnitud y longitud}
+cor(sismos_SJ[, .(`Longitud`,`Magnitud`)], use = "complete.obs")
+```
+
+
+
+```{r correlación magnitud y derivados}
+cor(sismos_SJ[, .(`Magnitud`, `Proxy amplitud`, `Proxy energía`)], use = "complete.obs")
+```
 
 
 
@@ -528,27 +618,32 @@ Previo a la partición (splitting) se realiza un escaleo uniforme sobre todo el 
 Para esto se hace uso de la función `scale` de la biblioteca `caret`.
 El objeto de hacer esto previo a un ajuste lineal es que los coeficientes de la regresión sean comparables entre sí.
 
-```{r escalamiento}
+```{r biblioteca caret}
 # no utilizo la biblioteca caret
-if (!require("caret")) {
-  install.packages("caret")
-}
-library("caret")
+# if (!require("caret")) {
+#   install.packages("caret")
+# }
+# library("caret")
+```
 
-# copy only some columns
-# sismos_SJ_escalado <- sismos_SJ[, .(Hora_decimal, Profundidad, Proxy_amplitud, Percibido)]
-# sismos_SJ_escalado <- sismos_SJ[, .(Hora_decimal, Profundidad, Proxy_amplitud, Percibido)]
+```{r escalamiento}
+# identify numerical features in the data
+numerical_features <- c("Latitud", "Longitud", "Magnitud", "Profundidad", "Proxy amplitud", "Proxy energía")
 
-# # copia
-sismos_SJ_escalado <- copy(sismos_SJ)
+# copy only numerical features and Percibido
+sismos_SJ_escalado <- sismos_SJ[, ..numerical_features, Percibido]
+# # copy only numerical features
+# sismos_SJ_escalado <- sismos_SJ[, ..numerical_features]
 
 # Scale numerical features
-numerical_features <- c("Hora_decimal", "Profundidad", "Magnitud", 
-"Proxy amplitud", "Latitud", "Longitud")
-# numerical_features <- c("Hora_decimal", "Profundidad", "Proxy_amplitud")
 sismos_SJ_escalado[, (numerical_features) := lapply(.SD, scale), .SDcols = numerical_features]
 
 head(sismos_SJ_escalado)
+```
+
+```{r test}
+# correlation between columns Magnitud and Proxy_amplitud
+cor(sismos_SJ$`Proxy amplitud`, sismos_SJ_escalado$Magnitud)
 ```
 
 
