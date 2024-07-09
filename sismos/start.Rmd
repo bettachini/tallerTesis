@@ -202,7 +202,7 @@ Hay código en (https://daniellaparada.github.io/IC-datasets-docencia/04_visuali
 ### El problema de la distancia
 
 ### Elección de la provincia de San Juan
-```{r select rows with Provincia == San Juan}
+```{r select rows of San Juan}
 sismos_SJ <- sismos[Provincia == "San Juan", ]
 # delete column Provincia
 sismos_SJ <- sismos_SJ[, Provincia := NULL]
@@ -549,18 +549,18 @@ magnitud_mínima
 ```
 
 ```{r Linealizar la escala de Richter}
-sismos_SJ[, "Proxy amplitud" := 10^(Magnitud- magnitud_mínima)]
+sismos_SJ[, "Proxy_amplitud" := 10^(Magnitud- magnitud_mínima)]
 ```
 
 ```{r descripción para magnitud lineal}
-# summary(sismos_SJ$"Proxy amplitud")
-summary(sismos_SJ[,'Proxy amplitud'])
+# summary(sismos_SJ$"Proxy_amplitud")
+summary(sismos_SJ[,'Proxy_amplitud'])
 ```
 
 
 ### Percecpión sísmica, ¿de amplitud o energía?
 ```{r proxy energía}
-sismos_SJ[, `Proxy energía` := `Proxy amplitud`^2]
+sismos_SJ[, `Proxy_energía` := `Proxy_amplitud`^2]
 ```
 
 
@@ -578,7 +578,7 @@ Podría verse si hay puede hacerse un heat map de correlaciones entre estas vari
 corr_alles <- cor(
   sismos_SJ[
     ,
-    .(`Latitud`, `Longitud`, `Magnitud`, `Profundidad`, `Proxy amplitud`, `Proxy energía`, Percibido)
+    .(`Latitud`, `Longitud`, `Magnitud`, `Profundidad`, `Proxy_amplitud`, `Proxy_energía`, Percibido)
     ]
     , use = "complete.obs"
     )
@@ -603,7 +603,7 @@ cor(sismos_SJ[, .(`Longitud`,`Magnitud`)], use = "complete.obs")
 
 
 ```{r correlación magnitud y derivados}
-cor(sismos_SJ[, .(`Magnitud`, `Proxy amplitud`, `Proxy energía`)], use = "complete.obs")
+cor(sismos_SJ[, .(`Magnitud`, `Proxy_amplitud`, `Proxy_energía`)], use = "complete.obs")
 ```
 
 
@@ -615,23 +615,21 @@ Las evaluaciones sobre la calidad de los modelos de clasificación generados se 
 
 ### Escalamiento
 Previo a la partición (splitting) se realiza un escaleo uniforme sobre todo el conjunto de datos (scaling) de las tres características numéricas.
-Para esto se hace uso de la función `scale` de la biblioteca `caret`.
+Para esto se hace uso de la función `scale` de la biblioteca base de R.
 El objeto de hacer esto previo a un ajuste lineal es que los coeficientes de la regresión sean comparables entre sí.
-
-```{r biblioteca caret}
-# no utilizo la biblioteca caret
-# if (!require("caret")) {
-#   install.packages("caret")
-# }
-# library("caret")
-```
 
 ```{r escalamiento}
 # identify numerical features in the data
-numerical_features <- c("Latitud", "Longitud", "Magnitud", "Profundidad", "Proxy amplitud", "Proxy energía")
+numerical_features <- c("Latitud", "Longitud", "Magnitud", "Profundidad", "Proxy_amplitud", "Proxy_energía")
+
+# copier tout
+sismos_SJ_escalado <- copy(sismos_SJ)
+
+# copy numerical_features and Percibido to sismos_SJ_escalado
+sismos_SJ_escalado <- sismos_SJ[, c("Percibido", ..numerical_features)]
 
 # copy only numerical features and Percibido
-sismos_SJ_escalado <- sismos_SJ[, ..numerical_features, Percibido]
+# sismos_SJ_escalado <- sismos_SJ[, ..numerical_features, Percibido]
 # # copy only numerical features
 # sismos_SJ_escalado <- sismos_SJ[, ..numerical_features]
 
@@ -641,26 +639,38 @@ sismos_SJ_escalado[, (numerical_features) := lapply(.SD, scale), .SDcols = numer
 head(sismos_SJ_escalado)
 ```
 
-```{r test}
+```{r}
 # correlation between columns Magnitud and Proxy_amplitud
-cor(sismos_SJ$`Proxy amplitud`, sismos_SJ_escalado$Magnitud)
+cor(sismos_SJ[, `Proxy_amplitud`], sismos_SJ[, Magnitud])
+cor(sismos_SJ_escalado[, `Proxy_amplitud`], sismos_SJ_escalado[, Magnitud])
 ```
-
+Bien, la correlación no cambia. Eso indica que funciona bien el escalado.
 
 
 
 ### División con estratificación
 Dado el desbalance de la clase Percibido comentado en la sección xxx, la división de los datos en subconjuntos entrenamiento y prueba se hará con estratificación usando la función \verb'CreateDataPartion'.
+```{r biblioteca caret}
+if(!require("caret")) {
+  install.packages("caret")
+}
+library("caret")
+```
 
 ```{r división con estratificación}
 # Split the data into training and testing sets
 set.seed(123)
-train_index <- createDataPartition(sismos_SJ_escalado$Percibido, p = 0.8, list = FALSE)
+train_index <- caret::createDataPartition(sismos_SJ_escalado[ , Percibido], p = 0.8, list = FALSE)
 entrenamiento_SJ <- sismos_SJ_escalado[train_index]
 ensayo_SJ <- sismos_SJ_escalado[-train_index]
 
 # Print the number of observations in each set
 c(nrow(entrenamiento_SJ), nrow(ensayo_SJ))
+```
+
+```{r}
+# correlation between columns Magnitud and Proxy_amplitud
+cor(entrenamiento_SJ[, `Proxy_amplitud`], entrenamiento_SJ[, Magnitud])
 ```
 
 
@@ -676,7 +686,20 @@ entrenamiento_SJ[, Percibido := as.factor(Percibido)]
 
 # Apply the ROSE algorithm to correct the imbalance
 # entrenamiento_SJ_balanceado <- ovun.sample(Percibido ~ ., data = entrenamiento_SJ, method = "over", N = nrow(entrenamiento_SJ), seed = 123)$data
-entrenamiento_SJ_balanceado <- ROSE(Percibido ~ ., data = entrenamiento_SJ, seed = 123)$data
+
+# Define the numerical features with backticks
+numerical_features <- c("Latitud", "Longitud", "Magnitud", "Profundidad", "`Proxy_amplitud`", "`Proxy_energía`")
+
+# Create the formula as a string and convert it to a formula object
+formula_str <- paste("Percibido ~", paste(numerical_features, collapse = " + "))
+formula <- as.formula(formula_str)
+
+# Apply the ROSE function with the dynamically created formula
+entrenamiento_SJ_balanceado <- ROSE(formula, data = entrenamiento_SJ, seed = 123)$data
+#entrenamiento_SJ_balanceado <- ROSE(Percibido ~ ., data = entrenamiento_SJ, seed = 123)$data
+
+# data.table
+entrenamiento_SJ_balanceado <- as.data.table(entrenamiento_SJ_balanceado)
 
 # Print the number of observations in each set
 c(nrow(entrenamiento_SJ_balanceado), nrow(ensayo_SJ))
@@ -690,6 +713,13 @@ table(entrenamiento_SJ_balanceado$Percibido)
 table(ensayo_SJ$Percibido)
 ```
 
+```{r}
+# correlation between columns Magnitud and Proxy_amplitud
+cor(entrenamiento_SJ[, `Proxy_amplitud`], entrenamiento_SJ[, Magnitud])
+cor(entrenamiento_SJ_balanceado[, `Proxy_amplitud`], entrenamiento_SJ_balanceado[, Magnitud])
+```
+
+
 
 ## Descripción de las métricas de evaluación de los modelos (si corresponde)
 
@@ -699,44 +729,321 @@ Contar sobre regresión logística aplicada a variables categóricas y sobre el 
 
 
 
-### Regresión logística
+### Regresión logística múltiple
 
 Utilizaré como base el código de Enfoque estadístico del aprendizaje, clase 9, dedicada a logit.
 ```{r biblioteca ajuste regresión lineal}
-if (!require("glmnet")) {
-  install.packages("glmnet")
+# if (!require("glmnet")) {
+#   install.packages("glmnet")
+# }
+# library("glmnet")
+if (!require("glm2")) {
+    install.packages("glm2")
 }
-library("glmnet")
+library("glm2")
 ```
 
 
-
-#### Múltiple sin interacción entre variables
+#### sin interacción entre variables
 
 ```{r múltiple definición}
 # Fit a logistic regression model
-logit_model <- glm(
+logit_model <- glm2::glm2(
   # Percibido ~ Hora_decimal + Profundidad + Proxy_amplitud,
-  Percibido ~ Hora_decimal + Profundidad + `Proxy amplitud`  + Latitud + Longitud,
+  Percibido ~ Magnitud + `Proxy_amplitud` + `Proxy_energía` + Longitud + Latitud + Profundidad,
    data = entrenamiento_SJ_balanceado,
   family = "binomial"
   )
 ```
 
-
 ```{r múltiple significativos}
 # Print the summary of the model
 summary(logit_model)
 ```
-Del sumario se indica con p-values que las variables `Profundidad` y `Proxy_amplitud` son significativas, pero no `Hora_decimal`.
+Del sumario se indica con p-values que las variables derivadas de la magnitud son menos significativas que las originales, en particular `proxy_energía` tiene un p-value excediendo 0.05.
+
+```{r tidy biblioteca}
+#if (!require("broom")) {
+#  install.packages("broom")
+#}
+#library("broom")
+```
+
+```{r tidy logit_model}
+## Convert the model summary to a tidy data frame
+#logit_model_tidy <- tidy(logit_model)
+#logit_model_tidy
+```
+Francamente no aporta nada que no dé summary, y de hecho oscurece con la terminología statistic y p-value en lugar de z-value y Pr(>|z|).
+
+
+
+#### Interacción entre variables
+
+```{r heat map correlations}
+# Create a copy of the data.frame excluding a specific column
+temp <- select(entrenamiento_SJ_balanceado, -Percibido)
+cor_matrix <- cor(temp)
+cor_matrix
+```
+
+```{r}
+# Get number of variables (assuming square matrix)
+n <- ncol(cor_matrix)
+
+# Convert correlation matrix to long format
+cor_long <- as.data.table(as.table(cor_matrix))
+
+# Extract variable names
+var_names <- colnames(cor_matrix)
+
+# Rename columns and remove self-correlation (value = 1)
+cor_long <- cor_long[, .(V1 = rep(var_names, n), V2 = rep(var_names, each = n), value = as.vector(cor_matrix))]
+cor_long <- cor_long[V1 != V2]
+
+# Sort by absolute correlation values
+sorted_cor_dt <- cor_long[order(abs(value), decreasing = TRUE)]
+
+# Print the sorted correlations with variable pairs and values
+print(sorted_cor_dt[, .(Variable_Pair = paste(V1, "-", V2), Absolute_Value = abs(value))])
+```
+
+
+```{r}
+# Get lower triangle of the correlation matrix
+  get_lower_tri<-function(cormat){
+    cormat[upper.tri(cormat)] <- NA
+    return(cormat)
+  }
+  # Get upper triangle of the correlation matrix
+  get_upper_tri <- function(cormat){
+    cormat[lower.tri(cormat)]<- NA
+    return(cormat)
+  }
+
+upper_tri <- get_upper_tri(cor_matrix)
+
+library(reshape2)
+melted_cormat <- melt(upper_tri, na.rm = TRUE)
+
+## Heatmap
+#if(!require("ggplot2")) {
+#  install.packages("ggplot2")
+#}
+#library("ggplot2")
+#
+#ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
+# geom_tile(color = "white")+
+# scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+#   midpoint = 0, limit = c(-1,1), space = "Lab", 
+#   name="Pearson\nCorrelation") +
+#  theme_minimal()+ 
+# theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+#    size = 12, hjust = 1))+
+# coord_fixed()
+```
+
+
+
+```{r}
+# Fit a logistic regression model
+logit_pairwise <- glm2::glm2(
+  # Percibido ~ Hora_decimal + Profundidad + Proxy_amplitud,
+  Percibido ~
+    Magnitud +
+    `Proxy_amplitud` +
+    `Proxy_energía` +
+    Longitud +
+    Latitud +
+    Profundidad +
+    `Proxy_energía` * `Proxy_amplitud` +
+    `Proxy_amplitud` * Magnitud +
+    Profundidad * Longitud +
+    `Proxy_energía` * Magnitud +
+    Magnitud * Longitud +
+    Profundidad * Latitud
+    ,
+   data = entrenamiento_SJ_balanceado,
+  family = "binomial"
+  )
+```
+
+```{r múltiple significativos}
+# Print the summary of the model
+summary(logit_pairwise)
+```
+
+Nuevamente los p-values indican que las interacciones no aportan significativamente al modelo, como muestra el cuadro
+
+
+
+
+#### Medida de la bondad del ajuste
+
+Modelo original sin interacciones logit_model
+
+Deviance
+```{r deviance based pseudo R squared}
+# if(!require("broom")) {
+#   install.packages("broom")
+# }
+# library("broom")
+
+# Calculate the pseudo R-squared
+pseudo_r2_sin <- 1 - logit_model$deviance / logit_model$null.deviance
+pseudo_r2_sin
+```
+
+AIC
+```{r AIC}
+# Calculate the AIC
+aic_sin <-  AIC(logit_model)
+aic_sin
+```
+
+```{r Hosmer-Lemeshow Test}
+if(!require("ResourceSelection")) {
+  install.packages("ResourceSelection")
+}
+library("ResourceSelection")
+
+# Hosmer-Lemeshow Test
+factor_forHL <- as.numeric(entrenamiento_SJ_balanceado$Percibido) - 1
+hl_test_sin <- ResourceSelection::hoslem.test(factor_forHL, fitted(logit_model))
+print(hl_test_sin)
+```
+
+
+##### Sin interacciones limpio
+```{r Modelo sin interacciones limpio}
+# Fit a logistic regression model
+logit_model_limpio <- glm2::glm2(
+  Percibido ~ Magnitud + Longitud + Latitud + Profundidad,
+   data = entrenamiento_SJ_balanceado,
+  family = "binomial"
+  )
+```
+
+```{r sin_limpio deviance based pseudo R squared}
+pseudo_r2_sin_limpio <- 1 - logit_model_limpio$deviance / logit_model_limpio$null.deviance
+pseudo_r2_sin_limpio
+```
+
+```{r AIC}
+# Calculate the AIC
+aic_sin_limpio <-  AIC(logit_model_limpio)
+aic_sin_limpio
+```
+
+```{r}
+hl_test_sin_limpio <- ResourceSelection::hoslem.test(factor_forHL, fitted(logit_model_limpio))
+print(hl_test_sin_limpio)
+```
+
+
+###### Pairwise 
+```{r}
+pseudo_r2_pairwise <- 1 - logit_pairwise$deviance / logit_pairwise$null.deviance
+pseudo_r2_pairwise
+```
+
+```{r AIC}
+# Calculate the AIC
+aic_pairwise <-  AIC(logit_pairwise)
+aic_pairwise
+```
+
+```{r}
+hl_test_pairwise <- ResourceSelection::hoslem.test(factor_forHL, fitted(logit_pairwise))
+print(hl_test_pairwise)
+```
+
+
+###### Pairwise limpio
+```{r}
+# Fit a logistic regression model
+logit_pairwise_limpio <- glm2::glm2(
+  # Percibido ~ Hora_decimal + Profundidad + Proxy_amplitud,
+  Percibido ~
+    Magnitud +
+    Longitud +
+    Latitud +
+    Profundidad +
+    Profundidad * Longitud +
+    Magnitud * Longitud +
+    Profundidad * Latitud
+    ,
+   data = entrenamiento_SJ_balanceado,
+  family = "binomial"
+  )
+```
+
+```{r}
+pseudo_r2_pairwise_limpio <- 1 - logit_pairwise_limpio$deviance / logit_pairwise_limpio$null.deviance
+pseudo_r2_pairwise_limpio
+```
+
+```{r AIC}
+# Calculate the AIC
+aic_pairwise_limpio <-  AIC(logit_pairwise_limpio)
+aic_pairwise_limpio
+```
+
+```{r}
+hl_test_pairwise_limpio <- ResourceSelection::hoslem.test(factor_forHL, fitted(logit_pairwise_limpio))
+print(hl_test_pairwise_limpio)
+```
+
+
+
+
+###### Hostmer-Lemeshow plot (no funca)
+```{r Hostmer-Lemeshow plot function}
+if(!require("OneR")) {
+  install.packages("OneR")
+}
+library("OneR")
+
+Hosmer_Lemeshow_plot <- function(dataset, predicted_column, class_column, bins, positive_value, color='forestgreen', nudge_x=0, nudge_y=0.05){
+  # Asignar los grupos a las observaciones de acuerdo a la probabilidad predicha
+  dataset['group'] <- bin(dataset[predicted_column], nbins = bins, method = 'l', labels=c(1:bins))
+  # Contar la cantidad de casos positivos por grupo
+  positive_class <- dataset %>% filter(!!sym(class_column)==positive_value) %>% group_by(group) %>% count()
+  # Obtener la media de las predicciones por grupo
+  HL_df <- dataset %>% group_by(group) %>% summarise(pred=mean(!!sym(predicted_column)), count=n()) %>%
+            inner_join(.,positive_class) %>%
+            mutate(freq=n/count)
+  # Gráfico 
+  HM_plot <- ggplot(HL_df, aes(x=pred, y=freq)) + 
+    geom_point(aes(size=n), color=color) +
+    geom_text(aes(label=n),nudge_y = nudge_y)+
+    geom_abline(slope = 1, intercept = 0, linetype='dashed') + 
+    theme_bw() +
+    labs(title='Hosmer-Lemeshow', size='Casos', x="Probabilidad Predicha", y="Frecuencia observada")
+  return(HM_plot)
+}
+```
+
 
 ```{r múltiple predicciones}
 # Make predictions on the test set
-prediction_full <- predict(logit_model, newdata = ensayo_SJ, type = "response")
+prediction_full <- predict(logit_pairwise_limpio, newdata = ensayo_SJ, type = "response")
 
 # Print the first few predictions
 head(prediction_full)
 ```
+
+
+
+```{r Hostmer-Lemeshow plot}
+Hosmer_Lemeshow_plot(prediction_full, '.fitted', 'Percibido', 10, 1) +
+  labs(subtitle="Modelo completo")
+```
+
+
+
+#### Evaluación de la predicción del modelo logístico
+
 
 ```{r múltiple metrics function}
 # Define the prediction metrics function
@@ -745,10 +1052,6 @@ prediction_metrics <- function(cutoff, predictions, actual) {
   actual <- factor(actual, levels = c(FALSE, TRUE))
   predicted_class <- factor(ifelse(predictions > cutoff, TRUE, FALSE), levels = c(FALSE, TRUE))
 
-  # predicted_class <- ifelse(predictions > cutoff, 1, 0)
-  # actual <- factor(actual, levels = c(0, 1))
-  # predicted_class <- factor(predicted_class, levels = c(0, 1))
-  
   # Ensure there is at least one instance of each class
   if (length(unique(predicted_class)) < 2 || length(unique(actual)) < 2) {
     return(data.frame(
@@ -756,7 +1059,8 @@ prediction_metrics <- function(cutoff, predictions, actual) {
       accuracy = NA,
       sensitivity = NA,
       specificity = NA,
-      precision = NA
+      precision = NA,
+      f1 = NA
     ))
   }
 
@@ -767,10 +1071,23 @@ prediction_metrics <- function(cutoff, predictions, actual) {
     accuracy = cm$overall['Accuracy'],
     sensitivity = cm$byClass['Sensitivity'],
     specificity = cm$byClass['Specificity'],
-    precision = cm$byClass['Precision']
+    precision = cm$byClass['Precision'],
+    F1 = cm$byClass['F1']
   )
 }
 ```
+
+
+##### Modelo con interacciones pero sin verivadas de magnitud
+
+```{r}
+# Make predictions on the test set
+prediction_full <- predict(logit_pairwise_limpio, newdata = ensayo_SJ, type = "response")
+
+# Print the first few predictions
+# head(prediction_full)
+```
+
 
 ```{r múltiple metrics_list}
 cutoffs <- seq(0.05, 0.95, by = 0.01)
@@ -781,72 +1098,467 @@ metrics_list <- lapply(cutoffs, function(cutoff) {
 })
 
 # Print the first few elements of metrics_list to check
-head(metrics_list)
+# head(metrics_list)
+```
+
+```{r tidyverse}
+if(!require("tidyverse")) {
+  install.packages("tidyverse")
+}
+library("tidyverse")
+```
+
+```{r múltiple metrics plot}
+## Combine the list of data frames into a single data frame
+#logit_pred <- do.call(rbind, metrics_list)
+#
+## Reshape the data for plotting
+#logit_pred <- logit_pred %>%
+#  pivot_longer(cols = -cutoff, names_to = "term", values_to = "estimate") %>%
+#  mutate(estimate = round(estimate, 3))
+#
+## Plot the results
+#ggplot(logit_pred, aes(cutoff, estimate, group = term, color = term)) +
+#  geom_line(size = 1) +
+#  theme_bw() #+
 ```
 
 
-```{r múltiple metrics plot}
+```{r}
 # Combine the list of data frames into a single data frame
 logit_pred <- do.call(rbind, metrics_list)
 
-# Reshape the data for plotting
+# Reshape the data for plotting and rename columns
 logit_pred <- logit_pred %>%
-  pivot_longer(cols = -cutoff, names_to = "term", values_to = "estimate") %>%
-  mutate(estimate = round(estimate, 3))
+  pivot_longer(cols = -cutoff, names_to = "métrica", values_to = "valor") %>%
+  mutate(
+    valor = round(valor, 3),
+    métrica = recode(
+      métrica,
+      "accuracy" = "exactitud",
+      "precision" = "precisión",
+      "sensitivity" = "sensibilidad",
+      "specificity" = "especificidad"
+      )
+    ) # Incluido también "specificity"
 
 # Plot the results
-ggplot(logit_pred, aes(cutoff, estimate, group = term, color = term)) +
-  geom_line(size = 1) +
-  theme_bw() #+
-# labs(
-#  title = 'Accuracy, Sensitivity, Specificity y Precision',
-#  subtitle = 'Modelo completo',
-#  color = ""
-#)
+#ggplot(logit_pred, aes(cutoff, valor, group = métrica, color = métrica)) +
+#  geom_line(size = 1) +
+#  labs(
+#       x = "Corte",
+#       y = "Valor",
+#       color = "Métricas") +
+#  theme_bw()
 ```
 
-```{r múltiple metrics plot castellano}
-# Assuming logit_pred is your data frame containing metrics like accuracy, sensitivity, etc.
-
-# copy logit_pred to a new data frame
-logit_pred_castellano <- copy(logit_pred)
-
-# Translate terms to Spanish
-logit_pred_castellano$term <- recode(logit_pred_castellano$term,
-                          "accuracy" = "Exactitud",
-                          "sensitivity" = "Sensibilidad",
-                          "specificity" = "Especificidad",
-                          "precision" = "Precisión")
-
-# names(logit_pred_castellano)[names(logit_pred_castellano) == "estimate"] <- "estimación"
-
-# Plot with translated labels
-ggplot(logit_pred_castellano, aes(cutoff, estimate, group=term, color=term)) + 
-  geom_line(size=1) +
-  theme_bw() +
-  labs`title = 'Exactitud, Sensibilidad, Especificidad y Precisión',
-       subtitle = 'Modelo completo',
-       color = "Métricas",
-       x = "Umbral de Corte",
-       y = "Valor") +
-  scale_color_manual(values = c("Exactitud" = "black",
-                                "Sensibilidad" = "blue",
-                                "Especificidad" = "red",
-                                "Precisión" = "green"))
-```
-
-
-```{r save to tikz}
-tikz('graphs/múltiple_metrics.tex',width=5,height=3)
-ggplot(logit_pred, aes(cutoff, estimate, group = term, color = term)) +
+```{r}
+tikz('graphs/múltiple_metrics.tex',width=5,height=2)
+ggplot(logit_pred, aes(cutoff, valor, group = métrica, color = métrica)) +
   geom_line(size = 1) +
+  labs(
+       x = "Corte",
+       y = "Valor",
+       color = "Métricas") +
   theme_bw()
 dev.off()
 ```
 
-let's guess I choose a cutoff of 0.5
-
-```{r múltiple metrics at 0.5}
+```{r}
 # Calculate metrics for the chosen cutoff value
-prediction_metrics(0.5, predictions = prediction_full, actual = ensayo_SJ$Percibido)
+corte = 0.6
+prediction_metrics(
+  corte, 
+  predictions = prediction_full, 
+  actual = ensayo_SJ$Percibido
+  )
 ```
+
+
+
+##### Modelo con interacciones con verivadas de magnitud
+
+```{r}
+# Make predictions on the test set
+prediction_full <- predict(logit_pairwise, newdata = ensayo_SJ, type = "response")
+
+# Print the first few predictions
+# head(prediction_full)
+```
+
+```{r}
+cutoffs <- seq(0.05, 0.95, by = 0.01)
+
+# Calculate metrics for each cutoff value
+metrics_list <- lapply(cutoffs, function(cutoff) {
+  prediction_metrics(cutoff, predictions = prediction_full, actual = ensayo_SJ$Percibido)
+})
+
+# Print the first few elements of metrics_list to check
+# head(metrics_list)
+```
+
+```{r}
+# Combine the list of data frames into a single data frame
+logit_pred <- do.call(rbind, metrics_list)
+
+# Reshape the data for plotting and rename columns
+logit_pred <- logit_pred %>%
+  pivot_longer(cols = -cutoff, names_to = "métrica", values_to = "valor") %>%
+  mutate(
+    valor = round(valor, 3),
+    métrica = recode(
+      métrica,
+      "accuracy" = "exactitud",
+      "precision" = "precisión",
+      "sensitivity" = "sensibilidad",
+      "specificity" = "especificidad"
+      )
+    ) # Incluido también "specificity"
+
+## Plot the results
+#ggplot(logit_pred, aes(cutoff, valor, group = métrica, color = métrica)) +
+#  geom_line(size = 1) +
+#  labs(
+#       x = "Corte",
+#       y = "Valor",
+#       color = "Métricas") +
+#  theme_bw()
+```
+
+```{r}
+tikz('graphs/múltiple_derivadas.tex',width=5,height=2)
+ggplot(logit_pred, aes(cutoff, valor, group = métrica, color = métrica)) +
+  geom_line(size = 1) +
+  labs(
+       x = "Corte",
+       y = "Valor",
+       color = "Métricas") +
+  theme_bw()
+dev.off()
+```
+
+```{r}
+# Calculate metrics for the chosen cutoff value
+corte = 0.6
+prediction_metrics(
+  corte, 
+  predictions = prediction_full, 
+  actual = ensayo_SJ$Percibido
+  )
+```
+
+
+
+
+
+
+
+## Predictor por XGBoost
+
+```{r biblioteca xgboost}
+if (!require("xgboost")) {
+  install.packages("xgboost")
+}
+library("xgboost")
+```
+
+```{r first train}
+# convert to data to matrix
+num_feat = c("Latitud", "Longitud", "Magnitud", "Profundidad", "Proxy_amplitud", "Proxy_energía")
+entrenamiento_SJ_balanceado_matrix <- as.matrix(entrenamiento_SJ_balanceado[ ,..num_feat])
+label_numeric <- as.numeric(entrenamiento_SJ_balanceado[, Percibido]) - 1
+bstSparse <- xgboost(
+  data = entrenamiento_SJ_balanceado_matrix, 
+  label = label_numeric, 
+  max.depth = 5, eta = 1, 
+  nthread = 2, nrounds = 5, 
+  objective = "binary:logistic", 
+  verbose = 2
+  )
+```
+
+```{r premiere prediction}
+ensayo_SJ_matrix <- as.matrix(ensayo_SJ[ ,..num_feat])
+prediction_xgboost <- predict(bstSparse, ensayo_SJ_matrix)
+umbral_p = 0.5
+prediction_xgboost_binario <- ifelse(prediction_xgboost > umbral_p, 1, 0)
+```
+
+```{r metrics}
+# confusion matrix
+confusion_matrix <- table(ensayo_SJ$Percibido, prediction_xgboost_binario)
+
+# accuracy
+accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+
+# sensitivity
+sensitivity <- confusion_matrix[2, 2] / sum(confusion_matrix[2, ])
+
+# specificity
+specificity <- confusion_matrix[1, 1] / sum(confusion_matrix[1, ])
+
+# precision
+precision <- confusion_matrix[2, 2] / sum(confusion_matrix[, 2])
+
+# F1
+F1 <- 2 * (precision * sensitivity) / (precision + sensitivity)
+
+# print the metrics
+c(accuracy, sensitivity, specificity, precision, F1)
+```
+  max.depth = 5, eta = 1, 
+  nthread = 2, nrounds = 5, 
+[1] 0.9804413 0.1138211 0.9986346 0.6363636 0.1931034
+
+
+
+#### Now without the derivatives
+```{r}
+num_feat = c("Latitud", "Longitud", "Magnitud", "Profundidad")
+entrenamiento_SJ_balanceado_matrix <- as.matrix(entrenamiento_SJ_balanceado[ ,..num_feat])
+label_numeric <- as.numeric(entrenamiento_SJ_balanceado[, Percibido]) - 1
+bstSparse <- xgboost(
+  data = entrenamiento_SJ_balanceado_matrix, 
+  label = label_numeric, 
+  max.depth = 3, eta = 1, 
+  nthread = 2, nrounds = 5, 
+  objective = "binary:logistic", 
+  verbose = 2
+  )
+```
+
+```{r}
+# convert to data to matrix
+ensayo_SJ_matrix <- as.matrix(ensayo_SJ[ ,..num_feat])
+# head(ensayo_SJ_matrix)
+prediction_xgboost <- predict(bstSparse, ensayo_SJ_matrix)
+# head(prediction_xgboost)
+umbral_p = 0.5
+prediction_xgboost_binario <- ifelse(prediction_xgboost > umbral_p, 1, 0)
+tail(prediction_xgboost_binario)
+```
+
+```{r}
+# confusion matrix
+confusion_matrix <- table(ensayo_SJ$Percibido, prediction_xgboost_binario)
+
+# accuracy
+accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+
+# sensitivity
+sensitivity <- confusion_matrix[2, 2] / sum(confusion_matrix[2, ])
+
+# specificity
+specificity <- confusion_matrix[1, 1] / sum(confusion_matrix[1, ])
+
+# precision
+precision <- confusion_matrix[2, 2] / sum(confusion_matrix[, 2])
+
+# F1
+F1 <- 2 * (precision * sensitivity) / (precision + sensitivity)
+
+# print the metrics
+c(accuracy, sensitivity, specificity, precision, F1)
+```
+  max.depth = 3, eta = 1, 
+  nthread = 2, nrounds = 5, 
+[1] 0.9244400 0.8943089 0.9250725 0.2003643 0.3273810
+
+
+
+
+
+
+
+
+# Corbeille
+
+### logístico otro modelo
+
+```{r}
+logit_model_sin <- glm2::glm2(
+  # Percibido ~ Hora_decimal + Profundidad + Proxy_amplitud,
+  Percibido ~ Magnitud + `Proxy_amplitud` + Longitud + Latitud + Profundidad,
+   data = entrenamiento_SJ_balanceado,
+  family = "binomial"
+  )
+summary(logit_model_sin)
+```
+
+```{r}
+if(!require("rms")) {
+  install.packages("rms")
+}
+library("rms")
+
+logit1.res <- lrm(
+  Percibido ~ Magnitud + `Proxy_amplitud` + `Proxy_energía` + Longitud + Latitud + Profundidad,
+  data = entrenamiento_SJ_balanceado,
+  y = TRUE, x = TRUE)
+residuals(logit1.res, type = "gof")
+```
+Modelo horrible
+
+
+#### advanced training xgb.train without
+
+Horrible
+```{r}
+# convert to data to matrix
+num_feat = c("Latitud", "Longitud", "Magnitud", "Profundidad")
+
+label_numeric <- as.numeric(entrenamiento_SJ_balanceado[, Percibido]) - 1
+entrenamiento_SJ_matrix <- as.matrix(entrenamiento_SJ[ ,..num_feat])
+
+
+dtrain <- xgb.DMatrix(
+  data = entrenamiento_SJ_matrix, 
+  label = label_numeric
+)
+
+bstSparse <- xgb.train(
+  data = dtrain, 
+  max.depth = 20, eta = 1, 
+  nthread = 2, nrounds = 1000, 
+  objective = "binary:logistic",
+  watchlist = list(train = dtrain), 
+  verbose = 2
+  )
+```
+
+```{r}
+# convert to data to matrix
+ensayo_SJ_matrix <- as.matrix(ensayo_SJ[ ,..num_feat])
+# head(ensayo_SJ_matrix)
+prediction_xgboost <- predict(bstSparse, ensayo_SJ_matrix)
+# head(prediction_xgboost)
+umbral_p = 0.5
+prediction_xgboost_binario <- ifelse(prediction_xgboost > umbral_p, 1, 0)
+tail(prediction_xgboost_binario)
+```
+
+```{r}
+# confusion matrix
+confusion_matrix <- table(ensayo_SJ$Percibido, prediction_xgboost_binario)
+
+# accuracy
+accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+
+# sensitivity
+sensitivity <- confusion_matrix[2, 2] / sum(confusion_matrix[2, ])
+
+# specificity
+specificity <- confusion_matrix[1, 1] / sum(confusion_matrix[1, ])
+
+# precision
+precision <- confusion_matrix[2, 2] / sum(confusion_matrix[, 2])
+
+# F1
+F1 <- 2 * (precision * sensitivity) / (precision + sensitivity)
+
+# print the metrics
+c(accuracy, sensitivity, specificity, precision, F1)
+```
+No se porque da tan diferente. No me importa, lo ignoro.
+
+
+
+
+
+
+
+
+#### Múltiples modelos lógisticos
+```{r modelr | declaración modelos}
+if(!require("modelr")) install.packages("modelr")
+library("modelr")
+
+# Creación de fórmulas
+logit_formulas <- modelr::formulas(
+  .response = ~ Percibido,
+  LaLoMPAE = ~ Latitud + Longitud + Magnitud + Profundidad + `Proxy_amplitud` + `Proxy_energía`, 
+  LaLoMPA = ~ Latitud + Longitud + Magnitud + Profundidad + `Proxy_amplitud`, 
+  LaLoMP = ~ Latitud + Longitud + Magnitud + Profundidad, 
+  LoMPAE = ~ Longitud + Magnitud + Profundidad + `Proxy_amplitud` + `Proxy_energía`, 
+  LoMPA = ~ Longitud + Magnitud + Profundidad + `Proxy_amplitud`, 
+  LoMP = ~ Longitud + Magnitud + Profundidad, 
+  MPAE = ~ Magnitud + Profundidad + `Proxy_amplitud` + `Proxy_energía`, 
+  MPA = ~ Magnitud + Profundidad + `Proxy_amplitud`, 
+  MP = ~ Magnitud + Profundidad, 
+  MA = ~ Magnitud + `Proxy_amplitud`,
+  PA = ~ Profundidad + `Proxy_amplitud`,
+  P = ~ Profundidad,
+  A = ~ `Proxy_amplitud`,
+  E = ~ `Proxy_energía`,
+  M = ~ Magnitud,
+)
+logit_formulas # observamos el objeto formulas
+```
+
+```{r purrr | modelos como logit de glment}
+if(!require("purrr")) install.packages("purrr")
+library("purrr")
+
+models <- data_frame(logit_formulas) %>% # dataframe a partir del objeto formulas
+  mutate(
+    models = names(logit_formulas), # columna con los nombres de las formulas
+    expression = paste(logit_formulas), # columna con las expresiones de las formulas
+    mod = map(
+      logit_formulas,
+      ~glm(
+        ., 
+        family = 'binomial',  
+        data = entrenamiento_SJ_balanceado,
+        )
+      )
+    ) # Que estamos haciendo acá? Que vamos a encontrar en la columna?
+models
+```
+
+
+### glmnet
+All the same but using the glmnet library
+  
+```{r glmnet}
+if(!require("glmnet")) {
+  install.packages("glmnet")
+}
+library("glmnet")
+```
+
+```{r glmnet summary}
+# Fit a logistic regression model
+logit_model <- glmnet::glmnet(
+  Percibido ~ Magnitud + `Proxy_amplitud` + `Proxy_energía` + Longitud + Latitud + Profundidad,
+  data = entrenamiento_SJ_balanceado,
+  family = "binomial"
+)
+```
+Didn´t worked, it expecs a matrix of predictors, not a data.table.
+
+```{r glmnet matrix}
+# Convert the data to a matrix
+X <- model.matrix(Percibido ~ Magnitud + `Proxy_amplitud` + `Proxy_energía` + Longitud + Latitud + Profundidad, data = entrenamiento_SJ_balanceado)
+y <- as.numeric(entrenamiento_SJ_balanceado$Percibido) - 1
+
+# Fit a logistic regression model
+logit_model_glmnet <- glmnet::glmnet(
+  x = X,
+  y = y,
+  family = "binomial"
+)
+```
+
+```{r glmnet summary}
+summary(logit_model_glmnet)
+
+# coefficients
+coef(logit_model_glmnet)
+
+tidy(logit_model_glmnet)
+```
+No sigo por acá:
+
+The glmnet package does not provide p-values directly because it uses penalized regression techniques that do not rely on traditional statistical inference. However, there is a way to approximate p-values using bootstrapping or cross-validation methods. Here, I'll provide an approach to approximate p-values for glmnet coefficients using cross-validation and refitting the model with glm on the selected variables.
+
