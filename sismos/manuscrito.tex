@@ -110,7 +110,7 @@
 				Se buscó desarrollar un modelo para predecir tal eventualidad utilizando usando solo datos básicos de terremotos.
 				Limitaciones de los datos públicos utilizados limitaron el espacio geográficos del estudio a la provincia de San Juan.
 				Se ensayaron modelos basado en regresión logística como uno basado en máquinas de potenciación de gradiente.
-				Se logró ajustar modelos con alternativamente alta sensibilidad o precisión, pero no ambas simultáneamente, por lo que debe optarse entre estas alternativas según cual sea la prioridad para la aplicación que quiera dárseles.
+				Se logró ajustar modelos con alternativamente alta sensibilidad o precisión, pero no ambas simultáneamente, por lo que se debe optar entre estas alternativas según cual sea la prioridad para la aplicación que quiera dárseles.
 				% Algo de resultados
     \end{abstract}
 		\end{minipage}
@@ -190,10 +190,10 @@ Se estructuró en los siguientes capítulos con temáticas diferenciadas
 
 En la prensa general se busca transmitir la importancia de un fenómeno sísmico informando un valor sea en la escala de Richter o de Mercalli como si fueran intercambiables.
 La primera se refiere a la magnitud, una característica física del terremoto (ver definición en la sección \ref{sec:ingeniería}), en tanto que la segunda se refiere a una caracterización subjetiva del sismo, la llamada intensidad.
-Esta última cuantidad es función de fenómenos percibidos por el público como si hubo grietas en el suelo o vidrios o si temblaron edificios \cite[sección 4.2.3]{fowler_solid_1990}.
+Esta última cantidad es función de fenómenos percibidos por el público como si hubo grietas en el suelo o vidrios o si temblaron edificios \cite[sección 4.2.3]{fowler_solid_1990}.
 % Como tal es una caracterización posterior al fenómeno por lo que su valor numérico no es útil a los efectos del objetivo descripto en la sección \ref{sec:objetivo}.
 Los organismos de monitoreo de sismos cuentan con portales en la world-wide web para que el público ofrezca tal información voluntariamente en formularios con preguntas de elección múltiple.
-Tal es el caso de los portales ``Encuesta de sismos'' del INPRES \cite{noauthor_encuesta_nodate} y ``Felt Report - Tell Us!'' \cite{noauthor_felt_nodate} parte del programa de riesgo de terremos del Geological Survey de los Estados Unidos de América (USGS) \cite{david_jay_usgs_2012}. 
+Tal es el caso de los portales ``Encuesta de sismos'' del INPRES \cite{noauthor_encuesta_nodate} y ``Felt Report - Tell Us!'' \cite{noauthor_felt_nodate} parte del programa de riesgo de terremotos del Geological Survey de los Estados Unidos de América (USGS) \cite{david_jay_usgs_2012}. 
 Este último aporta a la sistematización de reportes del público denominado ``Did you fell it?'' (DYFI) que ha nutrido en la último década y media a varios estudios relacionando la intensidad con diversos fenómenos citados en \cite{noauthor_dyfi_nodate}.
 
 La intensidad expresada en la escala modificada de Mercalli (MMI) \cite{noauthor_intensidad_2022} en la base de datos DYFI mostró estar bien correlacionada con medidas de espectro de oscilación lo que impulsó a buscar un modelo que le relacione con parámetros físicos de terremoto.
@@ -202,7 +202,7 @@ Una regresión múltiple basada en el método de máxima verosimilitud se encont
 	MMI = c_1 + c_2 (M_w - 6) + c_3 (M_w - 6)^2 + c_4\log{R} + c_5 R + c_6 B + c_7 M_w \log{R}, 
 	\label{eq:atkinson2007}
 \end{equation}
-donde \(M_w\) es la magnitud del momento, según la definición discutida en la sección \ref{sec:magnitud}, \(R = \sqrt{D + h}\) es la distancia entre observador e hipocentro en función de la distancia del primer al epicentro \(D\) y profundidad del segundo \(h\), y \(B\) es nulo para \(R < R_t\) una distancia de transición en la forma de atencuación de las ondas 
+donde \(M_w\) es la magnitud del momento, según la definición discutida en la sección \ref{sec:magnitud}, \(R = \sqrt{D + h}\) es la distancia entre observador e hipocentro en función de la distancia del primer al epicentro \(D\) y profundidad del segundo \(h\), y \(B\) es nulo para \(R < R_t\) una distancia de transición en la forma de atenuación de las ondas 
 Una posterior actualización de este modelo por los mismos autores se basó en agrupar los valores promedio de MMI en cada código postal
 \begin{equation}
 	MMI = c_1 + c_2 M_w + c_3 \log{R} + c_4 R + c_5 B + c_6 M_w\log{R},
@@ -265,7 +265,7 @@ Pero como glm2 genera modelos lineales generalizados, requiere un argumento adic
 La correspondiente función de enlace (link) relaciona el modelo lineal con función de probabilidad.
 Como se busca predecir un resultado booleano se indica la distribución binomial.
 
-Aunque se parte de pocas variables independientes, se ensayará forzar una mayor simplificación del mismo mediante la técnica de regularización tipo Lasso (L1) que fuerza a que los coeficientes de las variables independientes que menos aportan a predicción vayan anulándose.
+% Aunque se parte de pocas variables independientes, se ensayará forzar una mayor simplificación del mismo mediante la técnica de regularización tipo Lasso (L1) que fuerza a que los coeficientes de las variables independientes que menos aportan a predicción vayan anulándose.
 
 
 
@@ -360,11 +360,11 @@ Las transformaciones o ingeniería de características que se detallan luego en 
 
 
 \paragraph{Fecha y hora del sismo}
-Si se quieren utilizar las variables \emph{Fecha} y \emph{Hora} para segmentar el día en franjas horarias, o comparar interanuales, es útil convertirles en funciones de continuas, días corridos en el año, para la primra, y segundos, para la segunda 
+Si se quieren utilizar las variables \emph{Fecha} y \emph{Hora} para segmentar el día en franjas horarias, o comparar interanuales, es útil convertirles en funciones de continuas, días corridos en el año, para la primera, y segundos, para la segunda 
 
 La variable Fecha se reconocíó al importarse el conjunto de datos en formato ISO 8601 por lo que registrar una nueva variable para el año y otra para el día del año, fue sencillo con las funciones \lstinline[language = R]'year' y \lstinline[language = R]'yday' de la biblioteca base de R. 
 
-A partir de la varible Hora se escribió una función que genera otra continua contando el número entero de segundos transcurridos desde la medianoche del día en que se produjo el terremoto, \emph{Segundos del día}, apoyandose para esto en la función \lstinline[language = R]'strptime' del paquete base de R.
+A partir de la variable Hora se escribió una función que genera otra continua contando el número entero de segundos transcurridos desde la medianoche del día en que se produjo el terremoto, \emph{Segundos del día}, apoyándose para esto en la función \lstinline[language = R]'strptime' del paquete base de R.
 Esto habilita posibles análisis segmentando el día en franjas horarias.
 % Se verificó que los valores en la columna generada con \lstinline[language = R]'sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]' estuvieran en el rango de \num{0} a \SI{86400}{\second}, es decir, el de un día completo.
 
@@ -384,7 +384,7 @@ Resumiendo las nuevas variable generadas fueron:
 
 
 
-\section{Delimitación del espacio geográfico}{sec:geográfico}
+\section{Delimitación del espacio geográfico}\label{sec:geográfico}
 % \section{Características relevantes a la predicción}
 % \section{Descripción de la selección de características (si corresponde)}
 
@@ -395,7 +395,7 @@ Esto conlleva a que la mayor parte de los terremotos estén alejados de las mayo
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.8\textwidth]{mapa_sismos.png}
-\caption{Superponer las ubicaciones de los terremotos en un mápa físico muestra que la mayoría de los terremotos se registran en zonas de montaña o cerros en su mayoría alejados de las mayores urbanizaciones lo que afecta negativamente la estadística de los percibidos.
+\caption{Superponer las ubicaciones de los terremotos en un mapa físico muestra que la mayoría de los terremotos se registran en zonas de montaña o cerros en su mayoría alejados de las mayores urbanizaciones lo que afecta negativamente la estadística de los percibidos.
 La escala de colores muestra los más superficiales en azul y profundos en rojo.
 Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
 \label{fig:mapa_sismos}
@@ -425,7 +425,7 @@ Su buscador de sismos indica los sismos ``sentidos'' por usuarios con un color e
 \label{fig:resultado_búsqueda}
 \end{figure}
 
-Lamentablemente en el conjunto de datos curados no figura la ubicación del sismografo o la población que hizo el registro lo que imposibilita incorporar la distancia al epicentro como una variable en el modelo.%sin realizar un nuevo \emph{scrapping} de estos datos en el sitio del INPRES.
+Lamentablemente en el conjunto de datos curados no figura la ubicación del sismógrafo o la población que hizo el registro lo que imposibilita incorporar la distancia al epicentro como una variable en el modelo.%sin realizar un nuevo \emph{scrapping} de estos datos en el sitio del INPRES.
 Puesto que no se tiene control posible sobre la posición de quienes potencialmente percibieron un sismo se decidió para reducir el impacto del parámetro distancia limitar el espacio geográfico de los terremotos.
 Las posibles fuentes de datos para realizar tal operación son su latitud, longitud y provincia.
 
@@ -446,14 +446,14 @@ La distribución de terremotos en la provincia de San Juan dista de ser homogén
 	\centering
 	\includegraphics[width=0.8\textwidth]{sanJuan.png}
 	\caption{Recorte de la figura \ref{fig:terremotosMapa} en torno a la provincia de San Juan.
-	Los terremotos se presentan mayoritarialmente en su región meridional.
+	Los terremotos se presentan mayoritariamente en su región meridional.
 	Los puntos rojos son los percibidos por personas.
 	Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
 \label{fig:sanJuan}
 \end{figure}
 
 Lo anterior podría hacer sospechar de un sesgo con la latitud, pero la inspección visual de la figura muestra que la proporción de puntos rojos y amarillos, los de terremotos percibidos o no es similar con la que hay en el norte.
-En función de esto se decidió no eliminar las variable de latitud en este estadío y analizar más adelante su correlación con la percepción de los sismos.
+En función de esto se decidió no eliminar las variable de latitud en este estadio y analizar más adelante su correlación con la percepción de los sismos.
 A fin de cuentas el objetivo del trabajo es determinar si un modelo puede predecir la percepción de un sismo por parte de la población y no determinar los factores que influyen en la percepción de los sismos por parte de la población.
 En caso de que haya factores geográficos regionales, estos serán capturados por el modelo de clasificación y no necesariamente por la variable de latitud.
 
@@ -534,7 +534,7 @@ Sin embargo la figura \ref{fig:percibidos_trimestre_histrograma} muestra que en 
 	\label{fig:percibidos_trimestre_histrograma}
 \end{figure}
 
-Con el fin de explorar si los apartamientos trimestrales en las proporciones son signficativos se realizar un \emph{ensayo binomial} de cada proporción trimestral contra la media.
+Con el fin de explorar si los apartamientos trimestrales en las proporciones son significativos se realizar un \emph{ensayo binomial} de cada proporción trimestral contra la media.
 Este se alimenta con la tabla de contingencia de la figura \ref{fig:tabla_contingencia_trimestre} que muestra una cantidad de muestras que se consideran suficientes para proceder con el ensayo.
 
 \begin{table}[!ht]
@@ -554,7 +554,7 @@ Este se alimenta con la tabla de contingencia de la figura \ref{fig:tabla_contin
 Para el primer y tercer cuatrimestre se obtuvieron valores p de \(0.000452\) y \(0.016623\) respectivamente, lo que indica que las proporciones de sismos percibidos en estos trimestres son significativamente distintas de la media.
 No se tiene una explicación para esta observación, que debe aclararse, debe tomarse con precaución pues se realiza sobre un número muy limitado de proporciones.
 
-Dado que se son apreciables variaciones internanuales en el número total de terremotos, como lo evidencia la figura \ref{fig:acumulado_anual_magnitud}, tal vez debieran tomarse los trimestres de cada año en forma independientes años y analizar su medía y dispersión.
+Dado que se son apreciables variaciones interanuales en el número total de terremotos, como lo evidencia la figura \ref{fig:acumulado_anual_magnitud}, tal vez debieran tomarse los trimestres de cada año en forma independientes años y analizar su medía y dispersión.
 Pero es posible que el número de muestras en cada trimestre sea insuficiente para obtener resultados representativos. 
 
 
@@ -615,7 +615,7 @@ La figura \ref{fig:histograma_profundidad50km} mostró que los hay con \(h < \SI
 
 
 
-\subsection{Linealización de la magnitud}/label{sec:linealización}
+\subsection{Linealización de la magnitud}\label{sec:linealización}
 % \paragraph{Linealización de la magnitud}
 Todas las escalas de magnitud buscan dar cuenta de la energía liberada en el terremoto.
 La escala utilizada en los datos del INPRES es la de magnitud de momento (ver sección \ref{sec:datos}) definida como \cite[ec. 4.23]{fowler_solid_1990}
@@ -633,7 +633,7 @@ Puesto que este trabajo busca predecir la percepción por personas en la superfi
 	M = \log_{10} \left( \frac{A}{T} \right) + q(\Delta, h) + a,
 	\label{eq:magnitud}
 \end{equation}
-donde \(M\) es la magnitud, y aquí \(A\) es la amplitud de las ondas sismicas detectadas, \(T\) su período de oscilación, \(q\) es función de la profundidad del hipocentro, \(h\), \(\Delta\) el ángulo entre éste y el sismógrafo y la vertical, y \(a\) es una constante de ajuste \cite[ecuación 4.13]{fowler_solid_1990}.
+donde \(M\) es la magnitud, y aquí \(A\) es la amplitud de las ondas sísmicas detectadas, \(T\) su período de oscilación, \(q\) es función de la profundidad del hipocentro, \(h\), \(\Delta\) el ángulo entre éste y el sismógrafo y la vertical, y \(a\) es una constante de ajuste \cite[ecuación 4.13]{fowler_solid_1990}.
 
 Dado que se carece del dato del punto de detección del sismo, no puede determinarse \(\Delta\) y aunque se eligiera la escala que corresponde por \(h\) \footnote{Si \(h< \SI{50}{\kilo\metre}\) la mayor parte del aporte a la sismicidad la hacen ondas de propagación superficial por lo que se utiliza la \emph{magnitud de onda superficial}, \(M_s\), con distintos coeficientes de ajuste en la ecuación \ref{eq:magnitud}, que la \emph{magnitud de onda de cuerpo}, \(m_b\), que se usa para mayores profundidades \cite[sección 4.2.3]{fowler_solid_1990}.} no podría determinarse \(q(\Delta, h)\).
 Frente a esto las diferencias entre las relaciones empíricas entre \(M_w\) con \(M_s\) o \(m_b\)\cite{hanks_moment_1979}, son irrelevantes a los fines de este trabajo.
@@ -643,7 +643,7 @@ Se asume entonces por válida una fuerte aproximación
 	\label{eq:igualdad}
 \end{equation}
 
-Para las ondas de tipo S y P, las que contribuyen a los sismos percibidos en superficie (ver sección \ref{sec:contexto}) se puede hacer uso de la escala propuesta originalemente por Guntenberg en 1945 con la función de calibración para \(q(\Delta, h)\) propuesta por \emph{Gutemberg-Richter} en 1956 \cite[ecuación 4.18]{fowler_solid_1990} en la que se se omite de la expresión \ref{eq:magnitud} la constante de ajuste \(a\) y para definir la razón \(\frac{A}{T}\) se toma la mayor registrada por los sismógrafos,
+Para las ondas de tipo S y P, las que contribuyen a los sismos percibidos en superficie (ver sección \ref{sec:contexto}) se puede hacer uso de la escala propuesta originalmente por Guntenberg en 1945 con la función de calibración para \(q(\Delta, h)\) propuesta por \emph{Gutemberg-Richter} en 1956 \cite[ecuación 4.18]{fowler_solid_1990} en la que se se omite de la expresión \ref{eq:magnitud} la constante de ajuste \(a\) y para definir la razón \(\frac{A}{T}\) se toma la mayor registrada por los sismógrafos,
 \begin{equation}
 	m_b = \log_{10} \left( \frac{A}{T} \right)_\text{máx} + q(\Delta, h).
 	\label{eq:richter}
@@ -675,12 +675,12 @@ Con el comando
 sismos_SJ[, Proxy\_amplitud := 10^(Magnitud- magnitud_mínima)]
 \end{lstlisting}
 %'
-se generó una columna para este valor denominada \lstinline[language = R]'Proxy amplitud', que por lo comentado anteriorme tiene por valor mínimo \num{1}. 
+se generó una columna para este valor denominada \lstinline[language = R]'Proxy amplitud', que por lo comentado anteriormente tiene por valor mínimo \num{1}. 
 
 
 
-\subsection{Percecpión sísmica, ¿de amplitud o energía?}
-Es posible también que que en el límite entre percpeción o no (I o II de la escala MMI \cite{noauthor_intensidad_2022}) pueda explicarse mejor en función de la energía de la onda sísmica que de la amplitud, por lo que podría esperarse una mejor correlación con el cuadrado de esta última variable derivada.
+\subsection{Percepción sísmica, ¿de amplitud o energía?}
+Es posible también que que en el límite entre percepción o no (I o II de la escala MMI \cite{noauthor_intensidad_2022}) pueda explicarse mejor en función de la energía de la onda sísmica que de la amplitud, por lo que podría esperarse una mejor correlación con el cuadrado de esta última variable derivada.
 Para ensayarlo se generó con
 %\lstinline[language = R]'
 \begin{lstlisting}[breaklines=true, language=R]
@@ -743,7 +743,7 @@ cor(sismos_SJ[, .(`Magnitud`, `Proxy amplitud`, `Proxy energía`)], use = "compl
 %'
 arrojando que esta es \num{0.2328335} y \num{0.09030076} respectivamente.
 Por lo que estas variables no son redundantes entre sí y se espera que aporten información independiente al modelo de clasificación.
-Se ensayará retira de entre las variables utiilizadas estas variables derivadas para generar distintos modelos y evaluar el impacto de su inclusión.
+Se ensayará retira de entre las variables utilizadas estas variables derivadas para generar distintos modelos y evaluar el impacto de su inclusión.
 
 
 
@@ -793,11 +793,11 @@ ensayo_SJ <- sismos_SJ_escalado[-train_index]
 \end{lstlisting}
 
 La función mencionada indicó los índices de los datos a incluir en el conjunto de entrenamiento, \lstinline[language = R]'entrenamiento_SJ'.
-Los datos restante se destinal al conjunto de ensayo, \lstinline[language = R]'ensayo_SJ', este último con un número aún adecuado para su función de \num{5982} registros.
+Los datos restante se destina al conjunto de ensayo, \lstinline[language = R]'ensayo_SJ', este último con un número aún adecuado para su función de \num{5982} registros.
 
 
 \subsection{Desequilibrio en clase de clasificación}\label{sec:balanceo}
-Para contrarrestar el desequilibrio en el conjunto de entreaniento sobre la clase de clasificación se utilizará la técnica de sobremuestreo de la clase minoritaria que genera nuevos casos sintéticos de la clase minoritaria a partir de los existentes.
+Para contrarrestar el desequilibrio en el conjunto de entrenamiento sobre la clase de clasificación se utilizará la técnica de sobremuestreo de la clase minoritaria que genera nuevos casos sintéticos de la clase minoritaria a partir de los existentes.
 Para esto se utiliza la función \lstinline[language = R]'ovun.sample' de la biblioteca \lstinline[language = R]'ROSE' que genera un conjunto de datos de entrenamiento con un número de casos de la clase minoritaria igual al de la clase mayoritaria.
 Se generó así un nuevo conjunto de datos de entrenamiento \lstinline[language = R]'entrenamiento_SJ_balanceado' con \num{23934} registros.
 
@@ -842,7 +842,7 @@ Se calcula como
 \begin{equation}
 	\text{Sensibilidad} = \frac{\text{Verdaderos positivos}}{\text{Verdaderos positivos} + \text{Falsos negativos}}.
 \end{equation}
-En este trabajo cuantifica cuantos de los terremotos que tendrián que haber producido una predicción de percepción por parte de la población fueron efectivamente reportados como tales por el modelo al ensayarle en el conjunto de ensayo.
+En este trabajo cuantifica cuantos de los terremotos que tendrían que haber producido una predicción de percepción por parte de la población fueron efectivamente reportados como tales por el modelo al ensayarle en el conjunto de ensayo.
 Es esencialmente una medida de cuantos reportes falla en realizar.
 
 
@@ -898,8 +898,8 @@ Se calcula como
 
 \section{Predictor por regresión logística múltiple}
 
-Como se indicó en la sección \ref{sec:logística} una de las metodologías de predicción fue el de emplear modelos de predición logísticas.
-De acuerdo a cuales de las variables disponibles y que interecciones entre ellas  se incluyen se obtuvieron distintas modelos de clasificación.
+Como se indicó en la sección \ref{sec:logística} una de las metodologías de predicción fue el de emplear modelos de predicción logísticas.
+De acuerdo a cuales de las variables disponibles y que interacciones entre ellas  se incluyen se obtuvieron distintas modelos de clasificación.
 
 
 \subsection{Todas las variables}\label{sec:logística_sin_interacción}
@@ -948,7 +948,7 @@ Los resultados del ajuste para los coeficientes los muestra una invocación de l
 \end{table}
 
 Excepto los coeficientes para \lstinline[language = R]'Proxy_amplitud' y  \lstinline[language = R]'Proxy_energía', todos son significativos ya que sus probabilidades de que no tengan esos valores y se cumpla la hipótesis nula \(Pr(>|z|)\) para el estadístico \(z = \beta / \sigma_\beta\), se indican como inferiores al umbral usual de \(0.05\).
-Para el modelo de predección a utilizar se optaría por obviar \lstinline[language = R]'Proxy_amplitud' y  \lstinline[language = R]'Proxy_energía'.
+Para el modelo de predicción a utilizar se optaría por obviar \lstinline[language = R]'Proxy_amplitud' y  \lstinline[language = R]'Proxy_energía'.
 Antes de hacerlo y dejar definitivamente de lado las mismas se explorará si se puede mejorar el modelo con la inclusión de interacciones entre las variables.
 Estas debieran poder corregir sesgos introducidos al modelo por incluir entre sus variables aquellas supuestamente independientes pero que muestran correlación.
 
@@ -965,12 +965,12 @@ Estas debieran poder corregir sesgos introducidos al modelo por incluir entre su
 
 \subsection{Interacción entre variables}\label{sec:logística_con_interacción}
 Entre las 6 variables numéricas pueden formase pares de interacción, lo que lleva a preguntarse cuales incluir en un modelo.
-Puesto que se busca que incluirle aporte a mejorar la predección por corrección del sesgo que aporta su inclusión sin dar cuenta de la covarianza entre ellas se buscó determinar cuales pares presentan un mayor valor de la misma.
+Puesto que se busca que incluirle aporte a mejorar la predicción por corrección del sesgo que aporta su inclusión sin dar cuenta de la covarianza entre ellas se buscó determinar cuales pares presentan un mayor valor de la misma.
 
 Las covarianzas entre las variables deben volver a calcularse pues estas no son las mismas en el subconjunto de entrenamiento que en el total de los datos.
 Aunque la modificación que causa la partición en si no es muy importante (ver sección \ref{sec:partición}), si es más significativa la causada por el posterior balanceo de la clase de clasificación (ver sección \ref{sec:balanceo}).
 Se generó una función basada en la ya mencionada \lstinline[language=R]{cor} para determinar los pares de variables con mayor valor absoluto de covarianza.
-Las que superan un corte arbitario de \num{0.03} se muestran en el cuadro \ref{tab:covarianza}, junto con el respectivo valor.
+Las que superan un corte arbitrario de \num{0.03} se muestran en el cuadro \ref{tab:covarianza}, junto con el respectivo valor.
 
 \begin{table}[!ht]
 	\centering
@@ -989,8 +989,8 @@ Las que superan un corte arbitario de \num{0.03} se muestran en el cuadro \ref{t
 	\caption{Covarianza entre pares de variables numéricas.}
 	\label{tab:covarianza}
 \end{table}
-No es de extrañar que figuren las covarianzan entre \verb'Magnitud' y sus derivadas entre las de mayor covarianza.
-Pero también figuran unas no esperadas entre \verb'Profundidad' y ubicación del epicentro, además de las más esperadasa entre \verb'Magnitud' y \verb'Longitud', por las razones discutidas en la sección \ref{sec:correlaciones}.
+No es de extrañar que figuren las covarianzas entre \verb'Magnitud' y sus derivadas entre las de mayor covarianza.
+Pero también figuran unas no esperadas entre \verb'Profundidad' y ubicación del epicentro, además de las más esperadas entre \verb'Magnitud' y \verb'Longitud', por las razones discutidas en la sección \ref{sec:correlaciones}.
 
 Un modelo incorporando todas estas interacciones de pares a aquel propuesto en la sección \ref{sec:logística_sin_interacción} se generó con el comando
 \begin{lstlisting}[language=R, breaklines=true]
@@ -1001,7 +1001,7 @@ logit_model_interaccion <- glm2::glm2(
 	)
 \end{lstlisting}
 
-Nuevamente los p-values indican que las variables derivadas de \verb'Magnitud' y las interacciones con las mismas no aportan significativamente al modelo, como muestra el cuadro \ref{tab:coeficientes_interaccion}, pero todas las demás interacciones restultan aportar significativamente al modelo.
+Nuevamente los p-values indican que las variables derivadas de \verb'Magnitud' y las interacciones con las mismas no aportan significativamente al modelo, como muestra el cuadro \ref{tab:coeficientes_interaccion}, pero todas las demás interacciones resultan aportar significativamente al modelo.
 
 \begin{table}
 	\centering
@@ -1034,7 +1034,7 @@ Para afirmar que efectivamente es mejor se necesita utilizar alguna métrica de 
 
 
 \subsection{Medida de la bondad del ajuste}\label{sec:bondad}
-La desviación (del inglés deviance) es una generalización de la suma de cuadrados de los residuos en el ajuste ordinario de caudrados mínimos a casos donde el mismo se realiza por máxima verosimilitud \cite[sección 7.2]{hastie_elements_2009}.
+La desviación (del inglés deviance) es una generalización de la suma de cuadrados de los residuos en el ajuste ordinario de cuadrados mínimos a casos donde el mismo se realiza por máxima verosimilitud \cite[sección 7.2]{hastie_elements_2009}.
 Con este valor puede calcularse una especie de \emph{pseudo valores de R cuadrado}, como medida de que tan bien el modelo explica la varianza en la variable dependiente.
 Para el modelo presentado en la sección \ref{sec:logística_sin_interacción}, que denominaremos ``sin interacción'', se calcula con el comando
 \begin{lstlisting}[language=R, breaklines=true]
@@ -1087,7 +1087,7 @@ A los fines de comparar el pseudo R cuadrado para cada modelo se los resume en e
 	\label{tab:pseudo_r2}
 \end{table}
 
-Si bien el modelo ``con interacción'' es el que tiene el mayor pseudo R cuadrado, la diferencia con su variente ``sin derivadas'' que contiene coeficientes que no mostraron ser significativas (ver sección \ref{sec:logística_con_interacción}) llevan a optar entre ambos por el menos complejo.
+Si bien el modelo ``con interacción'' es el que tiene el mayor pseudo R cuadrado, la diferencia con su variante ``sin derivadas'' que contiene coeficientes que no mostraron ser significativas (ver sección \ref{sec:logística_con_interacción}) llevan a optar entre ambos por el menos complejo.
 
 Con lo anterior se tomó una decisión sobre cual modelo de regresión logística múltiple utilizar para predecir la percepción de los sismos en la provincia de San Juan, pero no se da una respuesta a si ajusta bien a los datos.
 Un ensayo específico para la bondad de ajuste de modelos de predicción logísticas es la prueba de Hosmer-Lemeshow. 
@@ -1121,7 +1121,7 @@ Para el modelo favorecido por el análisis de bondad de ajuste (sección \ref{se
 	\label{fig:múltiple_metrics}
 \end{figure}
 
-No es evidente un punto óptimo, la presición es muy baja para todos los puntos de corte pero ascendente con el punto de corte, pero la sensibilidad empieza a decaer muy rápido a partir de \(\approx 0.6\).
+No es evidente un punto óptimo, la precisión es muy baja para todos los puntos de corte pero ascendente con el punto de corte, pero la sensibilidad empieza a decaer muy rápido a partir de \(\approx 0.6\).
 Se decidió entonces tomar el punto de corte en \num{0.6}, en pos de mantener una alta sensibilidad, es decir que al predecir una predicción por la población hay una alta probabilidad de que esto sea así a costa de que no se generen reportes y luego la población perciban el sismo, lo que representa una baja precisión.
 Para este punto de corte de \num{0.6} los valores de las métricas se resumen en el cuadro \ref{tab:múltiple_metrics}.
 
@@ -1134,13 +1134,13 @@ Para este punto de corte de \num{0.6} los valores de las métricas se resumen en
 	\num{0.9281177} & \num{0.8943089} & \num{0.9288274} & \num{0.2087287} & \num{0.3384615}\\
 	\bottomrule
 	\end{tabular}
-	\caption{Métricas de predicción en el conjunto de ensayo del modelo de regresión logística múltiple con interacciones entre variablese excluyendo las derivadas de la magnitud del terremoto. Punto de corte en \num{0.6}.
+	\caption{Métricas de predicción en el conjunto de ensayo del modelo de regresión logística múltiple con interacciones entre variables excluyendo las derivadas de la magnitud del terremoto. Punto de corte en \num{0.6}.
 	}
 	\label{tab:múltiple_metrics}
 \end{table}
 
 Se repite el análisis de las métricas de evaluación para el modelo con interacción entre variables y que no descarta las variables derivadas de la magnitud.
-La figura que muestra las métricas de la predicción en función del punto de corte praa este caso, figura \ref{fig:múltiple_metrics_derivadas}, podría decirse que es una copia de la que realizada para el del modelo sin las derivadas de la magnitud, figura \ref{fig:múltiple_metrics}.
+La figura que muestra las métricas de la predicción en función del punto de corte para este caso, figura \ref{fig:múltiple_metrics_derivadas}, podría decirse que es una copia de la que realizada para el del modelo sin las derivadas de la magnitud, figura \ref{fig:múltiple_metrics}.
 Las diferencias son mínimas y esto es un testimonio del poco peso de los coeficientes correspondientes a las variables derivadas de la magnitud, a las relaciones con las otras, en este modelo. 
 
 \begin{figure}[!ht]
@@ -1166,7 +1166,7 @@ El desempeño de predicción es marginalmente mejor en este modelo en términos 
 		\num{0.9282849} & \num{0.8943089} & \num{0.9289981} & \num{0.2091255} & \num{0.3389831}\\
 		\bottomrule
 	\end{tabular}
-	\caption{Métricas de predicción en el conjunto de ensayo del modelo de regresión logística múltiple con interacciones entre variablese incluyendo las derivadas de la magnitud del terremoto. Punto de corte en \num{0.6}.
+	\caption{Métricas de predicción en el conjunto de ensayo del modelo de regresión logística múltiple con interacciones entre variables incluyendo las derivadas de la magnitud del terremoto. Punto de corte en \num{0.6}.
 	}
 	\label{tab:múltiple_metrics_derivadas}
 \end{table}
@@ -1192,7 +1192,7 @@ bstSparse <- xgboost(
   )
 \end{lstlisting}
 donde se indica que se ajustará un modelo de clasificación binaria con la función de pérdida logística, con un máximo de 5 niveles en los árboles y 5 iteraciones.
-Estos parámetros fueron elegidos a través de sucesivas pruebas manuales un busqueda de maximizar la métrica F1 (ver sección \ref{sec:métricas}) al contrastar la predicción, con un umbral de \num{0.5} contra el conjunto de ensayo \verb'ensayo_SJ' generado en la partición estratificada explicada en la sección \ref{sec:partición} con el comando
+Estos parámetros fueron elegidos a través de sucesivas pruebas manuales un búsqueda de maximizar la métrica F1 (ver sección \ref{sec:métricas}) al contrastar la predicción, con un umbral de \num{0.5} contra el conjunto de ensayo \verb'ensayo_SJ' generado en la partición estratificada explicada en la sección \ref{sec:partición} con el comando
 \begin{lstlisting}[language=R, breaklines=true]
 ensayo_SJ_matrix <- as.matrix(ensayo_SJ[ ,..num_feat])
 prediction_xgboost <- predict(bstSparse, ensayo_SJ_matrix)
@@ -1213,7 +1213,7 @@ Para este modelo con todas las variables, incluso los anteriormente deprecadas d
 	\label{tab:xgboost_metrics}
 \end{table}
 
-El siguiente ensayo fue con el modelo de regresión logística múltiple sin las variables derivadas de la \verb'Magnitud', que se entrena con un comando en todo similar al anterior a excepcion de los cambios
+El siguiente ensayo fue con el modelo de regresión logística múltiple sin las variables derivadas de la \verb'Magnitud', que se entrena con un comando en todo similar al anterior a excepción de los cambios
 \begin{lstlisting}[language=R, breaklines=true]
 num_feat = c("Latitud", "Longitud", "Magnitud", "Profundidad")
 ... 
@@ -1234,7 +1234,7 @@ donde el número de niveles en los árboles se redujo a 3 y se mantuvo el resto 
 	\label{tab:xgboost_metrics_sin_derivadas}
 \end{table}
 
-Se aprecia de comprarar los cuadros \ref{tab:múltiple_metrics} y \ref{tab:xgboost_metrics_sin_derivadas} que el modelo de regresión logística múltiple sin las variables derivadas de la \verb'Magnitud' sacrifica la precisión por una mayor sensibilidad, es decir que al predicir que la poblacińo percibirá un sismo hay una alta probabilidad de que esto sea así a costa de que muchos reporten no se efectuen y la población perciba sismas, lo que representa una baja precisión.
+Se aprecia de comparar los cuadros \ref{tab:múltiple_metrics} y \ref{tab:xgboost_metrics_sin_derivadas} que el modelo de regresión logística múltiple sin las variables derivadas de la \verb'Magnitud' sacrifica la precisión por una mayor sensibilidad, es decir que al predecir que la población percibirá un sismo hay una alta probabilidad de que esto sea así a costa de que muchos reporten no se efectúen y la población perciba sismos, lo que representa una baja precisión.
 Se considera que una mayor sensibilidad es más importante a los fines de no emitir una alerta incorrecta a la población de que percibirán un sismo, por lo que se opta por este último modelo de XGBoost para predecir la percepción de sismos en la provincia de San Juan. 
 
 
@@ -1268,11 +1268,11 @@ Como resume el cuadro \ref{tab:metricas_modelos}, todos estos tienen la misma al
 	XDer & \num{0.9804413} & \num{0.1138211} & \num{0.9986346} & \num{0.6363636} & \num{0.1931034} \\
 	\bottomrule
 	\end{tabular}
-	\caption{Métricas de predicción de los modelos seleccionados. Los modelos selecionados fueron los de regresión logística múltiple contemplando interacciones entre pares de variables incluyendo las variables derivadas de la magnitud del terremoto (LDer) o sin estas (LOrig), y los de XGBoost, también con (XDer) o sin estas variables derivadas (XOrig).}
+	\caption{Métricas de predicción de los modelos seleccionados. Los modelos seleccionados fueron los de regresión logística múltiple contemplando interacciones entre pares de variables incluyendo las variables derivadas de la magnitud del terremoto (LDer) o sin estas (LOrig), y los de XGBoost, también con (XDer) o sin estas variables derivadas (XOrig).}
 	\label{tab:metricas_modelos}
 \end{table}
 
-Si por el contrario se busca generar una alerta de que un terremoto será percibido como un sismo por la población, aunque esta resuelte luego en una ``falsa alarma'', debe optarse por un modelo que tenga una alta precisión, aún a costa de una baja sensibilidad.
+Si por el contrario se busca generar una alerta de que un terremoto será percibido como un sismo por la población, aunque esta resulte luego en una ``falsa alarma'', debe optarse por un modelo que tenga una alta precisión, aún a costa de una baja sensibilidad.
 Entre los modelos evaluados, el de XGBoost con todas las variables, incluyendo las derivadas de la \verb'Magnitud', es el que tiene la mayor precisión, como se muestra en el cuadro \ref{tab:metricas_modelos}, aunque sacrifica para esto la sensibilidad.
 
 
@@ -1284,7 +1284,7 @@ El mayor inconveniente enfrentado es la carencia de algún dato sobre la ubicaci
 Sumada esta ubicación para los reportados por la población, junto con la de un sismógrafo indicado como el que responsable primario para determinar magnitud y profundidad en los casos de terremotos percibidos o no, podrían hacerse inferencias en base a la distancia.
 Incluso sería posible calcular una aproximación al ángulo entre sismógrafo y terremoto y así aplicar la relación correcta entre magnitud y amplitud de onda (ver sección \ref{sec:linealización}).
 
-Algo que resta estudiar es la distribución de la proporción de percecpión en función de la estación en el año, pues lo hallado en la sección \ref{sec:temporal} contradijo la hipótesis allí planteada.
+Algo que resta estudiar es la distribución de la proporción de percepción en función de la estación en el año, pues lo hallado en la sección \ref{sec:temporal} contradijo la hipótesis allí planteada.
 Se puede trabajar en la segmentación de los terremotos en trimestres por todos los años como se comenta allí. 
 
 
@@ -1294,20 +1294,20 @@ Se puede trabajar en la segmentación de los terremotos en trimestres por todos 
 \section{Resumen de los hallazgos principales}
 % \textcolor{red}{Esto es un placeholder para una sección aún vacía.}
 Se hallaron dos familias de modelos que predicen la percepción por parte de la población de sismos en la provincia de San Juan, Argentina.
-Se utilizaró para esto datos públicos de sismos y reportes de percepción de la población publicados por el INPRES.
-No se pudo hallar un modelo que conjugue precisión y sensibilidad por lo que de aplicarse uno de ellos hay que optar a cuál de las métricas se le dá primacía.
+Se utilizaron para esto datos públicos de sismos y reportes de percepción de la población publicados por el INPRES.
+No se pudo hallar un modelo que conjugue precisión y sensibilidad por lo que de aplicarse uno de ellos hay que optar a cuál de las métricas se le da primacía.
 
 
 \section{Conclusiones generales y su relación con los objetivos del trabajo}
 %\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
-En relación a los objetivos planteados en la sección \ref{sec:objetivo}, debe admitirse que si bien pudieron producirse modelos de predección de la percepción de sismos, esto se logró solo para una provincia en particular por limitación de los datos geográficos disponibles.
-Pero la mayor limitación a los modelos de predicción hallados es que no se logró un modelo de aplicación a múltiples problemas, que conjugue precisión y sensibilidad, por lo que de aplicarse uno de los modelos desarrolados hay que optar a cuál de las métricas se le dá primacía. 
+En relación a los objetivos planteados en la sección \ref{sec:objetivo}, debe admitirse que si bien pudieron producirse modelos de predicción de la percepción de sismos, esto se logró solo para una provincia en particular por limitación de los datos geográficos disponibles.
+Pero la mayor limitación a los modelos de predicción hallados es que no se logró un modelo de aplicación a múltiples problemas, que conjugue precisión y sensibilidad, por lo que de aplicarse uno de los modelos desarrollados hay que optar a cuál de las métricas se le da primacía. 
 
 
 
 \section{Aplicaciones y relevancia de los resultados}
 %\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
-Los modelos desarrolados que mostraron alta sensibilidad, pero baja precisión, pueden ser útiles si las autoridades quieren mostrar a la población de que los terremotos son monitoreados y que se ponen a los sistemas gubernamentales en alerta.
+Los modelos desarrollados que mostraron alta sensibilidad, pero baja precisión, pueden ser útiles si las autoridades quieren mostrar a la población de que los terremotos son monitoreados y que se ponen a los sistemas gubernamentales en alerta.
 Pueden emitirse alertas de que un terremoto será percibido como un sismo por la población, y habrá una baja probabilidad de que esto resulte en una ``falsa alarma''.
 
 Por el contrario el modelo con alta precisión y baja sensibilidad, al cometer menos errores sobre si un terremoto debiera ser percibido como sismo por la población puede ser útil, no para emitir alerta, pero sí para contrastar con los reportes de percepción de la población y así determinar si hay un faltante de ellos.
@@ -1335,12 +1335,12 @@ Enlace al \href{https://github.com/bettachini/tallerTesis/tree/main/sismosURL}{r
 
 
 
-\section{Tablas y gráficos adicionales}
-\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
-
-
-\section{Otros materiales relevantes}
-\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+%\section{Tablas y gráficos adicionales}
+%\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
+%
+%
+%\section{Otros materiales relevantes}
+%\textcolor{red}{Esto es un placeholder para una sección aún vacía.}
 
 
 \end{document}
