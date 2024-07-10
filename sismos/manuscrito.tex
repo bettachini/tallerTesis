@@ -139,7 +139,7 @@ El estudio de estas ondas es el área llamada sismología y de ahí el termino s
 % \end{wrapfigure}
 \end{figure}
 
-Sea que las ondas de compresión longitudinal de la corteza, las tipo P, o las del tipo S transversales y más lentas, ambas arriban con mayor intensidad al punto de la superficial terrestre que se encuentra directamente sobre el hipocentro, que se denomina epicentro \cite[sección 4.1.2]{fowler_solid_1990} como ilustra la figura \ref{fig:epicentro_hipocentro}.
+Sean las generadas ondas de compresión longitudinal de la corteza, las tipo P, o las del tipo S, transversales y más lentas, ambas arriban con mayor intensidad al punto de la superficial terrestre que se encuentra directamente sobre el hipocentro, que se denomina epicentro \cite[sección 4.1.2]{fowler_solid_1990} como ilustra la figura \ref{fig:epicentro_hipocentro}.
 Cuanto más próximo es un punto en la superficie al hipocentro, la amplitud de las ondas sísmicas registradas en la superficie es mayor.
 Tanto esta amplitud como el período de oscilación son mucho mayores que el de otros desplazamientos de la corteza como los de las mareas solares y lunares de la corteza \cite[sección 4.1.4]{fowler_solid_1990}.
 Como resultado, estructuras artificiales pueden agitarse poniendo en riesgo su estabilidad estructural y haciendo caer elementos que no estaban fijados a esta o perdieron tal adhesión a causa de la agitación misma.
@@ -325,7 +325,7 @@ Pero se considera un avala más crucial un documento de la \emph{Comisión de tr
 
 \paragraph{Unidad de magnitud más corrientemente utilizada}
 A medida que se fueron instalando más estaciones sismográficas en todo el mundo, se hizo evidente que el método desarrollado por Richter sólo era estrictamente válido para determinados rangos de frecuencia y distancia.
-Para aprovechar el creciente número de estaciones sismográficas distribuidas por todo el mundo, se desarrollaron nuevas escalas de magnitud que son una extensión de la idea original de Richter en adelante denominada \(M_L\).
+En consecuencia se desarrollaron nuevas escalas de magnitud que son una extensión de la idea original de Richter en adelante denominada \(M_L\).
 Entre ellas se incluyen la magnitud de onda de cuerpo, \(m_b\) y la magnitud de onda de superficie \(M_s\) (ver sección \ref{sec:ingeniería}).
 Cada una de ellas es válida para un rango de frecuencias y un tipo de señal sísmica concretos.
 En su rango de validez, cada una es equivalente a la magnitud Richter.
@@ -389,19 +389,21 @@ Resumiendo las nuevas variable generadas fueron:
 % \section{Descripción de la selección de características (si corresponde)}
 
 \paragraph{Distribución geográfica de los datos}
-Como es esperable la mayor parte de los hipocentros se ubican en regiones con orografía elevada, como la cordillera de los Andes, producto de la subducción de la placa de Nazca bajo la placa Sudamericana, o las sierras cordobesas producto de procesos mucho más antiguos. 
+Como es esperable, la mayor parte de los hipocentros se ubican en regiones con orografía elevada, como la cordillera de los Andes, producto de la subducción de la placa de Nazca bajo la placa Sudamericana, o las sierras cordobesas, producto de procesos mucho más antiguos. 
 Una ubicación de los mismos sobre un mapa físico lo ilustra en la figura \ref{fig:mapa_sismos}.
 Esto conlleva a que la mayor parte de los terremotos estén alejados de las mayores urbanizaciones reduciendo la probabilidad de que sean percibidos por la población.
+
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.8\textwidth]{mapa_sismos.png}
-\caption{Superponer las ubicaciones de los terremotos en un mapa físico muestra que la mayoría de los terremotos se registran en zonas de montaña o cerros en su mayoría alejados de las mayores urbanizaciones lo que afecta negativamente la estadística de los percibidos.
+\caption{Superponer las ubicaciones de los terremotos en un mapa físico muestra que la mayoría de los terremotos se registran en zonas de montaña o cerros en su mayoría alejados de las mayores urbanizaciones, lo que afecta negativamente la estadística de los percibidos.
 La escala de colores muestra los más superficiales en azul y profundos en rojo.
 Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
 \label{fig:mapa_sismos}
 \end{figure}
 
-La ubicación de los terremotos sobre un mapa político que muestra la figura \ref{fig:terremotosMapa} deja a las claras que no tienen una distribución homogénea aún en provincias con abundante actividad.
+La ubicación de los terremotos sobre un mapa político que muestra la figura \ref{fig:terremotosMapa} deja a las claras que no tienen una distribución homogénea, aún en provincias con abundante actividad.
+
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.8\textwidth]{terremotosMapa.png}
@@ -414,26 +416,26 @@ Reproducido de \cite{daniela_parada_ic-datasets-docencia_nodate}}
 
 
 \paragraph{El problema de la distancia}
-Evidentemente la proximidad de un epicentro a una población es un factor relevante en la percepción de un sismo.
+Evidentemente, la proximidad de un epicentro a una población es un factor relevante en la percepción de un sismo.
 El INPRES tiene una metodología operativa para registrar la ubicación de los usuarios que reportan haber percibido un sismo a través de su página web \cite{noauthor_acerca_nodate}.
 Su buscador de sismos indica los sismos ``sentidos'' por usuarios con un color en sus resultados de búsqueda como ilustra la figura \ref{fig:resultado_búsqueda}.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=\textwidth]{resultado_búsqueda.png}
-\caption{Resultados de una búsqueda manual de sismos en el sitio del INPRES. El indicado en rojo fue percibido por la población. En la columna \emph{intensidad} se dan datos de ubicación de la población que lo percibió.}
+\caption{Resultados de una búsqueda manual de sismos en el sitio del INPRES. El indicado en rojo fue percibido por la población. En la columna \emph{intensidad} se dan datos de ubicación de la población que lo percibió, pero en una nomenclatura interna del INPRES que no pudo traducirse a una ubicación geográfica precisada por su latitud y longitud.}
 \label{fig:resultado_búsqueda}
 \end{figure}
 
-Lamentablemente en el conjunto de datos curados no figura la ubicación del sismógrafo o la población que hizo el registro lo que imposibilita incorporar la distancia al epicentro como una variable en el modelo.%sin realizar un nuevo \emph{scrapping} de estos datos en el sitio del INPRES.
+Lamentablemente, en el conjunto de datos curados no figura la ubicación del sismógrafo o la población que hizo el registro lo que imposibilita incorporar la distancia al epicentro como una variable en el modelo.%sin realizar un nuevo \emph{scrapping} de estos datos en el sitio del INPRES.
 Puesto que no se tiene control posible sobre la posición de quienes potencialmente percibieron un sismo se decidió para reducir el impacto del parámetro distancia limitar el espacio geográfico de los terremotos.
 Las posibles fuentes de datos para realizar tal operación son su latitud, longitud y provincia.
 
 
 \paragraph{Elección de la provincia de San Juan}
-Respondiendo a la discutido en el párrafo anterior se buscó trabajar en un extensión geográfica relativamente limitada, pero cuidando que el un número de sismos restantes sea aún elevado.
+Respondiendo a la discutido en el párrafo anterior se buscó trabajar en un extensión geográfica relativamente limitada, pero cuidando que el número de sismos restantes sea aún elevado.
 Tras una inspección visual de la figura \ref{fig:terremotosMapa} se determinó  que la provincia de San Juan cumple con tales requisitos, por lo que se procedió a filtrar los datos con el comando \lstinline[language = R]'sismos_SJ <- sismos[Provincia == "San Juan"]'.
-El subconjunto de datos de esta provincia representa un \(\approx 54 \%\) de los datos hasta aquí disponibles.
+El subconjunto de datos de esta provincia representa aproximadamente un \(54 \%\) de los datos hasta aquí disponibles.
 Con \num{29917} registros es aún un número suficiente para realizar análisis cono los métodos elegidos.
 
 % Se eligió entonces la provincia de San Juan por presentar un elevado número de casos percibidos o no en el conjunto de datos, por tener una extensión geográfica reducida en comparación con otras así como contar con una alta homogeneidad espacial en el reporte de sismos hace que el factor distancia entre epicentro y población que reporta tenga menor impacto que en otras provincias.
@@ -478,7 +480,7 @@ Saltan a la vista que hay valores extremos en el extremo superior de la variable
 
 \paragraph{Desequilibrio en la clase de clasificación}
 Sobre el total de registros solo un valor cercano al \(98\%\) fueron percibidos por el instrumental y no por la población.
-Restan tan solo unos 619 registros que efectivamente fueron percibidos por la población.
+Restan tan solo unos \num{619} registros que efectivamente fueron percibidos por la población.
 Este desequilibrio llama al uso de técnicas de balanceo de clases en los modelos de clasificación a utilizar.
 
 
@@ -584,7 +586,7 @@ Se busca omitir tales orígenes en los datos informados.
 
 Siendo que la variable se informa como enteros de kilómetros, estos representarían los hipocentros hasta una profundidad de \SI{500}{\metre}, compatibles con estas actividades artificiales.
 La omisión de estas fuentes a baja profundidad es una práctica usual en el análisis de datos orientados a sismos originados en terremotos \cite{hu_applying_2024}.
-El pequeño número que estos representan  el conjunto de datos se aprecia en el histograma según profundidad en la figura \ref{fig:histograma_profundidad50km}.
+El pequeño número que estos representan  en el conjunto de datos se aprecia en el histograma de profundidad que reproduce la figura \ref{fig:histograma_profundidad50km}.
 Son filtrados con la instrucción \lstinline[language = R]'sismos_SJ <- sismos_SJ[Profundidad > 0]'.
 \begin{figure}[!ht]
 % \begin{wrapfigure}[22]{r}[10pt]{0.48\textwidth}
@@ -664,7 +666,7 @@ Se decidió utilizar entonces un ficticio \(\tilde{q}(\Delta,h) = \) \lstinline[
 
 De querer despejar la amplitud de las ondas, \(A\), debiera tenerse información sobre el período de las ondas, \(T\), algo que no figura en el conjunto de datos.
 No se encontró otra alternativa que asumir que todos los fenómenos registrados tienen el mismo y en consecuencia asumir \(T_\text{constante}\).
-Así realizando despejes a partir de la ecuación \ref{eq:richter} y asumiendo tales condicionantes, se puede obtener un valor linealmente relacionado con amplitud registrada por un sismógrafo, \(A_\text{máx}\),
+Así realizando despejes a partir de la ecuación \ref{eq:richter} y asumiendo tales condicionantes, se puede obtener un valor linealmente relacionado con la amplitud registrada por un sismógrafo, \(A_\text{máx}\),
 \begin{equation}
 	\left( \frac{A_\text{máx}}{T_\text{constante}} \right) = 10^{(m_b - \tilde{q}(\Delta, h))}.
 	\label{eq:linealizacionMagnitud_final} 
@@ -765,7 +767,8 @@ Se ensayará retira de entre las variables utilizadas estas variables derivadas 
 
 \subsection{Escalamiento}\label{sec:escalamiento}
 Previo a la partición (splitting) se realiza un escalado uniforme sobre todo el conjunto de datos (scaling) de las variables numéricas, excluyendo las de fecha y hora con las que no se trabajará de aquí en adelante.
-Con esto variables de entrada a los modelos tendrán una media de cero y una desviación estándar de uno, lo que tiene consecuencias para interpretabilidad del modelo de regresión:
+Restando a cada valor de la variable su media y dividiendo por su desviación estándar se obtiene una variable con media cero y desviación estándar uno. 
+Esto tiene consecuencias para interpretabilidad del modelo de regresión:
 \begin{itemize}
 	\item los coeficientes serán comparables entre sí, no dependiendo de la escala de los datos,
 	\item el intercepto del modelo será la predicción esperada para el caso en que los factores contemplados sean nulos, es decir, no tengan efecto,
@@ -779,9 +782,9 @@ sismos_SJ_escalado <- scale(sismos_SJ[, .(Latitud, Longitud, Profundidad, Magnit
 
 \subsection{Partición con estratificación}\label{sec:partición}
 
-Dado el fuerte desequilibrio de la clase Percibido comentado en la sección \ref{sec:AED}, ante una división de los datos en subconjuntos entrenamiento y prueba estocástica está el riesgo de que el subconjunto de prueba quede con muy pocos casos positivos y no sea representativo de la distribución de la clase en el conjunto de datos. 
+Dado el fuerte desequilibrio de la clase \texttt{Percibido} comentado en la sección \ref{sec:AED}, ante una división de los datos en subconjuntos entrenamiento (train) y ensayo (test), está el riesgo de que el subconjunto de prueba quede con muy pocos casos positivos y no sea representativo de la distribución de la clase en el conjunto de datos. 
 Para evitar esto se realiza una división estratificada, esto es, 
-manteniendo en los subconjuntos de entrenamiento (train) y ensayo (test) una proporción similar a la original de los casos de \verb'Percibido'.
+manteniendo en los subconjuntos de entrenamiento y ensayo una proporción similar a la original de los casos de \verb'Percibido'.
 Las evaluaciones sobre la calidad de los modelos de clasificación generados se realizarán sobre un subconjuntos de ensayo con el \(20 \%\) de los datos de la provincia de San Juan, el resto se utilizará para el entrenamiento.
 aplicando la función \lstinline[language = R]'CreateDataPartion' de la biblioteca \lstinline[language = R]'caret' en el comando
 
@@ -810,12 +813,12 @@ Se generó así un nuevo conjunto de datos de entrenamiento \lstinline[language 
 % \section{Descripción de las métricas de evaluación de los modelos (si corresponde)}
 
 Independientemente del modelo de clasificación que se utilice, la evaluación de su desempeño se realiza a partir de la comparación de las predicciones del modelo con los valores reales de la variable objetivo.
-Se reservará un subconjunto de los datos para evaluar el desempeño del modelo, el conjunto de prueba y generar una matriz de confusión.
+%Se reservará un subconjunto de los datos para evaluar el desempeño del modelo, el conjunto de prueba y generar una matriz de confusión.
 
 
 \paragraph{Matriz de confusión}
 La matriz de confusión es una tabla que muestra el número de verdaderos positivos, falsos positivos, verdaderos negativos y falsos negativos del modelo.
-A partir de esta matriz se pueden calcular como razones entre verdaderos y falso positivos y negativos la exactitud, precisión, sensibilidad, especificidad y el valor F1.
+A partir de esta matriz se pueden calcular como razones entre verdaderos y falso positivos y negativos la exactitud, precisión, sensibilidad, especificidad y el valor F1, entre otras métricas de desempeño.
 
 
 \paragraph{Exactitud (accuracy)}
