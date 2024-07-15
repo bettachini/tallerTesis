@@ -1,0 +1,40 @@
+From dparada@dm.uba.ar Mon Jul 15 08:02:23 2024
+Date: Mon, 15 Jul 2024 08:00:00 -0300
+From: Daniela Laura Parada <dparada@dm.uba.ar>
+To: bettachini@gmail.com
+Subject: Devolución E4 + Nota de la materia
+
+¡Hola Víctor! Te escribo en relación con tu entrega 4 y el cierre de la
+materia.La entrega está excelente en cuanto al scope del trabajo final de
+especialización, ¡LO LOGRASTE! Está realmente para que lo mandes YA: sé que no
+era lo que tenías en mente al inicio, pero lograste armar algo conciso,
+consistente, con datos reales. Y valioso: ojalá lo suban pronto a la web porque
+es algo que ya pienso usar como ejemplo en las clases de grado de regresión
+logística ;) 
+También sos muy sincero en los alcances y limitaciones de lo que hacés, como
+corresponde, y de lo que se puede hacer con tus modelos, y lo que no, pero te
+aseguro que para cualquiera que se acerque por primera vez a estos temas puede
+encontrar en tu trabajo un aporte interesante que ejemplifica esas virtudes y
+carencias.
+Te dejo algunos comentarios para que YA lo mandes, aunque de seguro sean cosas
+que ya tengas en cuenta:
+ *  Usaría algún entorno tipo verbatim para las partes en las que incluís
+    código. Y cuando referís a variables del código o a código en el texto
+    central, usaría el monoespaciado que da texttt (que en muchas partes lo
+    usás, pero no siempre).
+ *  Revisá que todas las tablas entren en el ancho de caja sin desborde, hay
+    algunas desbordadas que si son muy anchas podés usar el "scale" para que se
+    redimensione al ancho de caja.
+ *  En las tablas hay algunos números negativos que, como no están en formato $
+    $, quedan con el signo menos "cortito", y no el guión medio largo que es el
+    usual en el entorno matemático.
+ *  En la página 25, cuando al final hablás del estadístico y ponés "beta sobre
+    sigma beta", todo ello debería ir con sombreros (estimadores); es decir, el
+    beta del numerador, el sigma del denominador y el beta del subíndice del
+    sigma del denominador.
+Por último, la nota final de la materia es 9 (nueve). La penalización respecto
+de la nota máxima no se debe a ninguna otra razón más que la "no entrega" y/o
+entrega tardía de la E2.
+¡Saludos y muchos éxitos!
+Daniela
+

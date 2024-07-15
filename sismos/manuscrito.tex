@@ -7,7 +7,9 @@
 %% listado de código
 %% https://es.wikibooks.org/wiki/Manual_de_LaTeX/Listados_de_c%C3%B3digo/Listados_con_listings
 \usepackage{listings}
-\lstset{literate=
+\lstset{
+	basicstyle=\ttfamily,
+	literate=
   {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
   {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
   {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
@@ -42,7 +44,7 @@
 \usepackage[style=numeric, backend=biber, sorting= none, url= true, maxnames=20]{biblatex}
 \DefineBibliographyStrings{spanish}{}
 \usepackage{csquotes}
-\usepackage{textgreek} % https://tex.stackexchange.com/questions/107352/non-ascii-characters-in-biblatex 
+\usepackage{textgreek} % https://tex.stackexchange.com/questions/107352/non-ascii-characters-in-biblatex  
 \addbibresource{sismos.bib}
 
 %% physics
@@ -90,7 +92,9 @@
     \huge\textbf{Predicción de la percepción de sismos por la población a partir de datos básicos de terremotos}
     
     \vspace{0.5in}
-		Trabajo final de la asignatura\\``Taller de tesis''\\
+		Trabajo final para optar por el título de\\
+		\emph{Especialista en Explotación de Datos y Descubrimiento del Conocimiento}\\
+		% Trabajo final de la asignatura\\``Taller de tesis''\\
     \vspace{0.5in}
 		\includegraphics[width=\textwidth]{logos}\\
     \vspace{0.5in}
@@ -129,14 +133,11 @@ Esto sucede a cierta profundidad en la corteza terrestre en el punto denominado 
 El estudio de estas ondas es el área llamada sismología y de ahí el termino sismo para un evento particular detectado, pero que debiera aclararse si se produjo por un terremoto u otra fuente de ondas \cite[sección 4.1.1]{fowler_solid_1990}.
 
 \begin{figure}[!ht]
-% \begin{wrapfigure}[15]{r}{0.4\textwidth}
   \centering
 	\includegraphics[width=0.6\textwidth]{eq-ed-fault-labeled.png}
 	\caption{El epicentro es el punto de la superficie inmediatamente sobre el hipocentro que es el punto a cierta profundidad al que se adscribe un terremoto.
-	Reproducido de \cite{lisa_wald_science_nodate}.
-	}
+	Reproducido de \cite{lisa_wald_science_nodate}.}
 	\label{fig:epicentro_hipocentro}
-% \end{wrapfigure}
 \end{figure}
 
 Sean las generadas ondas de compresión longitudinal de la corteza, las tipo P, o las del tipo S, transversales y más lentas, ambas arriban con mayor intensidad al punto de la superficial terrestre que se encuentra directamente sobre el hipocentro, que se denomina epicentro \cite[sección 4.1.2]{fowler_solid_1990} como ilustra la figura \ref{fig:epicentro_hipocentro}.
@@ -156,7 +157,6 @@ El caso inverso es también problemático, en que ante una carencia de una comun
 
 Contar con una estimación rápida a partir de los datos sísmicos registrados por instrumental de si un dado evento será percibido por la población o no permitiría a las autoridades tomar decisiones informadas sobre la comunicación a la población.
 Este trabajo busca determinar el grado de certeza con que ciertos métodos de ciencias de datos pueden predecir si la población percibirá actividad sísmica producto de terremotos a partir de unos pocos datos básicos sobre los mismos publicados por el Instituto Nacional de Prevención Sísmica (INPRES) que es el organismo público de la República Argentina que realiza estudios e investigaciones básicas y aplicadas de sismología \cite{noauthor_instituto_2022}.
-
 
 
 \section{Estructura del documento}
@@ -258,9 +258,9 @@ Para implementar tal función en código en lenguaje \emph{R}, el utilizado en e
 Esta tiene por argumentos \emph{formula} y \emph{data}, los mismo que la popular función \emph{lm} incluida en el paquete base de R para modelos lineales.
 Pero como glm2 genera modelos lineales generalizados, requiere un argumento adicional, \emph{family}, para indicar la distribución del error de la variable a predecir:
 \begin{itemize}
-	\item Binomial: link=logit
-	\item Poisson: link=log
-	\item Gaussiana: link=identidad
+	\item Binomial: \lstinline[language=R]{link = "logit"}
+	\item Poisson: \lstinline[language=R]{link = "log"}
+	\item Gaussiana: \lstinline[language=R]{link = "identity"}
 \end{itemize}
 La correspondiente función de enlace (link) relaciona el modelo lineal con función de probabilidad.
 Como se busca predecir un resultado booleano se indica la distribución binomial.
@@ -347,35 +347,35 @@ Tras descargar el archivo de datos en formato CSV se le importó en una estructu
 Esta estructura de datos permite una consulta de los datos análoga a la del lenguaje SQL de bases de datos relacionales lo que le hace una herramienta versátil para el análisis de datos tabulares \cite{noauthor_introduction_2024}.
 
 %\paragraph{Valores faltantes o duplicados}
-La presencia de valores faltantes indicados con el símbolo \verb'NA' se descartó cuando la ejecución \lstinline[language = R]'sum(is.na(sismos_arg))' arrojó un cero como resultado.
-Por el contrario ejecutar \lstinline[language = R]!sismos_arg[duplicated(sismos_arg, fromLast = TRUE)]! mostró unos \num{23} registros duplicadas sobre un total de \num{55817} registros.
+La presencia de valores faltantes indicados con el símbolo \verb'NA' se descartó cuando la ejecución \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'sum(is.na(sismos_arg))' arrojó un cero como resultado.
+Por el contrario ejecutar \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]!sismos_arg[duplicated(sismos_arg, fromLast = TRUE)]! mostró unos \num{23} registros duplicadas sobre un total de \num{55817} registros.
 
-En una nueva tabla con nombre más corto, \lstinline[language = R]'sismos', se copiaron los registros sin duplicados ejecutando \lstinline[language = R]'sismos_arg[!duplicated(sismos_arg)]'.
+En una nueva tabla con nombre más corto, \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'sismos', se copiaron los registros sin duplicados ejecutando \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'sismos_arg[!duplicated(sismos_arg)]'.
 
 
 \subsection{Inspección y cambio de formato de datos}\label{sec:formateo}
 % \paragraph{Inspección de tipos de datos}
-Ejecutar la función \lstinline[language = R]'colnames' con la \emph{data.table} denominada \lstinline[language = R]'sismos_arg' como argumento permitió verificar que contuviera las columnas con los nombres anunciados en el sitio que publica los datos en su sección \cite[Exploración inicial]{daniela_parada_ic-datasets-docencia_nodate}.
-Las transformaciones o ingeniería de características que se detallan luego en esta sección se realizaron en función de los tipos de datos de cada columnas constatados con la función \lstinline[language = R]'str'.
+Ejecutar la función \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'colnames' con la \emph{data.table} denominada \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'sismos_arg' como argumento permitió verificar que contuviera las columnas con los nombres anunciados en el sitio que publica los datos en su sección \cite[Exploración inicial]{daniela_parada_ic-datasets-docencia_nodate}.
+Las transformaciones o ingeniería de características que se detallan luego en esta sección se realizaron en función de los tipos de datos de cada columnas constatados con la función \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'str'.
 
 
 \paragraph{Fecha y hora del sismo}
 Si se quieren utilizar las variables \emph{Fecha} y \emph{Hora} para segmentar el día en franjas horarias, o comparar interanuales, es útil convertirles en funciones de continuas, días corridos en el año, para la primera, y segundos, para la segunda 
 
-La variable Fecha se reconocíó al importarse el conjunto de datos en formato ISO 8601 por lo que registrar una nueva variable para el año y otra para el día del año, fue sencillo con las funciones \lstinline[language = R]'year' y \lstinline[language = R]'yday' de la biblioteca base de R. 
+La variable Fecha se reconocíó al importarse el conjunto de datos en formato ISO 8601 por lo que registrar una nueva variable para el año y otra para el día del año, fue sencillo con las funciones \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'year' y \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'yday' de la biblioteca base de R. 
 
-A partir de la variable Hora se escribió una función que genera otra continua contando el número entero de segundos transcurridos desde la medianoche del día en que se produjo el terremoto, \emph{Segundos del día}, apoyándose para esto en la función \lstinline[language = R]'strptime' del paquete base de R.
+A partir de la variable Hora se escribió una función que genera otra continua contando el número entero de segundos transcurridos desde la medianoche del día en que se produjo el terremoto, \emph{Segundos del día}, apoyándose para esto en la función \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'strptime' del paquete base de R.
 Esto habilita posibles análisis segmentando el día en franjas horarias.
-% Se verificó que los valores en la columna generada con \lstinline[language = R]'sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]' estuvieran en el rango de \num{0} a \SI{86400}{\second}, es decir, el de un día completo.
+% Se verificó que los valores en la columna generada con \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'sismos[, Hora_decimal := sapply(Hora, convert_to_seconds)]' estuvieran en el rango de \num{0} a \SI{86400}{\second}, es decir, el de un día completo.
 
 
 Resumiendo las nuevas variable generadas fueron:
 \begin{itemize}
 	\item \emph{Segundos del día}: número entero de 0 a 86399
 	\item \emph{Día del año}: número entero de 1 a 366\\
-		\lstinline[language = R]'sismos[, `Día del año` := yday(as.Date(Fecha, format = "%Y-%m-%d")), ]'
+		\lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'sismos[, `Día del año` := yday(as.Date(Fecha, format = "%Y-%m-%d")), ]'
 	\item \emph{Año}: número entero de 2012 a 2022\\
-	\lstinline[language = R]'sismos[, Año := year(as.Date(Fecha, format = "%Y-%m-%d"))]'
+	\lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'sismos[, Año := year(as.Date(Fecha, format = "%Y-%m-%d"))]'
 \end{itemize}
 
 
@@ -434,7 +434,7 @@ Las posibles fuentes de datos para realizar tal operación son su latitud, longi
 
 \paragraph{Elección de la provincia de San Juan}
 Respondiendo a la discutido en el párrafo anterior se buscó trabajar en un extensión geográfica relativamente limitada, pero cuidando que el número de sismos restantes sea aún elevado.
-Tras una inspección visual de la figura \ref{fig:terremotosMapa} se determinó  que la provincia de San Juan cumple con tales requisitos, por lo que se procedió a filtrar los datos con el comando \lstinline[language = R]'sismos_SJ <- sismos[Provincia == "San Juan"]'.
+Tras una inspección visual de la figura \ref{fig:terremotosMapa} se determinó  que la provincia de San Juan cumple con tales requisitos, por lo que se procedió a filtrar los datos con el comando \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'sismos_SJ <- sismos[Provincia == "San Juan"]'.
 El subconjunto de datos de esta provincia representa aproximadamente un \(54 \%\) de los datos hasta aquí disponibles.
 Con \num{29917} registros es aún un número suficiente para realizar análisis cono los métodos elegidos.
 
@@ -474,8 +474,8 @@ Nuevamente será una virtud de los modelos si pueden explotar tal información p
 
 \section{Análisis exploratorio de datos}\label{sec:AED}
 
-Un primer vistazo sobre los datos con \lstinline[language = R]'summary(sismos_SJ)' permitió obtener un resumen de las variables numéricas y categóricas.
-Saltan a la vista que hay valores extremos en el extremo superior de la variable \lstinline[language = R]'Magnitud' bastante alejados de la mediana y que hay un fuerte desequilibrio en la variable ``Percibido'', la de clase de clasificación, en favor de los terremotos no percibidos.
+Un primer vistazo sobre los datos con \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'summary(sismos_SJ)' permitió obtener un resumen de las variables numéricas y categóricas.
+Saltan a la vista que hay valores extremos en el extremo superior de la variable \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'Magnitud' bastante alejados de la mediana y que hay un fuerte desequilibrio en la variable ``Percibido'', la de clase de clasificación, en favor de los terremotos no percibidos.
 
 
 \paragraph{Desequilibrio en la clase de clasificación}
@@ -543,10 +543,12 @@ Este se alimenta con la tabla de contingencia de la figura \ref{fig:tabla_contin
 	\centering
 	\begin{tabular}{lcccc}
 		\toprule
-		Trimestre & 1.ero & 2.do & 3.ero & 4.to \\
+		Trimestre & 1"o & 2"o & 3"o & 4"o \\
+		% https://www.rae.es/dpd/ordinales
+		% https://personal.us.es/doubova/Latex/spanish.pdf
 		\midrule
-		Percibido & 215 & 154 & 112 & 138 \\
-		No percibido & 8046 & 7399 & 6745 & 7108 \\
+		Percibido & \num{215} & \num{154} & \num{112} & \num{138} \\
+		No percibido & \num{8046} & \num{7399} & \num{6745} & \num{7108} \\
 		\bottomrule
 	\end{tabular}
 	\caption{Tabla de contingencia de sismos percibidos por trimestre.}
@@ -575,7 +577,7 @@ Pero es posible que el número de muestras en cada trimestre sea insuficiente pa
 % En estos casos se hace uso de un criterio que parte de condicionamientos sobre el sistema físico o se implementa un modelo en base a la física del sistema.
 % Dos de las variables de este conjunto de datos son afectadas por este tipo de modificación, que se describe posteriormente en una subsección.
 
-% Se generaron dos nuevas columnas a partir de las existentes en el conjunto de datos original, una en función al formato de los datos en la columna \lstinline[language = R]'Hora' y otra en función de la escala física utilizada en la columna \lstinline[language = R]'Magnitud'.
+% Se generaron dos nuevas columnas a partir de las existentes en el conjunto de datos original, una en función al formato de los datos en la columna \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'Hora' y otra en función de la escala física utilizada en la columna \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'Magnitud'.
 
 
 \subsection{Descarte de terremotos de poca profundidad}
@@ -587,7 +589,7 @@ Se busca omitir tales orígenes en los datos informados.
 Siendo que la variable se informa como enteros de kilómetros, estos representarían los hipocentros hasta una profundidad de \SI{500}{\metre}, compatibles con estas actividades artificiales.
 La omisión de estas fuentes a baja profundidad es una práctica usual en el análisis de datos orientados a sismos originados en terremotos \cite{hu_applying_2024}.
 El pequeño número que estos representan  en el conjunto de datos se aprecia en el histograma de profundidad que reproduce la figura \ref{fig:histograma_profundidad50km}.
-Son filtrados con la instrucción \lstinline[language = R]'sismos_SJ <- sismos_SJ[Profundidad > 0]'.
+Son filtrados con la instrucción \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'sismos_SJ <- sismos_SJ[Profundidad > 0]'.
 \begin{figure}[!ht]
 % \begin{wrapfigure}[22]{r}[10pt]{0.48\textwidth}
 	\centering
@@ -662,7 +664,7 @@ Pero la mínima magnitud, hallada con
 	magnitud_mínima = min(sismos_SJ[,Magnitud, ])
 \end{lstlisting}	
 resultó ser menor que ese promedio, \(\overline{q}(\Delta,h) = 7\), por lo que si se lo restara se obtendrían valores negativos para el valor a la izquierda de la ecuación y esto sería algo sin validez física (¡amplitudes negativas!).
-Se decidió utilizar entonces un ficticio \(\tilde{q}(\Delta,h) = \) \lstinline[language = R]'magnitud_mínima'.  
+Se decidió utilizar entonces un ficticio \(\tilde{q}(\Delta,h) = \) \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'magnitud_mínima'.  
 
 De querer despejar la amplitud de las ondas, \(A\), debiera tenerse información sobre el período de las ondas, \(T\), algo que no figura en el conjunto de datos.
 No se encontró otra alternativa que asumir que todos los fenómenos registrados tienen el mismo y en consecuencia asumir \(T_\text{constante}\).
@@ -672,24 +674,24 @@ Así realizando despejes a partir de la ecuación \ref{eq:richter} y asumiendo t
 	\label{eq:linealizacionMagnitud_final} 
 \end{equation}
 Con el comando
-%\lstinline[language = R]'
+%\lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'
 \begin{lstlisting}[breaklines=true, language=R]
 sismos_SJ[, Proxy\_amplitud := 10^(Magnitud- magnitud_mínima)]
 \end{lstlisting}
 %'
-se generó una columna para este valor denominada \lstinline[language = R]'Proxy amplitud', que por lo comentado anteriormente tiene por valor mínimo \num{1}. 
+se generó una columna para este valor denominada \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'Proxy amplitud', que por lo comentado anteriormente tiene por valor mínimo \num{1}. 
 
 
 
 \subsection{Percepción sísmica, ¿de amplitud o energía?}
 Es posible también que que en el límite entre percepción o no (I o II de la escala MMI \cite{noauthor_intensidad_2022}) pueda explicarse mejor en función de la energía de la onda sísmica que de la amplitud, por lo que podría esperarse una mejor correlación con el cuadrado de esta última variable derivada.
 Para ensayarlo se generó con
-%\lstinline[language = R]'
+%\lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'
 \begin{lstlisting}[breaklines=true, language=R]
 sismos_SJ[, `Proxy energía` := `Proxy amplitud`^2]
 \end{lstlisting}
 %' 
-la nueva variable \lstinline[language = R]'Proxy energía', 
+la nueva variable \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'Proxy energía', 
 
 
 \section{Variables a correlacionar con la percepción}\label{sec:correlaciones}
@@ -711,11 +713,11 @@ Como una medida preliminar de la valía de cada variable para los fines de clasi
 \begin{table}[!ht]
 	\centering
 	\resizebox{\textwidth}{!}{
-		\begin{tabular}{llllll}
+		\begin{tabular}{cccccc}
 			\toprule
       Magnitud & Proxy amplitud & Proxy energía & Longitud & Latitud & Profundidad\\ 
 			\midrule
-			0.40571008 & 0.16537190 &  0.06037060 & 0.05548810 & -0.01035141 & -0.14235874\\
+			\num{0.40571008} & \num{0.16537190} & \num{0.06037060} & \num{0.05548810} & \num{-0.01035141} & \num{-0.14235874}\\
 			\bottomrule
 		\end{tabular}
 	}
@@ -729,7 +731,7 @@ La latitud es casi irrelevante, siendo más relevante que cuanto al oeste se det
 Cuanto más al oeste, se está más adentrado en la cordillera de los Andes, donde menos población se ubica, así que el incremento de la percepción no se debiera a una mayor proximidad entre terremoto y quién lo reporta.
 Lo que también cabe esperarse es que allí los terremotos sean de mayor magnitud, por lo que la explicación de la mayor percepción con mayor longitud tendría esta variable como mediadora en la relación.
 Sin embargo la correlación entre longitud y magnitud, calculada por
-%\lstinline[language = R]'
+%\lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'
 \begin{lstlisting}[breaklines=true, language=R]
 cor(sismos_SJ[, .(`Longitud`,`Magnitud`)], use = "complete.obs")
 \end{lstlisting}
@@ -774,7 +776,7 @@ Esto tiene consecuencias para interpretabilidad del modelo de regresión:
 	\item el intercepto del modelo será la predicción esperada para el caso en que los factores contemplados sean nulos, es decir, no tengan efecto,
 	\item y finalmente si se hace uso de regularización se evita que los coeficientes de las variables de mayor escala tengan un peso desproporcionado en la función de pérdida \cite[sección 3.4.1]{hastie_elements_2009}.
 \end{itemize}
-Para esto se hace uso de \lstinline[language = R]'scale', función del conjunto base de R, para generar \lstinline[language = R]'sismos_SJ_escalado' con el comando
+Para esto se hace uso de \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'scale', función del conjunto base de R, para generar \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'sismos_SJ_escalado' con el comando
 \begin{lstlisting}[breaklines=true, language=R]
 sismos_SJ_escalado <- scale(sismos_SJ[, .(Latitud, Longitud, Profundidad, Magnitud, `Proxy amplitud`, `Proxy energía`)])
 \end{lstlisting} 
@@ -786,7 +788,7 @@ Dado el fuerte desequilibrio de la clase \texttt{Percibido} comentado en la secc
 Para evitar esto se realiza una división estratificada, esto es, 
 manteniendo en los subconjuntos de entrenamiento y ensayo una proporción similar a la original de los casos de \verb'Percibido'.
 Las evaluaciones sobre la calidad de los modelos de clasificación generados se realizarán sobre un subconjuntos de ensayo con el \(20 \%\) de los datos de la provincia de San Juan, el resto se utilizará para el entrenamiento.
-aplicando la función \lstinline[language = R]'CreateDataPartion' de la biblioteca \lstinline[language = R]'caret' en el comando
+aplicando la función \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'CreateDataPartion' de la biblioteca \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'caret' en el comando
 
 \begin{lstlisting}[breaklines=true, language=R]
 set.seed(123)
@@ -795,14 +797,14 @@ entrenamiento_SJ <- sismos_SJ_escalado[train_index]
 ensayo_SJ <- sismos_SJ_escalado[-train_index]
 \end{lstlisting}
 
-La función mencionada indicó los índices de los datos a incluir en el conjunto de entrenamiento, \lstinline[language = R]'entrenamiento_SJ'.
-Los datos restante se destina al conjunto de ensayo, \lstinline[language = R]'ensayo_SJ', este último con un número aún adecuado para su función de \num{5982} registros.
+La función mencionada indicó los índices de los datos a incluir en el conjunto de entrenamiento, \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'entrenamiento_SJ'.
+Los datos restante se destina al conjunto de ensayo, \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'ensayo_SJ', este último con un número aún adecuado para su función de \num{5982} registros.
 
 
 \subsection{Desequilibrio en clase de clasificación}\label{sec:balanceo}
 Para contrarrestar el desequilibrio en el conjunto de entrenamiento sobre la clase de clasificación se utilizará la técnica de sobremuestreo de la clase minoritaria que genera nuevos casos sintéticos de la clase minoritaria a partir de los existentes.
-Para esto se utiliza la función \lstinline[language = R]'ovun.sample' de la biblioteca \lstinline[language = R]'ROSE' que genera un conjunto de datos de entrenamiento con un número de casos de la clase minoritaria igual al de la clase mayoritaria.
-Se generó así un nuevo conjunto de datos de entrenamiento \lstinline[language = R]'entrenamiento_SJ_balanceado' con \num{23934} registros.
+Para esto se utiliza la función \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'ovun.sample' de la biblioteca \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'ROSE' que genera un conjunto de datos de entrenamiento con un número de casos de la clase minoritaria igual al de la clase mayoritaria.
+Se generó así un nuevo conjunto de datos de entrenamiento \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'entrenamiento_SJ_balanceado' con \num{23934} registros.
 
 
 
@@ -818,7 +820,7 @@ Independientemente del modelo de clasificación que se utilice, la evaluación d
 
 \paragraph{Matriz de confusión}
 La matriz de confusión es una tabla que muestra el número de verdaderos positivos, falsos positivos, verdaderos negativos y falsos negativos del modelo.
-A partir de esta matriz se pueden calcular como razones entre verdaderos y falso positivos y negativos la exactitud, precisión, sensibilidad, especificidad y el valor F1, entre otras métricas de desempeño.
+A partir de esta matriz se pueden calcular como razones entre verdaderos y falso positivos y negativos la exactitud, precisión, sensibilidad, especificidad y el valor F\textsubscript{1}, entre otras métricas de desempeño.
 
 
 \paragraph{Exactitud (accuracy)}
@@ -857,11 +859,11 @@ Se calcula como
 \end{equation}
 
 
-\paragraph{F1-score}
-El \emph{F1-score} es la media armónica de la precisión y la sensibilidad (recall).
+\paragraph{F\textsubscript{1}-score}
+El \emph{F\textsubscript{1}-score} es la media armónica de la precisión y la sensibilidad (recall).
 Se calcula como
 \begin{equation}
-	\text{F1-score} = 2 \times \frac{\text{Precisión} \times \text{Recall}}{\text{Precisión} + \text{Recall}}.
+	\mathrm{F_1-score} = 2 \times \frac{\text{Precisión} \times \text{Recall}}{\text{Precisión} + \text{Recall}}.
 \end{equation}
 
 
@@ -920,7 +922,7 @@ El primer modelo ensayado tiene todas las variables como predictores sin interac
 	\label{eq:regresion_logistica}
 \end{align}
 
-Este modelo se establece gracias a la función \lstinline[language = R]'glm2' (ver sección \ref{sec:logística}) con el comando
+Este modelo se establece gracias a la función \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'glm2' (ver sección \ref{sec:logística}) con el comando
 \begin{lstlisting}[language=R, breaklines=true]
 logit_model <- glm2::glm2(
   Percibido ~ Magnitud + `Proxy_amplitud` + `Proxy_energía` + Longitud + Latitud + Profundidad,
@@ -928,30 +930,30 @@ logit_model <- glm2::glm2(
   family = "binomial"
   )
 \end{lstlisting}
-donde la opción \lstinline[language = R]'family = "binomial"' indica que se ajustará un modelo de regresión logística de clasificación binaria sobre la variable \lstinline[language=R]|Percibido| que se muestra en función de las demás en el conjunto de dato indicado con \lstinline[language=R]|data| apuntando al conjunto de entrenamiento balanceado según se explicó en la sección \ref{sec:balanceo}.
-Los resultados del ajuste para los coeficientes los muestra una invocación de la función \lstinline[language = R]'summary' que muestra el cuadro \ref{tab:coeficientes}. 
+donde la opción \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'family = "binomial"' indica que se ajustará un modelo de regresión logística de clasificación binaria sobre la variable \lstinline[language=R]|Percibido| que se muestra en función de las demás en el conjunto de dato indicado con \lstinline[language=R]|data| apuntando al conjunto de entrenamiento balanceado según se explicó en la sección \ref{sec:balanceo}.
+Los resultados del ajuste para los coeficientes los muestra una invocación de la función \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'summary' que muestra el cuadro \ref{tab:coeficientes}. 
 
 \begin{table}[!ht]
  	\centering
- 	\begin{tabular}{lllcc}
+ 	\begin{tabular}{lcccc}
  		\toprule
- 		Variable & Coeficiente & Error estándar & \(z\) & \(Pr(>|z|)\) \\
+ 		Variable & \(\hat{\beta}\) & \(\sigma_{\hat{\beta}}\) & \(z\) & \(Pr(>|z|)\) \\
  		\midrule
- 		Intercepto & -2.232632 & 0.033904 & -65.851 & < 2e-16 \\
- 		Magnitud & 1.575057 & 0.020722 & 76.010 & < 2e-16 \\
- 		Proxy amplitud & 0.003223 & 0.008529 & 0.378 & 0.706 \\
- 		Proxy energía & -0.003303 & 0.008250 & -0.400 & 0.689 \\
- 		Longitud & 0.183377 & 0.021651 & 8.470 & < 2e-16 \\
- 		Latitud & -0.167088 & 0.021658 & -7.715 & 1.21e-14 \\
- 		Profundidad & -0.987883 & 0.017962 & -54.997 & < 2e-16 \\
+ 		Intercepto & \num{-2.232632} & \num{0.033904} & \num{-65.851} & <\num{2e-16} \\
+ 		Magnitud & \num{1.575057} & \num{0.020722} & \num{76.010} & <\num{2e-16} \\
+ 		Proxy amplitud & \num{0.003223} & \num{0.008529} & \num{0.378} & \num{0.706} \\
+ 		Proxy energía & \num{-0.003303} & \num{0.008250} & \num{-0.400} & \num{0.689} \\
+ 		Longitud & \num{0.183377} & \num{0.021651} & \num{8.470} & <\num{2e-16} \\
+ 		Latitud & \num{-0.167088} & \num{0.021658} & \num{-7.715} & \num{1.21e-14} \\
+ 		Profundidad & \num{-0.987883} & \num{0.017962} & \num{-54.997} & <\num{2e-16} \\
  		\bottomrule
  	\end{tabular}
- 	\caption{Coeficientes del modelo de regresión logística múltiple.}
+ 	\caption{Estimadores de los coeficientes, \(\hat{\beta}\), del modelo de regresión logística múltiple, y sus errores.}
  	\label{tab:coeficientes}
 \end{table}
 
-Excepto los coeficientes para \lstinline[language = R]'Proxy_amplitud' y  \lstinline[language = R]'Proxy_energía', todos son significativos ya que sus probabilidades de que no tengan esos valores y se cumpla la hipótesis nula \(Pr(>|z|)\) para el estadístico \(z = \beta / \sigma_\beta\), se indican como inferiores al umbral usual de \(0.05\).
-Para el modelo de predicción a utilizar se optaría por obviar \lstinline[language = R]'Proxy_amplitud' y  \lstinline[language = R]'Proxy_energía'.
+Excepto los coeficientes para \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'Proxy_amplitud' y  \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'Proxy_energía', todos son significativos ya que sus probabilidades de que no tengan esos valores y se cumpla la hipótesis nula \(Pr(>|z|)\) para el estadístico \(z = \hat{\beta} / \sigma_{\hat{\beta}}\), se indican como inferiores al umbral usual de \(0.05\).
+Para el modelo de predicción a utilizar se optaría por obviar \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'Proxy_amplitud' y  \lstinline[language=R,breaklines=true,basicstyle=\ttfamily]'Proxy_energía'.
 Antes de hacerlo y dejar definitivamente de lado las mismas se explorará si se puede mejorar el modelo con la inclusión de interacciones entre las variables.
 Estas debieran poder corregir sesgos introducidos al modelo por incluir entre sus variables aquellas supuestamente independientes pero que muestran correlación.
 
@@ -977,16 +979,16 @@ Las que superan un corte arbitrario de \num{0.03} se muestran en el cuadro \ref{
 
 \begin{table}[!ht]
 	\centering
-	\begin{tabular}{ll}
+	\begin{tabular}{lc}
 		\toprule
 		Variables & Covarianza\\
 		\midrule
-		Proxy\_energía - Proxy\_amplitud & 0.7432113838\\
-		Proxy\_amplitud - Magnitud & 0.3088276448\\
-		Profundidad - Longitud & 0.2930435805\\
-		Proxy\_energía - Magnitud & 0.1609778094\\
-		Magnitud - Longitud & 0.0427277428\\
-		Profundidad - Latitud & 0.0382461548\\
+		Proxy energía : Proxy amplitud & 0.7432113838\\
+		Proxy amplitud : Magnitud & 0.3088276448\\
+		Profundidad : Longitud & 0.2930435805\\
+		Proxy energía : Magnitud & 0.1609778094\\
+		Magnitud : Longitud & 0.0427277428\\
+		Profundidad : Latitud & 0.0382461548\\
 		\bottomrule
 	\end{tabular}
 	\caption{Covarianza entre pares de variables numéricas.}
@@ -1008,26 +1010,28 @@ Nuevamente los p-values indican que las variables derivadas de \verb'Magnitud' y
 
 \begin{table}
 	\centering
-	\begin{tabular}{lllcc}
-		\toprule
-		Variable & Coeficiente & Error estándar & \(z\) & \(Pr(>|z|)\) \\
-		\midrule
-		Intercepto & -2.265e+00 & 3.527e-02 & -64.221 & < 2e-16 \\
-		Magnitud & 1.598e+00 & 2.174e-02 & 73.503 & < 2e-16 \\
-		Proxy amplitud & 6.392e-04 & 1.203e-02 & 0.053 & 0.957625 \\
-		Proxy energía & -2.872e-03 & 1.188e-02 & -0.242 & 0.808996 \\
-		Longitud & 3.211e-01 & 3.213e-02 & 9.994 & < 2e-16 \\
-		Latitud & -1.291e-01 & 2.301e-02 & -5.612 & 2.00e-08 \\
-		Profundidad & -1.004e+00 & 1.923e-02 & -52.209 & < 2e-16 \\
-		Proxy amplitud:Proxy energía & -4.126e-04 & 1.023e-03 & -0.403 & 0.686825 \\
-		Magnitud:Proxy amplitud & 1.327e-03 & 5.903e-03 & 0.225 & 0.822178 \\
-		Longitud:Profundidad & 6.306e-02 & 1.636e-02 & 3.855 & 0.000116 \\
-		Magnitud:Proxy energía & -1.257e-05 & 6.013e-03 & -0.002 & 0.998332 \\
-		Magnitud:Longitud & -1.135e-01 & 1.924e-02 & -5.899 & 3.66e-09 \\
-		Latitud:Profundidad & 7.633e-02 & 1.326e-02 & 5.756 & 8.63e-09 \\
-		\bottomrule
-	\end{tabular}
-	\caption{Coeficientes del modelo de regresión logística múltiple incorporando la interacción entre variables.}
+	\resizebox{\textwidth}{!}{
+		\begin{tabular}{lcccc}
+			\toprule
+ 			Variable & \(\hat{\beta}\) & \(\sigma_{\hat{\beta}}\) & \(z\) & \(Pr(>|z|)\) \\
+			\midrule
+			Intercepto & \num{-2.265e+00} & \num{3.527e-02} & \num{-64.221} & <\num{2e-16} \\
+			Magnitud & \num{1.598e+00} & \num{2.174e-02} & \num{73.503} & <\num{2e-16} \\
+			Proxy amplitud & \num{6.392e-04} & \num{1.203e-02} & \num{0.053} & \num{0.957625} \\
+			Proxy energía & \num{-2.872e-03} & \num{1.188e-02} & \num{-0.242} & \num{0.808996} \\
+			Longitud & \num{3.211e-01} & \num{3.213e-02} & \num{9.994} & <\num{2e-16} \\
+			Latitud & \num{-1.291e-01} & \num{2.301e-02} & \num{-5.612} & \num{2.00e-08} \\
+			Profundidad & \num{-1.004e+00} & \num{1.923e-02} & \num{-52.209} & <\num{2e-16} \\
+			Proxy amplitud : Proxy energía & \num{-4.126e-04} & \num{1.023e-03} & \num{-0.403} & \num{0.686825} \\
+			Magnitud : Proxy amplitud & \num{1.327e-03} & \num{5.903e-03} & \num{0.225} & \num{0.822178} \\
+			Longitud:Profundidad & \num{6.306e-02} & \num{1.636e-02} & \num{3.855} & \num{0.000116} \\
+			Magnitud : Proxy energía & \num{-1.257e-05} & \num{6.013e-03} & \num{-0.002} & \num{0.998332} \\
+			Magnitud : Longitud & \num{-1.135e-01} & \num{1.924e-02} & \num{-5.899} & \num{3.66e-09} \\
+			Latitud : Profundidad & \num{7.633e-02} & \num{1.326e-02} & \num{5.756} & \num{8.63e-09} \\
+			\bottomrule
+		\end{tabular}
+	}
+ 	\caption{Estimadores de los coeficientes, \(\hat{\beta}\), del modelo de regresión logística múltiple incorporando la interacción entre variables, y sus errores.}
 	\label{tab:coeficientes_interaccion}
 \end{table}
 
@@ -1076,14 +1080,14 @@ Y el cuarto es el de esta misma sección pero sin las variables derivadas de \ve
 A los fines de comparar el pseudo R cuadrado para cada modelo se los resume en el cuadro \ref{tab:pseudo_r2}.
 \begin{table}[!ht]
 	\centering
-	\begin{tabular}{ll}
+	\begin{tabular}{lc}
 		\toprule
 		Modelo & Pseudo R cuadrado\\
 		\midrule
-		Sin interacción & 0.5930901\\
-		Sin interacción, sin derivadas &  0.5928425\\
-		Con interacción &  0.5938916\\
-		Con interacción, sin derivadas & 0.5935757\\
+		Sin interacción & \num{0.5930901}\\
+		Sin interacción, sin derivadas & \num{0.5928425}\\
+		Con interacción & \num{0.5938916}\\
+		Con interacción, sin derivadas & \num{0.5935757}\\
 		\bottomrule
 	\end{tabular}
 	\caption{Pseudo R cuadrado para los distintos modelos de regresión logística múltiple.}
@@ -1130,9 +1134,9 @@ Para este punto de corte de \num{0.6} los valores de las métricas se resumen en
 
 \begin{table}[!ht]
 	\centering
-	\begin{tabular}{lllll}
+	\begin{tabular}{ccccc}
 	\toprule
-	exactitud & sensibilidad & especificidad & precisión & \(F_1\) \\
+	Exactitud & Sensibilidad & Especificidad & Precisión & F\textsubscript{1} \\
 	\midrule
 	\num{0.9281177} & \num{0.8943089} & \num{0.9288274} & \num{0.2087287} & \num{0.3384615}\\
 	\bottomrule
@@ -1162,9 +1166,9 @@ El desempeño de predicción es marginalmente mejor en este modelo en términos 
 
 \begin{table}[!ht]
 	\centering
-	\begin{tabular}{lllll}
+	\begin{tabular}{ccccc}
 		\toprule
-		exactitud & sensibilidad & especificidad & precisión & \(F_1\) \\
+		Exactitud & Sensibilidad & Especificidad & Precisión & F\textsubscript{1} \\
 		\midrule
 		\num{0.9282849} & \num{0.8943089} & \num{0.9289981} & \num{0.2091255} & \num{0.3389831}\\
 		\bottomrule
@@ -1195,7 +1199,7 @@ bstSparse <- xgboost(
   )
 \end{lstlisting}
 donde se indica que se ajustará un modelo de clasificación binaria con la función de pérdida logística, con un máximo de 5 niveles en los árboles y 5 iteraciones.
-Estos parámetros fueron elegidos a través de sucesivas pruebas manuales un búsqueda de maximizar la métrica F1 (ver sección \ref{sec:métricas}) al contrastar la predicción, con un umbral de \num{0.5} contra el conjunto de ensayo \verb'ensayo_SJ' generado en la partición estratificada explicada en la sección \ref{sec:partición} con el comando
+Estos parámetros fueron elegidos a través de sucesivas pruebas manuales un búsqueda de maximizar la métrica F\textsubscript{1} (ver sección \ref{sec:métricas}) al contrastar la predicción, con un umbral de \num{0.5} contra el conjunto de ensayo \verb'ensayo_SJ' generado en la partición estratificada explicada en la sección \ref{sec:partición} con el comando
 \begin{lstlisting}[language=R, breaklines=true]
 ensayo_SJ_matrix <- as.matrix(ensayo_SJ[ ,..num_feat])
 prediction_xgboost <- predict(bstSparse, ensayo_SJ_matrix)
@@ -1205,14 +1209,14 @@ prediction_xgboost_binario <- ifelse(prediction_xgboost > umbral_p, 1, 0)
 Para este modelo con todas las variables, incluso los anteriormente deprecadas derivadas de la \verb'Magnitud', las métricas de evaluación de la predicción del modelo con el punto de corte en \(0.5\) que se resumen en el cuadro \ref{tab:xgboost_metrics}.
 \begin{table}[!ht]
 	\centering
-	\begin{tabular}{lllll}
+	\begin{tabular}{ccccc}
 	\toprule
-	exactitud & sensibilidad & especificidad & precisión & F1 \\
+	Exactitud & Sensibilidad & Especificidad & Precisión & F\textsubscript{1} \\
 	\midrule
 	\num{0.9804413} & \num{0.1138211} & \num{0.9986346} & \num{0.6363636} & \num{0.1931034} \\
 	\bottomrule
 	\end{tabular}
-	\caption{Métricas de evaluación para el mejor modelo de XGBoost hallado para todas las variables y punto de corte en \(0.5\).}
+	\caption{Métricas de evaluación para el mejor modelo de XGBoost hallado para todas las variables y punto de corte en \num{0.5}.}
 	\label{tab:xgboost_metrics}
 \end{table}
 
@@ -1226,9 +1230,9 @@ donde el número de niveles en los árboles se redujo a 3 y se mantuvo el resto 
 
 \begin{table}[!ht]
 	\centering
-	\begin{tabular}{lllll}
+	\begin{tabular}{ccccc}
 	\toprule
-	exactitud & sensibilidad & especificidad & precisión & \(F_1\) \\
+	Exactitud & Sensibilidad & Especificidad & Precisión & F\textsubscript{1} \\
 	\midrule
 	\num{0.9222668} & \num{0.8943089} & \num{0.9228537} & \num{0.1957295} & \num{0.3211679} \\
 	\bottomrule
@@ -1261,16 +1265,18 @@ Como resume el cuadro \ref{tab:metricas_modelos}, todos estos tienen la misma al
 
 \begin{table}[!ht]
 	\centering
-	\begin{tabular}{llllll}
-	\toprule
-	Modelo & exactitud & sensibilidad & especificidad & precisión & \(F_1\) \\
-	\midrule
-	LOrig & \num{0.9281177} & \num{0.8943089} & \num{0.9288274} & \num{0.2087287} & \num{0.3384615}\\
-	LDer & \num{0.9282849} & \num{0.8943089} & \num{0.9289981} & \num{0.2091255} & \num{0.3389831}\\
-	XOrig & \num{0.9222668} & \num{0.8943089} & \num{0.9228537} & \num{0.1957295} & \num{0.3211679} \\
-	XDer & \num{0.9804413} & \num{0.1138211} & \num{0.9986346} & \num{0.6363636} & \num{0.1931034} \\
-	\bottomrule
-	\end{tabular}
+	\resizebox{\textwidth}{!}{
+		\begin{tabular}{lccccc}
+		\toprule
+		Modelo & Exactitud & Sensibilidad & Especificidad & Precisión & F\textsubscript{1} \\
+		\midrule
+		LOrig & \num{0.9281177} & \num{0.8943089} & \num{0.9288274} & \num{0.2087287} & \num{0.3384615}\\
+		LDer & \num{0.9282849} & \num{0.8943089} & \num{0.9289981} & \num{0.2091255} & \num{0.3389831}\\
+		XOrig & \num{0.9222668} & \num{0.8943089} & \num{0.9228537} & \num{0.1957295} & \num{0.3211679} \\
+		XDer & \num{0.9804413} & \num{0.1138211} & \num{0.9986346} & \num{0.6363636} & \num{0.1931034} \\
+		\bottomrule
+		\end{tabular}
+	}
 	\caption{Métricas de predicción de los modelos seleccionados. Los modelos seleccionados fueron los de regresión logística múltiple contemplando interacciones entre pares de variables incluyendo las variables derivadas de la magnitud del terremoto (LDer) o sin estas (LOrig), y los de XGBoost, también con (XDer) o sin estas variables derivadas (XOrig).}
 	\label{tab:metricas_modelos}
 \end{table}
